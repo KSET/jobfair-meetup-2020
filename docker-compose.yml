@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  nuxt:
+    build:
+      context: .
+      dockerfile: .docker/node/Dockerfile
+    restart: always
+    volumes:
+      - .:/web
+    env_file:
+      - .env
+    depends_on:
+      - meetup-db
+    command:
+      "yarn start"
+
+
+  meetup-db:
+    image: postgres:11-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_DB: 'meetup'
+    volumes:
+      - /var/lib/postgresql/data

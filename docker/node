@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR="$(pwd)"
+DOCKER_NAME="nuxt"
+
+source "$DIR/.env"
+
+node_container() {
+    ARGS=()
+
+    if [ ! -t 0 ]; then
+        ARGS+=(-T)
+    fi
+
+    ARGS+=(--user "$(id -u)")
+
+    if ! docker/compose ps | grep "_${DOCKER_NAME}_" | grep "Up" &> /dev/null; then
+        ARGS+=(-p "$PORT:3000")
+        ARGS+=(-e "PORT=3000")
+    fi
+
+    docker/compose run --rm --no-deps "${ARGS[@]}" "$DOCKER_NAME" "$@"
+}
+
+node_container "$@"

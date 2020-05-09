@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -e
+
+DIR="$(pwd)"
+DOCKER_NAME="bruc-db"
+
+source "$DIR/.env"
+
+db_container() {
+    ARGS=()
+
+    if [ ! -t 0 ]; then
+        ARGS+=(-T)
+    fi
+
+    docker/compose up -d "$DOCKER_NAME"
+    docker/compose exec "$DOCKER_NAME" "${ARGS[@]}" "$@"
+}
+
+db_container "$@"

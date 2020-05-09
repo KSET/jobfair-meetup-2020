@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker/compose up -d meetup-db
+docker/node node node_modules/knex/bin/cli.js "$@"
