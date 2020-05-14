@@ -5,7 +5,7 @@ module.exports = {
     node: true,
   },
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: "babel-eslint",
   },
   extends: [
     "@nuxtjs",
@@ -15,7 +15,11 @@ module.exports = {
   rules: {
     "nuxt/no-cjs-in-config": "off",
     "space-before-function-paren": [
-      "error", "never",
+      "error", {
+        "anonymous": "never",
+        "named": "never",
+        "asyncArrow": "always",
+      },
     ],
     "vue/html-indent": [
       "error", 2,
