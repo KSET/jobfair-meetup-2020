@@ -5,14 +5,16 @@
   "author": "Josip Igrec",
   "private": true,
   "scripts": {
-    "dev": "nuxt",
+    "dev": "node --inspect node_modules/.bin/nuxt dev",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+    "lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
+    "stylelint": "stylelint --ignore-path .gitignore 'assets/**/*.{s?(a|c)ss,less,stylus}' '{components,layouts,pages}/**/*.vue'"
   },
   "lint-staged": {
-    "*.{js,vue}": "yarn lint"
+    "*.{js,vue}": "yarn lint",
+    "*.{css,vue}": "yarn stylelint"
   },
   "husky": {
     "hooks": {
@@ -23,19 +25,34 @@
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/pwa": "^3.0.0-0",
+    "@nuxtjs/router": "^1.5.0",
     "nuxt": "^2.0.0",
-    "nuxt-vue-material": "^1.2.0"
+    "vue": "^2.6.11",
+    "vue-router": "^3.1.6",
+    "vue-typer": "^1.2.0",
+    "vuex": "^3.3.0"
   },
   "devDependencies": {
-    "@nuxt/typescript-build": "^0.6.0",
-    "@nuxtjs/eslint-config-typescript": "^1.0.0",
+    "@nuxtjs/eslint-config": "^3.0.0",
     "@nuxtjs/eslint-module": "^1.0.0",
+    "@nuxtjs/stylelint-module": "^3.2.2",
+    "@nuxtjs/vuetify": "^1.11.2",
     "babel-eslint": "^10.0.1",
+    "cssesc": "^3.0.0",
     "eslint": "^6.1.0",
     "eslint-plugin-nuxt": ">=0.4.2",
     "husky": "^4.0.0",
     "lint-staged": "^10.0.0",
+    "loader-utils": "^2.0.0",
     "node-sass": "^4.14.1",
-    "sass-loader": "^8.0.2"
+    "normalize-path": "^3.0.0",
+    "nuxt-imagemin": "^1.0.0",
+    "nuxt-purgecss": "^1.0.0",
+    "nuxt-svg-loader": "^1.2.0",
+    "sass-loader": "^8.0.2",
+    "short-unique-id": "^3.0.0-rc1",
+    "stylelint": "^13.3.3",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-scss": "^3.17.2"
   }
 }

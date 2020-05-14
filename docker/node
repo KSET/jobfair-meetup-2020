@@ -18,6 +18,7 @@ node_container() {
 
     if ! docker/compose ps | grep "_${DOCKER_NAME}_" | grep "Up" &> /dev/null; then
         ARGS+=(-p "$PORT:3000")
+        ARGS+=(-p "9229:9229")
         ARGS+=(-e "PORT=3000")
     fi
 

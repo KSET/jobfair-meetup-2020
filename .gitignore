@@ -65,8 +65,11 @@ typings/
 # next.js build output
 .next
 
-# nuxt.js build output
+# nuxt.js temp build output
 .nuxt
+
+# nuxt.js prod build output
+.nuxt-prod
 
 # Nuxt generate
 dist
@@ -88,3 +91,5 @@ sw.*
 
 # Vim swap files
 *.swp
+
+docker-compose.override.yml

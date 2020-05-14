@@ -1,9 +1,75 @@
-@import "~vue-material/dist/theme/engine"; // Import the theme engine
+@import "./include/all";
+@import url("https://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800,400italic&display=swap");
 
-@include md-register-theme("default", (
-  primary: #ecb000,
-  accent: #ebeae8,
-  theme: dark,
-));
+html,
+body {
 
-@import "~vue-material/dist/theme/all"; // Apply the theme
+  .theme--dark {
+
+    &.v-application {
+      font-family: Raleway, Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: $fer-black;
+      background: $fer-gray;
+    }
+
+    &.v-navigation-drawer,
+    &.v-app-bar.v-toolbar.v-sheet,
+    &.theme--dark.v-footer {
+      color: $fer-white;
+      background-color: $fer-dark-blue;
+    }
+  }
+}
+
+.page {
+  $duration: .2s;
+
+  &-enter-active,
+  &-leave-active {
+    transition: opacity #{$duration} #{$transition-timing-function};
+  }
+
+  &-enter,
+  &-leave-active {
+    opacity: 0;
+  }
+}
+
+.fer-button {
+  @extend %fer-button;
+}
+
+.fer-button-transparent {
+  @extend %fer-button-transparent;
+}
+
+html > body > div {
+
+  .theme--dark.v-btn.v-btn--flat {
+    transition-property: color, background-color;
+    color: fer-active($fer-yellow);
+    border-radius: 2px;
+
+    &:hover {
+      color: fer-hover($fer-yellow);
+      background-color: transparentize($fer-yellow, .85);
+    }
+
+    &:active {
+      color: fer-active($fer-yellow);
+    }
+  }
+}
+
+.page-container {
+
+  & > .row > .col.col-12 {
+    max-width: $content-max-width;
+    margin: 0 auto;
+    padding: 0 2em;
+
+    @include media(sm) {
+      max-width: 91.5%;
+    }
+  }
+}

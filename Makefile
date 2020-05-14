@@ -1,6 +1,6 @@
 NODE_MODULES := ./node_modules
 
-.PHONY: up dev down install yarn-install build clean restart
+.PHONY: stop start up prod dev down restart reboot rebuild install yarn-install build clean build-containers
 
 stop:
 	docker/compose stop
@@ -8,17 +8,23 @@ stop:
 start:
 	docker/compose start
 
-up: build
+up:
 	docker/compose up -d
 
+prod: build reboot
+
 dev: $(NODE_MODULES)
-	docker/yarn dev
+	docker/yarn dev || exit 0
 	$(MAKE) down
 
 down:
 	docker/compose down
 
-restart: down up
+restart: stop start
+
+reboot: down up
+
+rebuild: build restart
 
 install: clean yarn-install
 

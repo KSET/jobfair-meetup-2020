@@ -4,8 +4,11 @@ module.exports = {
     browser: true,
     node: true,
   },
+  parserOptions: {
+    parser: 'babel-eslint'
+  },
   extends: [
-    "@nuxtjs/eslint-config-typescript",
+    "@nuxtjs",
     "plugin:nuxt/recommended",
   ],
   // add your custom rules here
@@ -44,7 +47,7 @@ module.exports = {
       },
     ],
     "comma-style": [ "error", "last" ],
-    "computed-property-spacing": [ "error", "always" ],
+    "computed-property-spacing": [ "error", "never" ],
     "dot-notation": "error",
     "eqeqeq": [ "error", "always" ],
     "guard-for-in": "error",
@@ -100,6 +103,7 @@ module.exports = {
     "semi": [ "error", "always" ],
     "space-before-blocks": [ "warn", "always" ],
     "space-infix-ops": "error",
+    "template-curly-spacing": [ "error", "always" ],
     "template-tag-spacing": [ "error", "never" ],
     "wrap-iife": [ "error", "inside" ],
     "yoda": [ "error", "always", { "exceptRange": true } ],

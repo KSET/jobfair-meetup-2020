@@ -1,0 +1,85 @@
+@import "variables";
+@import "functions";
+
+%fer-button-disabled {
+  $color: grayscale(fer-active($fer-yellow));
+  $background: lighten($color, 40%);
+
+  cursor: default !important;
+  color: $color !important;
+  border: none !important;
+  background-color: $background !important;
+
+  &:hover {
+    cursor: default;
+    color: $color;
+    border: none;
+    background-color: $background;
+  }
+
+  &:active {
+    cursor: default;
+    color: $color;
+    border: none;
+    background-color: $background;
+  }
+}
+
+%fer-button {
+  font-size: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  margin: 0 .6em;
+  padding: .5em 1.5em;
+  cursor: pointer;
+  transition-timing-function: $transition-timing-function;
+  transition-duration: .3s;
+  transition-property: color, border-color, background-color;
+  color: $fer-black !important;
+  border: none;
+  border-radius: 2px;
+  background-color: $fer-yellow;
+
+  &,
+  &:hover,
+  &:active {
+    text-decoration: none !important;
+  }
+
+  &:not(:disabled):not(.disabled) {
+
+    &:hover {
+      background-color: fer-hover($fer-yellow);
+    }
+
+    &:active {
+      background-color: fer-active($fer-yellow);
+    }
+  }
+
+  &:disabled,
+  &.disabled {
+    @extend %fer-button-disabled;
+  }
+}
+
+%fer-button-transparent {
+  @extend %fer-button;
+
+  color: $fer-yellow !important;
+  background-color: transparent;
+  border: 1px solid;
+
+  &:not(:disabled):not(.disabled) {
+
+    &:hover {
+      background-color: transparentize($fer-yellow, .85);
+    }
+
+    &:active {
+      background-color: transparentize($fer-yellow, .7);
+    }
+  }
+}
