@@ -1,8 +1,12 @@
-import { relative } from "path";
+import {
+  relative,
+} from "path";
 import ShortUniqueId from "short-unique-id";
 import normalizePath from "normalize-path";
 import cssesc from "cssesc";
-import { interpolateName } from "loader-utils";
+import {
+  interpolateName,
+} from "loader-utils";
 
 // eslint-disable-next-line no-control-regex
 const filenameReservedRegex = /[<>:"/\\|?*\x00-\x1F]/g;
@@ -25,8 +29,8 @@ export default {
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, minimal-ui" },
       { hid: "description", name: "description", content: process.env.npm_package_description || "" },
-      { hid: "theme-color", name: "theme-color", content: "#00003F" },
-      { hid: "background-color", name: "background-color", content: "#00003F" },
+      { hid: "theme-color", name: "theme-color", content: "#00003f" },
+      { hid: "background-color", name: "background-color", content: "#00003f" },
     ],
   },
   /*
@@ -41,7 +45,7 @@ export default {
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: "#ECB000" },
+  loading: { color: "#ecb000" },
   /*
    ** Global CSS
    */
@@ -100,9 +104,9 @@ export default {
 
       themes: {
         dark: {
-          primary: "#ECB000",
-          secondary: "#00003F",
-          accent: "#00003F",
+          primary: "#ecb000",
+          secondary: "#00003f",
+          accent: "#00003f",
         },
       },
     },

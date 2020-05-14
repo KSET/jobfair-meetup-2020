@@ -80,6 +80,11 @@ module.exports = {
     "no-self-compare": "error",
     "no-sequences": "error",
     "no-useless-constructor": "error",
+    "object-curly-newline": [
+      "error", {
+        "ImportDeclaration": "always",
+      },
+    ],
     "object-shorthand": [ "error", "always" ],
     "prefer-arrow-callback": "warn",
     "prefer-const": "warn",
