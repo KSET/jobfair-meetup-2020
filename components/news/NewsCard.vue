@@ -8,7 +8,7 @@
   >
     <v-img
       :src="news.image"
-      :lazy-src="news.imagePlaceholder"
+      :lazy-src="news.imageThumbnail"
       aspect-ratio="1.875"
     />
     <div :class="$style.newsCardDate">

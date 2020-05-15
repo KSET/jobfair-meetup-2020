@@ -50,7 +50,8 @@ const data =
               .replace(/-+/g, "-")
               .replace(/^-+|-+$/g, "")
           }-${ i }`,
-        image: `https://picsum.photos/id/${ i }/374/200`,
+        image: `https://picsum.photos/id/${ i + 20 }/1920/1080`,
+        imageThumbnail: `https://picsum.photos/id/${ i + 20 }/178/100`,
         date: new Date(Date.now() - (Math.random() * 3 * 24 * 60 * 60 * 1000) * (i - 1)),
       })
     ,
