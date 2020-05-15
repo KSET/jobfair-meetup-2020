@@ -1,14 +1,14 @@
 <template>
   <v-footer absolute app dark>
     <v-container :class="$style.container" fluid>
-      <v-row>
+      <v-row :class="$style.hideOnSmall">
         <v-col>
           <h1 :class="$style.organizatori">
             Organizatori
           </h1>
         </v-col>
       </v-row>
-      <v-row :class="$style.logoRow">
+      <v-row :class="[ $style.logoRow, $style.hideOnSmall ]">
         <v-col
           v-for="logo in logos"
           :key="logo.src"
@@ -27,7 +27,7 @@
           >
         </v-col>
       </v-row>
-      <v-row>
+      <v-row :class="$style.hideOnSmall">
         <v-divider :class="$style.spacer" />
       </v-row>
       <v-row :class="$style.bottomPart">
@@ -241,5 +241,13 @@
     &:last-child {
       margin-right: initial;
     }
+  }
+
+  @include media(md) {
+
+    .hideOnSmall {
+      display: none;
+    }
+
   }
 </style>
