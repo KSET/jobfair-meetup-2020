@@ -18,7 +18,7 @@
       {{ news.title }}
     </v-card-title>
     <v-card-text :class="$style.newsCardText">
-      {{ news.text }}
+      {{ news.description }}
     </v-card-text>
   </v-card>
 </template>
