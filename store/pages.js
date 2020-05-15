@@ -20,35 +20,10 @@ export const mutations = {
 
 export const actions = {
   async fetchPages({ commit }) {
-    const pages = [
-      {
-        name: "Blog",
-        to: { name: "Blog:Home" },
-      },
-      {
-        name: "O MeetUPu",
-        to: { name: "About" },
-      },
-      {
-        name: "Sudionici",
-        to: { name: "Sudionici" },
-      },
-      {
-        name: "Kontakt",
-        to: { name: "Kontakt" },
-      },
-      {
-        name: "Press",
-        to: { name: "Press" },
-      },
-      {
-        name: "Prijavi se",
-        href: "https://jobfair.fer.unizg.hr/",
-      },
-    ];
+    const { data } = await this.$api.$get("/pages/list");
 
-    await commit("SET_PAGES", pages);
+    await commit("SET_PAGES", data);
 
-    return pages;
+    return data;
   },
 };

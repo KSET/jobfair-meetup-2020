@@ -89,6 +89,10 @@ export default {
     [ "@nuxtjs/router", { keepDefaultRouter: true } ],
     "nuxt-svg-loader",
   ],
+
+  serverMiddleware: [
+    "~/api/index.js",
+  ],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options

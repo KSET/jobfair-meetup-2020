@@ -196,7 +196,7 @@
           >
             <v-card
               :class="$style.newsCard"
-              :to="{ name: 'Blog:Home' }"
+              :to="{ name: 'Blog:Post', params: { slug: newsItem.slug } }"
               light
               tile
             >
@@ -298,8 +298,60 @@
 </template>
 
 <script>
+  import {
+    mapActions,
+  } from "vuex";
+  import {
+    formatDate,
+  } from "~/helpers/date";
+
+  const storeActions = {
+    fetchNews: "news/fetchNews",
+    fetchParticipants: "companies/fetchParticipants",
+    fetchProjectFriends: "companies/fetchProjectFriends",
+  };
+
   export default {
     name: "Index",
+
+    async asyncData({ store }) {
+      const ensureArray =
+        (val) =>
+          Array.isArray(val)
+            ? val
+            : []
+      ;
+
+      const processNews =
+        (news) =>
+          news
+            .map(
+              ({ date, ...newsItem }) =>
+                ({
+                  ...newsItem,
+                  date: formatDate(date),
+                })
+              ,
+            )
+            .slice(0, 3)
+      ;
+
+      const [
+        news,
+        projectFriends,
+        participants,
+      ] = await Promise.all([
+        store.dispatch(storeActions.fetchNews).then(ensureArray).then(processNews),
+        store.dispatch(storeActions.fetchProjectFriends).then(ensureArray),
+        store.dispatch(storeActions.fetchParticipants).then(ensureArray),
+      ]);
+
+      return {
+        news,
+        projectFriends,
+        participants,
+      };
+    },
 
     computed: {
       titleTexts() {
@@ -333,65 +385,10 @@
           },
         ];
       },
+    },
 
-      news() {
-        const dateFormatter = Intl.DateTimeFormat(undefined, {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-        });
-
-        return [
-          {
-            id: 1,
-            title: "Ostajemo doma: Otkazan ovogodišnji Job Fair",
-            date: new Date(Date.now() - Math.random() * 10000),
-            text: "S obzirom na neizvjesnost razvoja situacije s virusom COVID-19 te sukladno smjernicama Nacionalnog stožera civilne zaštite i Vlade Republike Hrvatske.",
-            image: require("@/assets/images/placeholder/1.png"),
-          },
-          {
-            id: 2,
-            title: "Budi IN na LinkedInu za 15. Job Fair!",
-            date: new Date(Date.now() - Math.random() * 10000),
-            text: "Dok marljivo pripremaš svoj životopis za bazu životopisa koja je odnedavno otvorena, želimo ti približiti još jedan način kako se dodatno možeš  istaknuti na 15. Job Fairu.",
-            image: require("@/assets/images/placeholder/2.png"),
-          },
-          {
-            id: 3,
-            title: "Time to shine - baza životopisa za 15. Job Fair službeno je otvorena!",
-            date: new Date(Date.now() - Math.random() * 10000),
-            text: "Pripremi se - lov na karijere uskoro počinje! Ovogodišnji Job Fair, koji će se održati 13. i 14. svibnja na  Fakultetu elektrotehnike i računarstva donosi mnogo poslovnih prilika!",
-            image: require("@/assets/images/placeholder/3.png"),
-          },
-        ].map(
-          ({ date, ...rest }) =>
-            ({
-              ...rest,
-              date: dateFormatter.format(date),
-            })
-          ,
-        );
-      },
-
-      participants() {
-        const image = require("@/assets/images/404.svg?inline");
-
-        return Array(5 * 8).fill(0).map((_, i) => ({
-          id: i + 1,
-          image,
-          description: `Sudionik ${ i + 1 }`,
-        }));
-      },
-
-      projectFriends() {
-        const image = require("@/assets/images/404.svg?inline");
-
-        return Array(5 * 2).fill(0).map((_, i) => ({
-          id: i + 1,
-          image,
-          description: `Sudionik ${ i + 1 }`,
-        }));
-      },
+    methods: {
+      ...mapActions(storeActions),
     },
   };
 </script>
