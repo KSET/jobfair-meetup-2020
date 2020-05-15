@@ -30,7 +30,7 @@
                 <div :class="$style.headNewsContent">
                   <v-card-subtitle :class="$style.headNewsDate" v-text="headNews.date" />
                   <v-card-title :class="$style.headNewsTitle" v-text="headNews.title" />
-                  <v-card-text :class="$style.headNewsText" v-text="headNews.text" />
+                  <v-card-text :class="$style.headNewsText" v-text="headNews.description" />
                 </div>
               </div>
             </v-card>
