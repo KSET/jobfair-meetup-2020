@@ -363,6 +363,16 @@
 
   .pageContainer {
 
+    & > :global(.row) > :global(.col.col-12) {
+      max-width: $content-max-width;
+      margin: 0 auto;
+      padding: 0 2em;
+
+      @include media(sm) {
+        max-width: 91.5%;
+      }
+    }
+
     .heroContainer {
       $min-height: 1565px;
 
