@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app dark elevate-on-scroll>
     <v-toolbar-title>
-      <nuxt-link :class="$style.logoLink" :to="{ name: 'Index' }">
+      <nuxt-link v-ripple :class="$style.logoLink" :to="{ name: 'Index' }">
         <jobfair-meetup-logo />
       </nuxt-link>
     </v-toolbar-title>
@@ -15,14 +15,14 @@
         v-for="page in pages"
         :key="page.href || JSON.stringify(page.to)"
 
+        v-ripple
+
         :class="[page.variant || $style.navLink]"
 
         :href="page.href"
         :rel="page.href ? 'noopener noreferrer' : ''"
         :target="page.href ? '_blank' : ''"
         :to="page.to"
-
-        :v-ripple="Boolean(page.href)"
 
         large
         nuxt
@@ -99,6 +99,8 @@
 
   .logoLink {
     display: flex;
+    padding: .3em;
+    border-radius: 4px;
   }
 
   .navBurgerButton {
@@ -132,6 +134,8 @@
       color: $fer-white;
       border-top: #{$border-size} solid transparent;
       border-bottom: #{$border-size} solid transparent;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
       will-change: color, border-bottom-color;
 
       &:global(.nuxt-link-active) {
@@ -145,6 +149,10 @@
 
       &:hover {
         color: fer-hover($fer-yellow);
+      }
+
+      &:active {
+        border-bottom-color: transparentize($fer-yellow, .75);
       }
 
       .navLinkText {
