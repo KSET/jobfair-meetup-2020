@@ -37,7 +37,7 @@
           </v-col>
         </v-row>
 
-        <v-row>
+        <v-row :class="$style.restNews">
           <v-col
             v-for="news in restNews"
             :key="news.id"
@@ -45,6 +45,7 @@
             :md="4"
           >
             <app-news-card
+              :class="$style.restNewsCard"
               :elevation="0"
               :news-item="news"
             />
@@ -140,6 +141,13 @@
           opacity: .7;
           color: $fer-black;
         }
+      }
+    }
+
+    .restNews {
+
+      .restNewsCard {
+        height: 100%;
       }
     }
   }
