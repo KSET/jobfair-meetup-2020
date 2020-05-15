@@ -6,5 +6,5 @@ export const formatDate = (dateStr) => {
   const month = zeroPad(date.getMonth() + 1);
   const day = zeroPad(date.getDate());
 
-  return `${ day }.${ month }.${ year }`;
+  return `${ day }.${ month }.${ year }.`;
 };

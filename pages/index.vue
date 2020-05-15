@@ -194,26 +194,10 @@
             cols="12"
             md="4"
           >
-            <v-card
-              :class="$style.newsCard"
-              :to="{ name: 'Blog:Post', params: { slug: newsItem.slug } }"
-              light
-              tile
-            >
-              <v-img
-                :src="newsItem.image"
-                aspect-ratio="1.875"
-              />
-              <div :class="$style.newsCardDate">
-                {{ newsItem.date }}
-              </div>
-              <v-card-title :class="$style.newsCardTitle">
-                {{ newsItem.title }}
-              </v-card-title>
-              <v-card-text :class="$style.newsCardText">
-                {{ newsItem.text }}
-              </v-card-text>
-            </v-card>
+            <app-news-card
+              :news-item="newsItem"
+              :class="$style.newsItem"
+            />
           </v-col>
         </v-row>
 
@@ -301,9 +285,11 @@
   import {
     mapActions,
   } from "vuex";
+  import AppNewsCard from "~/components/news/NewsCard";
   import {
-    formatDate,
-  } from "~/helpers/date";
+    ensureArray,
+    limitLength,
+  } from "~/helpers/data";
 
   const storeActions = {
     fetchNews: "news/fetchNews",
@@ -313,35 +299,14 @@
 
   export default {
     name: "Index",
-
+    components: { AppNewsCard },
     async asyncData({ store }) {
-      const ensureArray =
-        (val) =>
-          Array.isArray(val)
-            ? val
-            : []
-      ;
-
-      const processNews =
-        (news) =>
-          news
-            .map(
-              ({ date, ...newsItem }) =>
-                ({
-                  ...newsItem,
-                  date: formatDate(date),
-                })
-              ,
-            )
-            .slice(0, 3)
-      ;
-
       const [
         news,
         projectFriends,
         participants,
       ] = await Promise.all([
-        store.dispatch(storeActions.fetchNews).then(ensureArray).then(processNews),
+        store.dispatch(storeActions.fetchNews).then(ensureArray).then(limitLength(3)),
         store.dispatch(storeActions.fetchProjectFriends).then(ensureArray),
         store.dispatch(storeActions.fetchParticipants).then(ensureArray),
       ]);
@@ -615,39 +580,10 @@
         color: $fer-yellow;
       }
 
-      .newsCard {
+      .newsItem {
         max-width: 95%;
         height: 100%;
         margin: 0 auto;
-
-        .newsCardDate {
-          font-size: 87.5%;
-          padding: 1rem 1rem 0;
-          opacity: .5;
-        }
-
-        .newsCardTitle {
-          font-size: 125%;
-          font-weight: bold;
-          padding: .3em 1rem;
-          transition-timing-function: $transition-timing-function;
-          transition-duration: 150ms;
-          transition-property: opacity;
-          word-break: break-word;
-          color: $fer-dark-blue;
-          will-change: opacity;
-        }
-
-        .newsCardText {
-          font-size: 100%;
-        }
-
-        &:hover {
-
-          .newsCardTitle {
-            opacity: .7;
-          }
-        }
       }
 
       .newsLearnMoreContainer {
