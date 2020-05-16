@@ -35,14 +35,6 @@ body {
   }
 }
 
-.fer-button {
-  @extend %fer-button;
-}
-
-.fer-button-transparent {
-  @extend %fer-button-transparent;
-}
-
 html > body > div {
 
   .theme--dark.v-btn.v-btn--flat {
