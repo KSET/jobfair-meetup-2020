@@ -6,6 +6,6 @@
 
 <script>
   export default {
-    name: "Sudionici",
+    name: "PageSudionici",
   };
 </script>

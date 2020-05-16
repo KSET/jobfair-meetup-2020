@@ -13,7 +13,7 @@
         <v-row>
           <v-col>
             <v-card
-              :to="{ name: 'Blog:Post', params: { slug: headNews.slug } }"
+              :to="{ name: 'PageBlogPost', params: { slug: headNews.slug } }"
 
               elevation="0"
               light
@@ -67,8 +67,10 @@
   } from "~/helpers/news";
 
   export default {
-    name: "Blog:Home",
+    name: "PageBlogHome",
+
     components: { AppMaxWidthContainer, AppNewsCard },
+
     async asyncData({ store }) {
       const news = await store.dispatch("news/fetchNews").then(ensureArray);
 

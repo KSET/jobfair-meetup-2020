@@ -205,7 +205,7 @@
           <v-col cols="12">
             <v-btn
               :class="$style.rightButton"
-              :to="{ name: 'Blog:Home' }"
+              :to="{ name: 'PageBlogHome' }"
               color="primary"
               outlined
               x-large

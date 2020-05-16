@@ -1,7 +1,7 @@
 <template>
   <v-card
     :class="$style.newsCard"
-    :to="{ name: 'Blog:Post', params: { slug: news.slug } }"
+    :to="{ name: 'PageBlogPost', params: { slug: news.slug } }"
     light
     tile
     v-bind="$attrs"

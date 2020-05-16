@@ -8,7 +8,7 @@
   } from "vuex";
 
   export default {
-    name: "Blog:Post",
+    name: "PageBlogPost",
 
     computed: {
       ...mapGetters({

@@ -11,23 +11,23 @@ router.get("/list", apiRoute(() => {
   return [
     {
       name: "Blog",
-      to: { name: "Blog:Home" },
+      to: { name: "PageBlogHome" },
     },
     {
       name: "O MeetUPu",
-      to: { name: "About" },
+      to: { name: "PageAbout" },
     },
     {
       name: "Sudionici",
-      to: { name: "Sudionici" },
+      to: { name: "PageSudionici" },
     },
     {
       name: "Kontakt",
-      to: { name: "Kontakt" },
+      to: { name: "PageKontakt" },
     },
     {
       name: "Press",
-      to: { name: "Press" },
+      to: { name: "PagePress" },
     },
     {
       name: "Prijavi se",

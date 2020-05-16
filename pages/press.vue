@@ -6,6 +6,6 @@
 
 <script>
   export default {
-    name: "Press",
+    name: "PagePress",
   };
 </script>

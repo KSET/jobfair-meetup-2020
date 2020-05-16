@@ -6,6 +6,6 @@
 
 <script>
   export default {
-    name: "Kontakt",
+    name: "PageKontakt",
   };
 </script>
