@@ -45,7 +45,7 @@ export class ApiError extends Error {
 
   constructor(message, statusCode, additionalData = null) {
     super(message);
-    this.statusCode = status;
+    this.statusCode = statusCode;
     this.additionalData = additionalData;
   }
 }
@@ -70,12 +70,10 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
       res.status(e.statusCode);
     }
 
-    res.json(error({
+    return res.json(error({
       status: res.statusCode,
       reason: e.message,
       additionalData: e.additionalData,
     }));
-
-    return next(e);
   }
 });
