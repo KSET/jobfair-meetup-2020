@@ -8,7 +8,7 @@ import {
   apiRoute,
   ApiError,
   registerRoutesInFolder,
-} from "./helpers";
+} from "./helpers/route";
 
 const app = express();
 const routes = registerRoutesInFolder(joinPath(__dirname, "routes"));

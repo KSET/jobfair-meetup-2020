@@ -3,7 +3,7 @@ import {
 } from "express";
 import {
   apiRoute,
-} from "../helpers";
+} from "../helpers/route";
 
 const router = Router();
 
