@@ -24,7 +24,7 @@ router.post("/", apiRoute(async (req) => {
 
   try {
     const { data = {} } = await post(
-      "https://jobfair.fer.unizg.hr/api/v2/graphql",
+      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
       loginMutation({ email, password }),
     );
 
@@ -39,7 +39,7 @@ router.post("/refresh", apiRoute(async (req) => {
 
   try {
     const { data = {} } = await post(
-      "https://jobfair.fer.unizg.hr/api/v2/graphql",
+      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
       refreshTokenMutation({ token, refreshToken }),
     );
 

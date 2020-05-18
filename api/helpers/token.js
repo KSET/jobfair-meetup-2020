@@ -40,7 +40,7 @@ export const fetchAuthenticatedUser = async (reqOrToken) => {
 
   try {
     const { data } = await post(
-      "https://jobfair.fer.unizg.hr/api/v2/graphql",
+      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
       currentUserQuery(),
       {
         headers: {
