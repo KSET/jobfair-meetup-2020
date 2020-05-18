@@ -138,6 +138,10 @@
       border-top-right-radius: 4px;
       will-change: color, border-bottom-color;
 
+      &:active {
+        border-bottom-color: transparentize($fer-yellow, .75);
+      }
+
       &:global(.nuxt-link-active) {
         color: fer-hover($fer-yellow);
         border-bottom-color: fer-hover($fer-yellow);
@@ -149,10 +153,6 @@
 
       &:hover {
         color: fer-hover($fer-yellow);
-      }
-
-      &:active {
-        border-bottom-color: transparentize($fer-yellow, .75);
       }
 
       .navLinkText {
