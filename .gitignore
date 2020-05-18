@@ -93,3 +93,5 @@ sw.*
 *.swp
 
 docker-compose.override.yml
+
+uploads/
