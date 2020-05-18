@@ -156,9 +156,7 @@ export const actions = {
     if (token && refreshToken) {
       const userData = await dispatch("fetchCurrentUser");
       if (!userData) {
-        console.log("|> REFRESHING TOKEN...");
-        const resp = await dispatch("doRefreshToken");
-        console.log("|> REFRESH DATA", resp);
+        await dispatch("doRefreshToken");
       }
     }
   },
