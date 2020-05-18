@@ -7,8 +7,8 @@
     v-bind="$attrs"
   >
     <v-img
-      :src="news.image"
       :lazy-src="news.imageThumbnail"
+      :src="news.image"
       aspect-ratio="1.875"
     />
     <div :class="$style.newsCardDate">
@@ -52,6 +52,7 @@
   @import "../../assets/styles/include/all";
 
   .newsCard {
+    height: 100%;
 
     .newsCardDate {
       font-size: 87.5%;
