@@ -88,6 +88,7 @@ export default {
     "@nuxtjs/dotenv",
     [ "@nuxtjs/router", { keepDefaultRouter: true } ],
     "nuxt-svg-loader",
+    [ "cookie-universal-nuxt", { parseJSON: false } ],
   ],
 
   serverMiddleware: [
@@ -104,10 +105,10 @@ export default {
   vuetify: {
     defaultAssets: false,
     theme: {
-      dark: true,
+      light: true,
 
       themes: {
-        dark: {
+        light: {
           primary: "#ecb000",
           secondary: "#00003f",
           accent: "#00003f",

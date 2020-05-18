@@ -4,7 +4,7 @@
 
     <app-nav-drawer />
 
-    <v-content>
+    <v-content :class="$style.contentContainer">
       <v-container :class="$style.container" fluid>
         <nuxt :class="$style.pageContainer" />
       </v-container>
@@ -23,6 +23,7 @@
   } from "~/helpers/head";
 
   export default {
+    name: "LayoutDefault",
 
     components: {
       AppNavBar,
@@ -44,7 +45,15 @@
 <style lang="scss" module>
   @import "../assets/styles/include/all";
 
+  .contentContainer {
+
+    > :global(.v-content__wrap) {
+      display: flex;
+    }
+  }
+
   .container {
+    display: flex;
     padding: 0;
   }
 

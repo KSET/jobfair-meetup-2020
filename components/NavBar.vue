@@ -28,8 +28,85 @@
         nuxt
         outlined
       >
-        <span :class="$style.navLinkText">{{ page.name }}</span>
+        <span :class="$style.navLinkText" v-text="page.name" />
       </nuxt-link>
+
+      <v-menu
+        v-if="user"
+        v-model="userOpen"
+        :close-on-content-click="false"
+        offset-y
+        transition="scroll-y-transition"
+      >
+        <template #activator="{ on }">
+          <a
+            :class="$style.navLink"
+            v-on="on"
+          >
+            <span :class="$style.navLinkText" v-text="user.name" />
+          </a>
+        </template>
+
+        <v-card>
+          <v-list>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title v-text="user.name" />
+                <v-list-item-subtitle v-text="user.email" />
+              </v-list-item-content>
+            </v-list-item>
+
+            <v-divider inset />
+
+            <v-list-item
+              v-for="company in user.companies"
+              :key="company.id"
+            >
+              <v-list-item-avatar :data-srcset="getSrcSet(company.logo)">
+                <v-img
+                  :lazy-src="company.logo.small.url"
+                  :src="company.logo.original.url"
+                  :srcset="getSrcSet(company.logo)"
+                  fill
+                />
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title v-text="company.brand_name" />
+                <v-list-item-subtitle v-text="company.short_description.substr(0, 50) + '...'" />
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+
+          <v-divider />
+
+          <!--          <v-list>-->
+          <!--            <v-list-item>-->
+          <!--              <v-list-item-action>-->
+          <!--                <v-switch v-model="message" color="purple" />-->
+          <!--              </v-list-item-action>-->
+          <!--              <v-list-item-title>Enable messages</v-list-item-title>-->
+          <!--            </v-list-item>-->
+
+          <!--            <v-list-item>-->
+          <!--              <v-list-item-action>-->
+          <!--                <v-switch v-model="hints" color="purple" />-->
+          <!--              </v-list-item-action>-->
+          <!--              <v-list-item-title>Enable hints</v-list-item-title>-->
+          <!--            </v-list-item>-->
+          <!--          </v-list>-->
+
+          <v-card-actions>
+            <v-spacer />
+
+            <v-btn text @click="userOpen = false">
+              Cancel
+            </v-btn>
+            <v-btn color="error" text @click="userOpen = logout()">
+              Logout
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-menu>
     </div>
 
     <v-btn :class="$style.navBurgerButton" icon @click.stop="toggleOpen">
@@ -40,6 +117,7 @@
 
 <script>
   import {
+    mapActions,
     mapGetters,
     mapMutations,
   } from "vuex";
@@ -54,9 +132,14 @@
       JobfairMeetupLogo,
     },
 
+    data: () => ({
+      userOpen: false,
+    }),
+
     computed: {
       ...mapGetters({
         rawPages: "pages/getPages",
+        user: "user/getUser",
       }),
 
       HeaderLinkVariants() {
@@ -88,6 +171,29 @@
       ...mapMutations({
         toggleOpen: "nav-drawer/TOGGLE_OPEN",
       }),
+
+      ...mapActions({
+        doLogout: "user/doLogout",
+      }),
+
+      async logout() {
+        await this.doLogout();
+
+        await this.$router.push({ name: "Index" });
+      },
+
+      getSrcSet(imageList) {
+        return (
+          Object
+            .values(imageList)
+            .map(
+              ({ width, url }) =>
+                `${ url } ${ width }w`
+              ,
+            )
+            .join(",")
+        );
+      },
     },
   };
 </script>
