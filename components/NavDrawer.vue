@@ -1,5 +1,12 @@
 <template>
-  <v-navigation-drawer :value="isOpen" app right temporary @input="setOpen">
+  <v-navigation-drawer
+    :value="isOpen"
+    app
+    right
+    temporary
+    dark
+    @input="setOpen"
+  >
     <v-list :class="$style.listNav" flat nav>
       <v-subheader>
         <nuxt-link :class="$style.logoLink" :to="{ name: 'Index' }">
