@@ -5,6 +5,7 @@ import {
 import express from "express";
 import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 import {
   apiRoute,
@@ -28,6 +29,7 @@ const fileUploadMiddleware = fileUpload({
 const app = express();
 const routes = registerRoutesInFolder(joinPath(__dirname, "routes"));
 
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(fileUploadMiddleware);
