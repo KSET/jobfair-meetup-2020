@@ -11,12 +11,13 @@ import {
 import {
   currentUserQuery,
 } from "../../graphql/queries";
+import {
+  requireAuth,
+} from "../../helpers/middleware";
 
 const router = Router();
 
-router.get("/", apiRoute(async (req) => {
-  const auth = req.get("Authorization");
-
+router.get("/", requireAuth, apiRoute(async (req) => {
   try {
     const { data } = await post(
       "https://jobfair.fer.unizg.hr/api/v2/graphql",
@@ -24,7 +25,7 @@ router.get("/", apiRoute(async (req) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: auth,
+          Authorization: req.authHeader,
         },
       },
     );

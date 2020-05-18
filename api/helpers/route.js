@@ -71,9 +71,9 @@ export const asyncWrapper = (fn) => (...args) => {
 };
 
 
-export const apiRoute = (fn) => asyncWrapper(async (req, res) => {
+export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
   try {
-    const result = await fn(req, res);
+    const result = await fn(req, res, next);
 
     return res.json(success(result));
   } catch (e) {
