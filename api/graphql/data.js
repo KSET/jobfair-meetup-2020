@@ -57,6 +57,15 @@ export const companyData = {
   industry,
 };
 
+export const basicUserData = {
+  ...basicFields(
+    "id",
+    "email",
+    "name",
+    "role",
+  ),
+};
+
 export const userData = {
   ...basicFields(
     "id",

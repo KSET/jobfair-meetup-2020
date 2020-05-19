@@ -1,4 +1,5 @@
 import {
+  basicUserQuery,
   currentUserQuery,
 } from "../graphql/queries";
 import {
@@ -31,7 +32,7 @@ export const extractAuthorizationToken = (req) => {
   }
 };
 
-export const fetchAuthenticatedUser = async (reqOrToken) => {
+export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
   const auth =
     "string" === typeof reqOrToken
     ? reqOrToken
@@ -40,7 +41,7 @@ export const fetchAuthenticatedUser = async (reqOrToken) => {
 
   try {
     const data = await graphQlQuery(
-      currentUserQuery(),
+      fullUser ? currentUserQuery() : basicUserQuery(),
       auth,
     );
 
