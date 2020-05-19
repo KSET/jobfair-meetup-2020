@@ -29,7 +29,7 @@ const extensionMap = {
 
 const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
 
-router.use(requireAuth);
+router.use(requireAuth());
 
 router.post("/", async (req, res) => {
   const { file } = req.files;
