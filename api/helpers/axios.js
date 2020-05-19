@@ -34,7 +34,7 @@ export async function get(url, config = {}) {
  * @param {string} url
  * @param {any} data
  * @param {AxiosRequestConfig} config
- * @returns {Promise<void>}
+ * @returns {Promise<any>}
  */
 export async function post(url, data = undefined, config = {}) {
   return await request({
@@ -46,4 +46,38 @@ export async function post(url, data = undefined, config = {}) {
     },
     ...config,
   });
+}
+
+/**
+ * @param {string} query
+ * @param {string} [operationName]
+ * @param {object} [variables]
+ * @param {string} [token]
+ * @returns {Promise<object>}
+ */
+export async function graphQlQuery({ query, operationName, variables }, token = null) {
+  const config =
+    token
+    ? {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      }
+    : {}
+  ;
+
+  return (
+    await post(
+      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
+      { operationName, query, variables },
+      config,
+    )
+      .then(({ data }) => data || {})
+      .catch((e) => {
+        console.log("|> GRAPHQL ERROR", e);
+
+        return {};
+      })
+  );
 }

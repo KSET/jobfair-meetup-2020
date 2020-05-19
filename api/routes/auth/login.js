@@ -6,7 +6,7 @@ import {
   apiRoute,
 } from "../../helpers/route";
 import {
-  post,
+  graphQlQuery,
 } from "../../helpers/axios";
 import {
   loginMutation,
@@ -23,10 +23,7 @@ router.post("/", apiRoute(async (req) => {
   }
 
   try {
-    const { data = {} } = await post(
-      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
-      loginMutation({ email, password }),
-    );
+    const data = await graphQlQuery(loginMutation({ email, password }));
 
     return data.login || null;
   } catch (e) {
@@ -38,10 +35,7 @@ router.post("/refresh", apiRoute(async (req) => {
   const { token, refreshToken } = req.body;
 
   try {
-    const { data = {} } = await post(
-      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
-      refreshTokenMutation({ token, refreshToken }),
-    );
+    const data = await graphQlQuery(refreshTokenMutation({ token, refreshToken }));
 
     return data.refresh_token || null;
   } catch (e) {

@@ -2,7 +2,7 @@ import {
   currentUserQuery,
 } from "../graphql/queries";
 import {
-  post,
+  graphQlQuery,
 } from "./axios";
 
 export const extractAuthorizationToken = (req) => {
@@ -39,15 +39,9 @@ export const fetchAuthenticatedUser = async (reqOrToken) => {
   ;
 
   try {
-    const { data } = await post(
-      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
+    const data = await graphQlQuery(
       currentUserQuery(),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: auth,
-        },
-      },
+      auth,
     );
 
     return data.current_user;

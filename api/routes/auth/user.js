@@ -6,7 +6,7 @@ import {
   apiRoute,
 } from "../../helpers/route";
 import {
-  post,
+  graphQlQuery,
 } from "../../helpers/axios";
 import {
   currentUserQuery,
@@ -19,16 +19,7 @@ const router = Router();
 
 router.get("/", requireAuth, apiRoute(async (req) => {
   try {
-    const { data } = await post(
-      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
-      currentUserQuery(),
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: req.authHeader,
-        },
-      },
-    );
+    const data = await graphQlQuery(currentUserQuery(), req.authHeader);
 
     return data.current_user;
   } catch (e) {
