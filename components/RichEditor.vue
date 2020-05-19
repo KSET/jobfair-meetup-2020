@@ -32,7 +32,7 @@
         default: () => ({
           cloudServices: {
             uploadUrl: "/api/image/upload",
-            tokenUrl: "/api/image/upload/token",
+            tokenUrl: "/api/auth/token/jwt",
           },
         }),
       },

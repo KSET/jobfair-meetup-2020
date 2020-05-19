@@ -129,9 +129,4 @@ router.post("/", async (req, res) => {
   return res.json(files);
 });
 
-router.get("/token", (req, res) => {
-  res.write(req.authHeader);
-  res.end();
-});
-
 export default router;

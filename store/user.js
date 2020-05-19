@@ -117,7 +117,7 @@ export const actions = {
 
     try {
       const { data = {} } = await this.$api.$post(
-        "/auth/login/refresh",
+        "/auth/token/refresh",
         {
           token,
           refreshToken,
