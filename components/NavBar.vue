@@ -123,6 +123,9 @@
   } from "vuex";
   import MenuIcon from "~/assets/images/icons/menu.svg";
   import JobfairMeetupLogo from "~/assets/images/logo/jobfair.svg";
+  import {
+    getSrcSet,
+  } from "~/helpers/image";
 
   export default {
     name: "AppNavBar",
@@ -182,18 +185,7 @@
         await this.$router.push({ name: "Index" });
       },
 
-      getSrcSet(imageList) {
-        return (
-          Object
-            .values(imageList)
-            .map(
-              ({ width, url }) =>
-                `${ url } ${ width }w`
-              ,
-            )
-            .join(",")
-        );
-      },
+      getSrcSet,
     },
   };
 </script>
