@@ -1,4 +1,5 @@
 import {
+  companyData,
   userData,
   basicUserData,
 } from "./data";
@@ -17,5 +18,11 @@ export const currentUserQuery = () => ({
   query: `{ ${ createObject({
     // eslint-disable-next-line camelcase
     current_user: userData,
+  }) } }`,
+});
+
+export const participantsQuery = () => ({
+  query: `{ ${ createObject({
+    companies: companyData,
   }) } }`,
 });
