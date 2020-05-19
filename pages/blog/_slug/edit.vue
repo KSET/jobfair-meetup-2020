@@ -189,7 +189,7 @@
     }
 
     .editableArea,
-    :global(*[contenteditable]) {
+    :global(*[contenteditable="yes"]) {
       position: relative;
       overflow: hidden;
       min-height: 1em;
