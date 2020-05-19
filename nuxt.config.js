@@ -58,6 +58,7 @@ export default {
   plugins: [
     { src: "~/plugins/vue-typer", ssr: false },
     { src: "~/plugins/axios" },
+    { src: "~/plugins/rich-editor", ssr: false },
   ],
   /*
    ** Nuxt.js dev-modules

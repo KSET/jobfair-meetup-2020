@@ -13,6 +13,18 @@
 
     <v-row :class="$style.contentContainer">
       <v-col cols="12">
+        <v-row v-if="$store.getters['user/getUser']" :class="$style.adminActionContainer">
+          <v-col cols="12">
+            <v-btn
+              :to="{ name: 'PageBlogPostEdit', params: { slug: $route.params.slug } }"
+              color="primary"
+              outlined
+            >
+              Edit
+            </v-btn>
+          </v-col>
+        </v-row>
+
         <v-row>
           <v-col cols="12" md="7" offset-md="2">
             <v-row>
@@ -198,6 +210,14 @@
   @import "../../../assets/styles/include/all";
 
   .container {
+
+    .adminActionContainer {
+      text-align: right;
+
+      @include media(md) {
+        margin-top: 1em;
+      }
+    }
 
     .contentContainer {
       margin: 0 3em;
