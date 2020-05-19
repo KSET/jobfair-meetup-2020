@@ -241,6 +241,8 @@
               <v-img
                 :alt="participant.description"
                 :src="participant.image"
+                :lazy-src="participant.images.small.url"
+                :srcset="getSrcSet(participant.images)"
                 aspect-ratio="1.875"
                 contain
               />
@@ -290,6 +292,9 @@
     ensureArray,
     limitLength,
   } from "~/helpers/data";
+  import {
+    getSrcSet,
+  } from "~/helpers/image";
 
   const storeActions = {
     fetchNews: "news/fetchNews",
@@ -354,6 +359,8 @@
 
     methods: {
       ...mapActions(storeActions),
+
+      getSrcSet,
     },
   };
 </script>
