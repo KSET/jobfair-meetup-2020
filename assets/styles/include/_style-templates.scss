@@ -104,14 +104,14 @@
 
       > figcaption {
         font-size: .75em;
+        font-style: italic;
         display: table-caption;
-        padding: .6em;
+        padding: .3em 0 .6em 1em;
         caption-side: bottom;
         word-break: break-word;
         opacity: .8;
         color: $fer-black;
         outline-offset: -1px;
-        background-color: transparentize($fer-dark-blue, .91);
       }
     }
 
