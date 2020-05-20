@@ -29,6 +29,8 @@ const fileUploadMiddleware = fileUpload({
 const app = express();
 const routes = registerRoutesInFolder(joinPath(__dirname, "routes"));
 
+app.set("x-powered-by", false);
+
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
