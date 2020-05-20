@@ -32,7 +32,8 @@ const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
 router.use(requireAuth());
 
 router.post("/", async (req, res) => {
-  const { file } = req.files;
+  let files = {};
+
   const error = (message, data = {}) => {
     res.status(415);
 
@@ -46,38 +47,38 @@ router.post("/", async (req, res) => {
     });
   };
 
-  if (!file) {
-    return error("No file provided");
-  }
-
-  const ext = extensionMap[file.mimetype];
-
-  if (!ext) {
-    return error(`Invalid file type. Only ${ Object.values(extensionMap).map((ext) => `.${ ext }`).join(", ") } supported.`, {
-      mimeType: file.mimetype,
-    });
-  }
-
-  const id = `image-${ i++ }`;
-  const dir = joinPath(process.cwd(), "uploads", id);
-
-  await mkdir(dir, { recursive: true });
-
-  const fileUploadName =
-    (name) =>
-      Number.isInteger(name)
-      ? `w${ name }.${ ext }`
-      : `${ name }.${ ext }`
-  ;
-
-  const fileUploadPath =
-    (name) =>
-      joinPath(dir, fileUploadName(name))
-  ;
-
-  let files = {};
-
   try {
+    const { file } = req.files;
+
+    if (!file) {
+      return error("No file provided");
+    }
+
+    const ext = extensionMap[file.mimetype];
+
+    if (!ext) {
+      return error(`Invalid file type. Only ${ Object.values(extensionMap).map((ext) => `.${ ext }`).join(", ") } supported.`, {
+        mimeType: file.mimetype,
+      });
+    }
+
+    const id = `image-${ i++ }`;
+    const dir = joinPath(process.cwd(), "uploads", id);
+
+    await mkdir(dir, { recursive: true });
+
+    const fileUploadName =
+      (name) =>
+        Number.isInteger(name)
+        ? `w${ name }.${ ext }`
+        : `${ name }.${ ext }`
+    ;
+
+    const fileUploadPath =
+      (name) =>
+        joinPath(dir, fileUploadName(name))
+    ;
+
     if ("gif" === ext) {
       const filePath = fileUploadPath("default");
 
