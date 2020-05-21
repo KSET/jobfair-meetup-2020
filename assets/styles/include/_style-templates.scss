@@ -91,8 +91,13 @@
     .image {
       display: table;
       clear: both;
+      width: 100%;
       margin: 2.5em auto;
       text-align: center;
+
+      &.image-style-side {
+        margin: 0 1em;
+      }
 
       > img {
         display: block;
