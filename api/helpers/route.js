@@ -10,7 +10,7 @@
  * @property {boolean} error - Whether an error occurred
  * @property {number} status - The response status code (200 - OK, everything else - error)
  * @property {string} reason - The reason for the error (eg. error text)
- * @property {*} additionalData - Any response data
+ * @property {*} errorData - Any response data
  */
 
 
@@ -52,12 +52,12 @@ export const error = ({ reason, status = 403, data = null }) => ({
 export class ApiError extends Error {
   statusCode;
 
-  additionalData;
+  data;
 
-  constructor(message, statusCode = 403, additionalData = null) {
+  constructor(message, statusCode = 418, data = null) {
     super(message);
     this.statusCode = statusCode;
-    this.additionalData = additionalData;
+    this.data = data;
   }
 }
 
@@ -86,7 +86,7 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
     return res.json(error({
       status: res.statusCode,
       reason: e.message,
-      additionalData: e.additionalData,
+      data: e.data,
     }));
   }
 });
