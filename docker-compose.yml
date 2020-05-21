@@ -24,4 +24,7 @@ services:
       POSTGRES_USER: 'postgres'
       POSTGRES_DB: 'meetup'
     volumes:
-      - /var/lib/postgresql/data
+      - jobfair-meetup-db:/var/lib/postgresql/data
+
+volumes:
+  jobfair-meetup-db:
