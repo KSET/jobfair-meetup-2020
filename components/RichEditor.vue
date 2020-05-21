@@ -41,8 +41,24 @@
     data() {
       return {
         editor: Editor,
-        editorConfig: this.options,
       };
+    },
+
+    computed: {
+
+      editorConfig() {
+        const givenOptions = this.options;
+
+        return {
+          language: "hr",
+          ...givenOptions,
+          cloudServices: {
+            uploadUrl: "/api/image/upload",
+            tokenUrl: "/api/auth/token/jwt",
+          },
+        };
+      },
+
     },
   };
 </script>
