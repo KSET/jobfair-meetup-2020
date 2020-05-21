@@ -2,9 +2,6 @@ import {
   mkdir as mkdirCb,
 } from "fs";
 import {
-  join as joinPath,
-} from "path";
-import {
   promisify,
 } from "util";
 import {
@@ -14,12 +11,22 @@ import sharp from "sharp";
 import {
   requireAuth,
 } from "../../helpers/middleware";
+import {
+  apiFilePath,
+  localFilePath,
+  localFolderPath,
+} from "../../helpers/image";
+import {
+  getClient,
+} from "../../../db/methods";
+import {
+  queryImageCreate,
+  queryImageVariationCreate,
+} from "../../../db/helpers/image";
 
 const mkdir = promisify(mkdirCb);
 
 const router = Router();
-
-let i = 0;
 
 const extensionMap = {
   "image/gif": "gif",
@@ -32,7 +39,24 @@ const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
 router.use(requireAuth());
 
 router.post("/", async (req, res) => {
-  let files = {};
+  const files = {};
+  const client = {
+    instance: null,
+
+    async connect() {
+      this.instance = await getClient();
+
+      return this.instance;
+    },
+
+    async query(...args) {
+      if (!this.instance) {
+        return;
+      }
+
+      return await this.instance.query(...args);
+    },
+  };
 
   const error = (message, data = {}) => {
     res.status(415);
@@ -62,8 +86,17 @@ router.post("/", async (req, res) => {
       });
     }
 
-    const id = `image-${ i++ }`;
-    const dir = joinPath(process.cwd(), "uploads", id);
+    await client.connect();
+
+    await client.query("BEGIN");
+
+    const createImageResponse = await client.query(queryImageCreate({
+      name: file.name,
+      creatorId: req.authUser.id,
+    }));
+
+    const [ { id: imageId } ] = createImageResponse.rows;
+    const dir = localFolderPath({ imageId });
 
     await mkdir(dir, { recursive: true });
 
@@ -76,18 +109,43 @@ router.post("/", async (req, res) => {
 
     const fileUploadPath =
       (name) =>
-        joinPath(dir, fileUploadName(name))
+        localFilePath({
+          imageId,
+          name: fileUploadName(name),
+        })
     ;
 
-    if ("gif" === ext) {
+    const createImageVariation =
+      (filenameOverride = "") =>
+        async ({ width, height }) =>
+          await client
+            .query(queryImageVariationCreate({
+              name: filenameOverride || width,
+              path: fileUploadPath(filenameOverride || width),
+              width,
+              height,
+              imageId,
+              mimeType: file.mimetype,
+            }))
+            .then(({ rows: [ row ] }) => row)
+    ;
+
+    const uploadGif = async ({ file }) => {
       const filePath = fileUploadPath("default");
 
       await file.mv(filePath);
 
-      files = {
-        default: filePath,
+      const { image_id: imageId, name } = await createImageVariation("default")({
+        width: 300,
+        height: 300,
+      });
+
+      return {
+        default: apiFilePath({ imageId, name }),
       };
-    } else {
+    };
+
+    const uploadImage = async ({ file, imageSizes }) => {
       const resizedImages =
         imageSizes
           .slice(0, -1)
@@ -99,11 +157,12 @@ router.post("/", async (req, res) => {
                   fit: "contain",
                 })
                 .toFile(fileUploadPath(width))
+                .then(createImageVariation())
             ,
           )
       ;
 
-      await Promise.all([
+      const imageData = await Promise.all([
         ...resizedImages,
         sharp(file.tempFilePath)
           .resize({
@@ -111,21 +170,39 @@ router.post("/", async (req, res) => {
             withoutEnlargement: true,
             fit: "contain",
           })
-          .toFile(fileUploadPath("default")),
+          .toFile(fileUploadPath("default"))
+          .then(createImageVariation("default")),
       ]);
 
-      files = Object.fromEntries(
-        imageSizes
+      return Object.fromEntries(
+        imageData
           .map(
-            (size) =>
-              [ size, `/api/image/resource/${ id }/${ fileUploadName(size) }` ]
+            ({ image_id: imageId, name }) =>
+              [ name, apiFilePath({ imageId, name }) ]
             ,
           ),
       );
-    }
+    };
+
+    const uploadHandler =
+      "gif" === ext
+      ? uploadGif
+      : uploadImage
+    ;
+
+    Object.assign(
+      files,
+      await uploadHandler({ file, imageSizes }),
+    );
   } catch (e) {
+    await client.query("ROLLBACK");
+
+    console.log("|> UPLOAD ERROR", e);
+
     return error("Something went wrong. Please try again.");
   }
+
+  await client.query("COMMIT");
 
   return res.json(files);
 });

@@ -22,9 +22,11 @@
               <div :class="$style.headNews">
                 <div>
                   <v-img
-                    :lazy-src="headNews.imageThumbnail"
-                    :src="headNews.image"
-                    contain
+                    :lazy-src="headNews.images.thumb.url"
+                    :src="headNews.images.default.url"
+                    :srcset="srcSet(headNews.images)"
+                    aspect-ratio="2.2"
+                    cover
                   />
                 </div>
                 <div :class="$style.headNewsContent">
@@ -63,6 +65,9 @@
     ensureArray,
   } from "~/helpers/data";
   import {
+    getSrcSet,
+  } from "~/helpers/image";
+  import {
     processNewsItem,
   } from "~/helpers/news";
 
@@ -87,6 +92,10 @@
       restNews() {
         return this.news.slice(1);
       },
+    },
+
+    methods: {
+      srcSet: getSrcSet,
     },
 
     head: () => ({

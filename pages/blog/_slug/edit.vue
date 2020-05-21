@@ -3,8 +3,9 @@
     <v-row :class="$style.imageRow">
       <v-col cols="12">
         <v-img
-          :lazy-src="news.imageThumbnail"
-          :src="news.image"
+          :class="$style.headerImage"
+          :lazy-src="rawNews.images.thumb.url"
+          :src="imagePreview || rawNews.images.default.url"
           aspect-ratio="2.4"
           position="bottom center"
         />

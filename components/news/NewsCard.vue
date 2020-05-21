@@ -7,9 +7,11 @@
     v-bind="$attrs"
   >
     <v-img
-      :lazy-src="news.imageThumbnail"
-      :src="news.image"
+      :lazy-src="news.images.thumb.url"
+      :src="news.images.default.url"
+      :srcset="srcSet(news.images)"
       aspect-ratio="1.875"
+      cover
     />
     <div :class="$style.newsCardDate">
       {{ news.date }}
@@ -24,6 +26,9 @@
 </template>
 
 <script>
+  import {
+    getSrcSet,
+  } from "~/helpers/image";
   import {
     processNewsItem,
   } from "~/helpers/news";
@@ -44,6 +49,10 @@
       news() {
         return processNewsItem(this.newsItem);
       },
+    },
+
+    methods: {
+      srcSet: getSrcSet,
     },
   };
 </script>
