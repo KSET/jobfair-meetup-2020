@@ -8,6 +8,11 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 
 import {
+  query,
+} from "../db/methods";
+import dbStructure from "../db/structure";
+
+import {
   apiRoute,
   ApiError,
   registerRoutesInFolder,
@@ -42,6 +47,10 @@ app.use(routes);
 app.use("*", apiRoute(() => {
   throw new ApiError("not-found", 404);
 }));
+
+query(dbStructure).then(() => {
+  console.log("Database updated");
+});
 
 export default {
   path: "/api",

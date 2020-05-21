@@ -1,6 +1,7 @@
 NODE_MODULES := ./node_modules
+DB_CONTAINER := meetup-db
 
-.PHONY: stop start up prod dev down restart reboot rebuild install yarn-install build clean build-containers
+.PHONY: stop start up up-db prod dev down restart reboot rebuild install yarn-install build clean build-containers
 
 stop:
 	docker/compose stop
@@ -11,9 +12,12 @@ start:
 up:
 	docker/compose up -d
 
+up-db:
+	docker/compose up -d $(DB_CONTAINER)
+
 prod: build reboot
 
-dev: $(NODE_MODULES)
+dev: $(NODE_MODULES) up-db
 	docker/yarn dev || exit 0
 	$(MAKE) down
 
