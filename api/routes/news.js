@@ -8,6 +8,7 @@ import {
 import {
   queryNewsGetAll,
   queryNewsGetBySlug,
+  queryNewsUpdateBySlug,
 } from "../../db/helpers/news";
 import {
   query,
@@ -89,6 +90,66 @@ router.get("/item/:slug", apiRoute(async ({ params }) => {
   const images = rawImages.map(processImage);
 
   return processNews(images)(rawNews);
+}));
+
+router.patch("/item/:slug", apiRoute(async ({ params, body }) => {
+  const validations = [];
+
+  const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
+
+  if (!oldNews) {
+    throw new ApiError("news-not-found", 403, {
+      global: "News not found",
+    });
+  }
+
+  const capitalize = (s) => {
+    if ("string" !== typeof s) {
+      return "";
+    }
+
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
+  const minLength =
+    (prop, length) =>
+      body[prop] && length < body[prop].length
+      ? false
+      : [ prop, `${ capitalize(prop) } must be at least ${ length } characters long` ]
+  ;
+
+  const validDate =
+    (prop) => {
+      const data = body[prop];
+      const date = Date.parse(data);
+
+      if (false === isNaN(date)) {
+        return false;
+      }
+
+      return [ prop, `${ capitalize(prop) } must be a valid date` ];
+    }
+  ;
+
+  validations.push(minLength("title", 5));
+  validations.push(minLength("description", 5));
+  validations.push(minLength("content", 5));
+  validations.push(validDate("date"));
+
+  const errors = validations.filter((e) => false !== e);
+
+  if (0 < errors.length) {
+    throw new ApiError("validation-failed", 403, Object.fromEntries(errors));
+  }
+
+  const [ res ] = await query(queryNewsUpdateBySlug(params.slug, {
+    ...body,
+    date: new Date(body.date),
+  }));
+
+  return {
+    slug: res.slug,
+  };
 }));
 
 export default router;

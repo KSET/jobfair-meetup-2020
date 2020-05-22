@@ -25,7 +25,7 @@ export const actions = {
     return data;
   },
 
-  async fetchNewsItem({ commit, state }, slug, force = false) {
+  async fetchNewsItem({ commit, state }, { slug, force = false }) {
     if (!force && state.item && state.item.slug === slug) {
       return state.item;
     }
@@ -35,5 +35,17 @@ export const actions = {
     commit("SET_NEWS_ITEM", data);
 
     return data;
+  },
+
+  async updateNewsItem({ commit, state }, { slug, news }) {
+    return await this.$api.$patch(
+      `/news/item/${ slug }`,
+      news,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
   },
 };

@@ -44,4 +44,21 @@ router.get("/:imageId/:name", async (req, res) => {
   return res.sendFile(image.path);
 });
 
+router.get("/:imageId/:name/info", apiRoute(async (req) => {
+  const { imageId, name } = req.params;
+
+  const [ image ] = await query(queryImageVariationGetByNameAndImage({
+    imageId,
+    name,
+  }));
+
+  if (!image) {
+    throw new ApiError("not-found", 404, [
+      "Image not found",
+    ]);
+  }
+
+  return image;
+}));
+
 export default router;

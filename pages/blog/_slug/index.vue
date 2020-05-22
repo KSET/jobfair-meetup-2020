@@ -187,7 +187,7 @@
     },
 
     validate({ params, store }) {
-      return store.dispatch("news/fetchNewsItem", params.slug);
+      return store.dispatch("news/fetchNewsItem", { slug: params.slug, force: true });
     },
 
     head() {

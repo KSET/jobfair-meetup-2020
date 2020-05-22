@@ -4,11 +4,44 @@
       <v-col cols="12">
         <v-img
           :class="$style.headerImage"
-          :lazy-src="rawNews.images.thumb.url"
+          :lazy-src="rawNews.images.thumb ? rawNews.images.thumb.url : null"
           :src="imagePreview || rawNews.images.default.url"
           aspect-ratio="2.4"
           position="bottom center"
-        />
+        >
+          <div
+            :class="$style.headerImageInputContainer"
+            class="align-self-center d-flex"
+          >
+            <v-file-input
+              :accept="headerImage.allowedMimeTypes"
+              :class="$style.headerImageInput"
+              :clearable="!loading"
+              :error-count="Infinity"
+              :loading="loading"
+              :prepend-icon="null"
+              :rules="headerImageRules"
+              :value="headerImage.file"
+              dense
+              full-width
+              label="Header slika"
+              show-size
+              solo
+              @change="handleHeaderImageChange"
+            />
+          </div>
+          <div
+            v-if="headerImage.file && !headerImage.error"
+            :class="$style.headerImageUploadContainer"
+            @click.prevent="handleHeaderImageUpload"
+          >
+            <v-btn
+              :loading="loading"
+            >
+              Upload
+            </v-btn>
+          </div>
+        </v-img>
       </v-col>
     </v-row>
 
@@ -27,6 +60,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-text-field
+                  :error="errors.date"
                   :value="news.date"
                   label="Datum"
                   light
@@ -42,6 +76,12 @@
               />
             </v-menu>
 
+            <v-sheet
+              v-if="errors.title"
+              :class="$style.errorBar"
+              color="error"
+              v-text="errors.title"
+            />
             <h1
               v-once
               :class="[ $style.header ]"
@@ -55,6 +95,12 @@
 
         <v-row>
           <v-col cols="12">
+            <v-sheet
+              v-if="errors.description"
+              :class="$style.errorBar"
+              color="error"
+              v-text="errors.description"
+            />
             <p
               v-once
               :class="[ $style.description ]"
@@ -67,6 +113,13 @@
         </v-row>
 
         <v-row>
+          <v-sheet
+            v-if="errors.content"
+            :class="$style.errorBar"
+            class="col col-12"
+            color="error"
+            v-text="errors.content"
+          />
           <v-col
             :class="{
               [$style.editableArea]: true,
@@ -88,12 +141,54 @@
             />
           </v-col>
         </v-row>
+
+        <v-row>
+          <v-col class="text-right">
+            <v-btn
+              :loading="loading"
+              color="warning"
+              x-large
+              :href="$router.resolve({ name: 'PageBlogPost', params: { slug: news.slug } }).href"
+            >
+              Cancel
+            </v-btn>
+            <v-btn
+              :loading="loading"
+              color="success"
+              x-large
+              @click="submitForm"
+            >
+              Save
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
+
+    <v-snackbar
+      v-model="error"
+      bottom
+      color="error"
+      light
+      multi-line
+      right
+    >
+      {{ errorText }}
+      <v-btn
+        color="#fff"
+        text
+        @click="error = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </app-max-width-container>
 </template>
 
 <script>
+  import {
+    mapActions,
+  } from "vuex";
   import {
     processNewsItem,
   } from "~/helpers/news";
@@ -118,12 +213,73 @@
         editorLoading: true,
         datePickerOpen: false,
         editedDate: newsItem.date,
+        loading: false,
+        error: false,
+        errorText: "",
+        errors: {},
+
+        headerImage: {
+          newId: null,
+          error: false,
+          file: null,
+          allowedMimeTypes: [
+            "image/png",
+            "image/jpeg",
+          ],
+        },
       };
     },
 
     computed: {
       news() {
         return processNewsItem(this.rawNews);
+      },
+
+      imagePreview() {
+        if (!this.headerImage.file || this.headerImage.error) {
+          return "";
+        }
+
+        return URL.createObjectURL(this.headerImage.file);
+      },
+
+      headerImageRules() {
+        const validMimeType = (file) => {
+          if (!file) {
+            return true;
+          }
+
+          const allowedTypes = this.headerImage.allowedMimeTypes;
+
+          if (false === allowedTypes.includes(file.type)) {
+            const types =
+              allowedTypes
+                .map((e) => e.split("/").pop())
+                .map((e) => `.${ e }`).join(", ")
+            ;
+
+            return `Datoteka mora biti slika (${ types })`;
+          }
+
+          return true;
+        };
+
+        const smallerThan5Mb = (file) => {
+          if (!file) {
+            return true;
+          }
+
+          if (1000 * 1000 * 5 < file.size) {
+            return "Datoteka mora biti manja od 5MB";
+          }
+
+          return true;
+        };
+
+        return [
+          smallerThan5Mb,
+          validMimeType,
+        ];
       },
     },
 
@@ -134,16 +290,114 @@
     },
 
     methods: {
+      ...mapActions({
+        doNewsUpdate: "news/updateNewsItem",
+        doUploadImage: "image/uploadImage",
+        fetchImageInfo: "image/fetchImageVariationInfo",
+      }),
+
       handleEdit(prop, event) {
         event.preventDefault();
         event.stopPropagation();
 
         this.$set(this.rawNews, prop, event.target.textContent);
       },
+
+      handleHeaderImageChange(file) {
+        this.headerImage.error = false;
+
+        if (!file) {
+          this.headerImage.file = null;
+          return;
+        }
+
+        for (const validation of this.headerImageRules) {
+          if (true !== validation(file)) {
+            return;
+          }
+        }
+
+        this.headerImage.file = file;
+      },
+
+      async handleHeaderImageUpload() {
+        const err = (msg) => {
+          this.error = true;
+          this.errorText = msg;
+          this.loading = false;
+        };
+
+        this.loading = true;
+        const {
+          error,
+          message,
+          images,
+        } = await this.doUploadImage(this.headerImage.file);
+
+        if (error) {
+          return err(message);
+        }
+
+        const imageInfo = await this.fetchImageInfo(images.default.replace(/^\/api/i, ""));
+
+        if (imageInfo.error) {
+          return err("Something went wrong. Please try again.");
+        }
+
+        const parsedImages = Object.fromEntries(
+          Object
+            .entries(images)
+            .map(([ width, url ]) => [ width, { width, url } ])
+          ,
+        );
+
+        this.headerImage.file = null;
+        this.headerImage.newId = imageInfo.data.image_id;
+        this.$set(this.rawNews, "images", parsedImages);
+
+        this.loading = false;
+      },
+
+      async submitForm() {
+        const { slug, date, content, title, description } = this.rawNews;
+        const news = {
+          date,
+          content,
+          title,
+          description,
+          imageId: this.headerImage.newId,
+        };
+
+        this.loading = true;
+        const res = await this.doNewsUpdate({
+          slug,
+          news,
+        });
+        this.loading = false;
+
+        this.error = res.error;
+
+        if (this.error) {
+          if (res.errorData.global) {
+            this.errorText = res.errorData.global;
+            return;
+          }
+
+          this.errorText = "Provjerite greške";
+          this.$set(this, "errors", res.errorData);
+          this.$nextTick(() => this.$vuetify.goTo(`.${ this.$style.errorBar }`, {
+            duration: 1000,
+            offset: 20,
+            easing: "easeInOutCubic",
+          }));
+        } else {
+          await this.$router.push({ name: "PageBlogPost", params: { slug } });
+        }
+      },
     },
 
     validate({ params, store }) {
-      return store.dispatch("news/fetchNewsItem", params.slug);
+      return store.dispatch("news/fetchNewsItem", { slug: params.slug });
     },
   };
 </script>
@@ -152,6 +406,45 @@
   @import "../../../assets/styles/include/all";
 
   .container {
+
+    .headerImage {
+
+      :global .v-responsive__content {
+        display: flex;
+      }
+
+      .headerImageUploadContainer {
+        position: absolute;
+        right: 1em;
+        bottom: 1em;
+      }
+
+      .headerImageInputContainer {
+        align-items: center;
+        justify-content: center;
+        width: 50%;
+        margin: 0 auto;
+
+        .headerImageInput {
+
+          :global .v-messages.error--text {
+            padding: .6em;
+            border-top: 1px solid transparentize($fer-black, .85);
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 4px;
+            background-color: $fer-white;
+          }
+
+          :global .v-text-field__details {
+            margin-top: -4px;
+          }
+
+          :global .v-input__slot {
+            cursor: pointer;
+          }
+        }
+      }
+    }
 
     .contentContainer {
       margin: 0 3em;
@@ -238,6 +531,22 @@
       padding: 0;
       border: none !important;
       box-shadow: none !important;
+    }
+
+    :global(.row) .errorBar {
+      font-weight: bold;
+      padding: 8px;
+      color: $fer-white;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      text-shadow: 1px 1px rgba(0, 0, 0, .3);
+
+      & + :global(*) {
+        box-sizing: border-box;
+        border-top: none;
+        border-top-left-radius: 1px;
+        border-top-right-radius: 1px;
+      }
     }
   }
 </style>

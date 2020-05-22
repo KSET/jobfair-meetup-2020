@@ -8,7 +8,8 @@ export const query =
   (text, params) =>
     pool
       .query(text, params)
-      .then(({ rows }) => rows)
+      .then(({ rows }) => rows || [])
+      .catch(() => [])
 ;
 
 export const getClient =
