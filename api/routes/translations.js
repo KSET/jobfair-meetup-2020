@@ -2,15 +2,86 @@ import {
   Router,
 } from "express";
 import {
+  queryTranslationsGetAll,
+  queryTranslationsGetByKey,
+  queryTranslationsInsertOne,
+  queryTranslationsUpdateByKey,
+} from "../../db/helpers/translations";
+import {
+  query,
+  getClient,
+} from "../../db/methods";
+import {
   apiRoute,
+  ApiError,
 } from "../helpers/route";
 
 const router = Router();
 
-router.get("/all", apiRoute(() => {
-  return {
-    "index.heroDate": "19. - 23.10. | FER, Zagreb",
-  };
+const fetchAllTranslations =
+  async () => {
+    const translations = await query(queryTranslationsGetAll());
+
+    return Object.fromEntries(
+      translations
+        .map(
+          ({ key, value }) =>
+            [ key, value ]
+          ,
+        )
+      ,
+    );
+  }
+;
+
+router.get("/all", apiRoute(async () => {
+  return await fetchAllTranslations();
+}));
+
+router.put("/", apiRoute(async ({ body: keys = [] }) => {
+  if (!Array.isArray(keys)) {
+    throw new ApiError("invalid-keys");
+  }
+
+  const client = await getClient();
+
+  await client.query("BEGIN");
+
+  await Promise.all(
+    keys
+      .map(
+        (key) =>
+          client
+            .query(queryTranslationsInsertOne({ key, value: key }))
+            .catch((e) => console.log("|> TRANSLATION KEY ERROR", e))
+        ,
+      )
+    ,
+  );
+
+  await client.query("COMMIT");
+
+  return await fetchAllTranslations();
+}));
+
+router.patch("/:key", apiRoute(async ({ body, params }) => {
+  const { key } = params;
+  const { value } = body;
+  if (!value) {
+    throw new ApiError("value-missing");
+  }
+
+  const [ translation ] = await query(queryTranslationsGetByKey(key));
+
+  if (!translation) {
+    throw new ApiError("translation-not-found");
+  }
+
+  translation.value = value;
+
+  await query(queryTranslationsUpdateByKey(key, value));
+
+  return translation;
 }));
 
 export default router;

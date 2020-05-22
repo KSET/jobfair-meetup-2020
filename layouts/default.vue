@@ -31,6 +31,20 @@
       AppFooter,
     },
 
+    watch: {
+      "$route.path": {
+        handler() {
+          setTimeout(
+            () => {
+              this.$store.dispatch("translations/syncNewTranslations");
+            },
+            500,
+          );
+        },
+        immediate: true,
+      },
+    },
+
     head() {
       return {
         title: "Welcome",

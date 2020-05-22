@@ -8,6 +8,8 @@ import {
   interpolateName,
 } from "loader-utils";
 
+import hooks from "./hooks";
+
 // eslint-disable-next-line no-control-regex
 const filenameReservedRegex = /[<>:"/\\|?*\x00-\x1F]/g;
 // eslint-disable-next-line no-control-regex
@@ -59,6 +61,7 @@ export default {
     { src: "~/plugins/vue-typer", ssr: false },
     { src: "~/plugins/axios" },
     { src: "~/plugins/rich-editor", ssr: false },
+    { src: "~/plugins/translation-directive" },
   ],
   /*
    ** Nuxt.js dev-modules
@@ -220,4 +223,43 @@ export default {
   optimizedImages: {
     optimizeImages: true,
   },
+
+  render: {
+
+    bundleRenderer: {
+
+      directives: {
+
+        translation(node, binding) {
+          const { $store } = node.context;
+
+          if (!$store) {
+            return;
+          }
+
+          const translate = $store.getters["translations/translation"];
+          const registerKey = (key) => $store.commit("translations/ADD_TRANSLATION_KEY", key);
+
+          const { value: bindValue } = binding;
+          const { children = [] } = node;
+
+          const { text: elValue = "" } = children.find(({ text }) => text && 0 < text.trim().length) || {};
+
+          const key = bindValue || elValue.trim();
+
+          registerKey(key);
+
+          node.data.domProps = {
+            innerHTML: translate(key),
+          };
+        },
+
+      },
+
+    },
+
+  },
+
+  hooks: hooks(this),
+
 };
