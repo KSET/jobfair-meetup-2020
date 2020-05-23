@@ -55,6 +55,10 @@
           name: "Press releases",
           to: { name: "PageAdminPressReleaseList" },
         },
+        {
+          name: "News",
+          to: { name: "PageAdminNewsList" },
+        },
       ],
     }),
 

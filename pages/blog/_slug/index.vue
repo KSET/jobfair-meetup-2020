@@ -16,7 +16,7 @@
         <v-row v-if="$store.getters['user/getUser']" :class="$style.adminActionContainer">
           <v-col cols="12">
             <v-btn
-              :to="{ name: 'PageBlogPostEdit', params: { slug: $route.params.slug } }"
+              :to="{ name: 'PageAdminNewsEdit', params: { slug: $route.params.slug } }"
               color="primary"
               outlined
             >

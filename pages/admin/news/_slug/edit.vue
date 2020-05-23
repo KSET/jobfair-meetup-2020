@@ -148,7 +148,7 @@
               :loading="loading"
               color="warning"
               x-large
-              :href="$router.resolve({ name: 'PageBlogPost', params: { slug: news.slug } }).href"
+              :href="$router.resolve({ name: 'PageAdminNewsList' }).href"
             >
               Cancel
             </v-btn>
@@ -195,7 +195,7 @@
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   export default {
-    name: "PageBlogPostEdit",
+    name: "PageAdminNewsEdit",
 
     middleware: "authenticated",
 
@@ -403,7 +403,7 @@
 </script>
 
 <style lang="scss" module>
-  @import "../../../assets/styles/include/all";
+  @import "../../../../assets/styles/include/all";
 
   .container {
 
