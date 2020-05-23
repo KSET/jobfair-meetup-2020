@@ -6,6 +6,9 @@
           v-ripple
           :class="$style.logoLink"
           :to="{ name: 'Index' }"
+          light
+          color="primary"
+          class="black--text"
         >
           &larr; Back to site
         </v-btn>
