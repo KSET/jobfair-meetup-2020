@@ -74,3 +74,52 @@ export const queryNewsUpdateBySlug =
     };
   }
 ;
+
+export const queryNewsCreate =
+  ({
+     date,
+     content,
+     title,
+     slug,
+     description,
+     creatorId,
+     imageId,
+   }) => {
+    const news = {
+      date,
+      content,
+      title,
+      slug,
+      description,
+      // eslint-disable-next-line camelcase
+      image_id: imageId,
+      // eslint-disable-next-line camelcase
+      creator_id: creatorId,
+    };
+
+    const filteredNews =
+      Object
+        .entries(news)
+        .filter(([ _, v ]) => v)
+    ;
+
+    const keys = filteredNews.map(([ k ]) => k);
+    const queryValues = filteredNews.map((_, i) => `$${ i + 1 }`);
+    const values = filteredNews.map(([ _, v ]) => v);
+
+    return {
+      text: `
+        insert into news
+            (${ keys.join(", ") })
+        values
+            (${ queryValues.join(", ") })
+        returning
+          id
+      `,
+      values: [
+        ...values,
+      ],
+    };
+  }
+;
+

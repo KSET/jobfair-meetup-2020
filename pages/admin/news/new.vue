@@ -4,8 +4,8 @@
       <v-col cols="12">
         <v-img
           :class="$style.headerImage"
-          :lazy-src="rawNews.images.thumb ? rawNews.images.thumb.url : null"
-          :src="imagePreview || rawNews.images.default.url"
+          :lazy-src="rawNews.images && rawNews.images.thumb ? rawNews.images.thumb.url : null"
+          :src="imagePreview || rawNews.images && rawNews.images.default.url || require('@/assets/images/404.svg?inline')"
           aspect-ratio="2.4"
           position="bottom center"
         >
@@ -153,6 +153,7 @@
               Cancel
             </v-btn>
             <v-btn
+              :disabled="!rawNews.images"
               :loading="loading"
               color="success"
               x-large
@@ -195,14 +196,20 @@
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   export default {
-    name: "PageAdminNewsEdit",
+    name: "PageAdminNewsCreate",
 
     components: {
       AppMaxWidthContainer,
     },
 
     data() {
-      const newsItem = this.$store.getters["news/newsItem"];
+      const newsItem = {
+        title: "",
+        description: "",
+        content: "",
+        date: (new Date()).toISOString(),
+        images: null,
+      };
 
       return {
         rawNews: {
@@ -279,6 +286,14 @@
           validMimeType,
         ];
       },
+
+      saveHandler() {
+        if (this.rawNews.id) {
+          return this.doNewsUpdate;
+        } else {
+          return this.doNewsCreate;
+        }
+      },
     },
 
     watch: {
@@ -290,6 +305,7 @@
     methods: {
       ...mapActions({
         doNewsUpdate: "news/updateNewsItem",
+        doNewsCreate: "news/createNewsItem",
         doUploadImage: "image/uploadImage",
         fetchImageInfo: "image/fetchImageVariationInfo",
       }),
@@ -367,7 +383,7 @@
         };
 
         this.loading = true;
-        const res = await this.doNewsUpdate({
+        const res = await this.saveHandler({
           slug,
           news,
         });
@@ -393,15 +409,11 @@
         }
       },
     },
-
-    validate({ params, store }) {
-      return store.dispatch("news/fetchNewsItem", { slug: params.slug });
-    },
   };
 </script>
 
 <style lang="scss" module>
-  @import "../../../../assets/styles/include/all";
+  @import "../../../assets/styles/include/all";
 
   .container {
 

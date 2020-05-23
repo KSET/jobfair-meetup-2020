@@ -14,7 +14,7 @@
           Back
         </v-btn>
         <v-btn
-          :to="{ name: 'PageAdminPressReleaseCreate' }"
+          :to="{ name: 'PageAdminNewsCreate' }"
           color="success"
         >
           Create
@@ -38,7 +38,7 @@
                   md="4"
                   sm="6"
                 >
-                  <v-card>
+                  <v-card class="pa-1">
                     <app-news-card
                       :news-item="item"
                       class="ma-3"

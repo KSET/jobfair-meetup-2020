@@ -9,6 +9,7 @@ import {
   queryNewsGetAll,
   queryNewsGetBySlug,
   queryNewsUpdateBySlug,
+  queryNewsCreate,
 } from "../../db/helpers/news";
 import {
   query,
@@ -163,6 +164,43 @@ router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ pa
 
   return {
     slug: res.slug,
+  };
+}));
+
+router.put("/item/", requireAuth({ role: "admin" }), apiRoute(async ({ body, authUser }) => {
+  if (!body.imageId) {
+    throw new ApiError("image-required", 403, {
+      global: "Image is required",
+    });
+  }
+
+  const errors = validateNews(body);
+
+  if (0 < errors.length) {
+    throw new ApiError("validation-failed", 403, Object.fromEntries(errors));
+  }
+
+  const sluggedTitle =
+    String(body.title)
+      .toLowerCase()
+      .replace(/\W/gi, "-")
+      .replace(/-+/gi, "-")
+  ;
+
+  const timeStamp = Date.now().toString(36);
+
+  const newNews = {
+    ...body,
+    slug: `${ sluggedTitle }-${ timeStamp }`,
+    date: new Date(body.date),
+    creatorId: authUser.id,
+  };
+
+  const [ res ] = await query(queryNewsCreate(newNews));
+
+  return {
+    id: res.id,
+    ...newNews,
   };
 }));
 

@@ -41,11 +41,13 @@ export const actions = {
     return await this.$api.$patch(
       `/news/item/${ slug }`,
       news,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
+    ).catch((e) => e);
+  },
+
+  async createNewsItem({ commit, state }, { news }) {
+    return await this.$api.$put(
+      "/news/item/",
+      news,
+    ).catch((e) => e);
   },
 };
