@@ -88,6 +88,14 @@
                 <translated-text trans-key="header.enableEditing" />
               </v-list-item-title>
             </v-list-item>
+
+            <v-list-item>
+              <v-btn
+                :to="{ name: 'PageAdminIndex' }"
+              >
+                <translated-text trans-key="button.adminPanel" />
+              </v-btn>
+            </v-list-item>
           </v-list>
 
           <v-card-actions>

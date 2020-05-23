@@ -4,6 +4,8 @@
 
 <script>
   export default {
+    layout: "admin",
+
     middleware: "is-admin",
   };
 </script>
