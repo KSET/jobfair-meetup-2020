@@ -41,6 +41,9 @@
                 >
                   Cancel
                 </v-btn>
+
+                <v-spacer />
+
                 <v-btn
                   :disabled="!allValid"
                   :loading="loading"
