@@ -5,12 +5,10 @@
         <v-row>
           <v-col :class="$style.heroMainContainer" cols="12">
             <h3 :class="$style.heroDate">
-              19. - 23.10. | FER, Zagreb
+              <translated-text trans-key="index.hero.date" />
             </h3>
             <h1 :class="$style.heroTitle">
-              Ulovi karijeru
-              <br>
-              dolaskom na
+              <translated-text trans-key="index.hero.title" />
               <br>
               <client-only>
                 <vue-typer
@@ -35,20 +33,17 @@
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Prijavi se
+                <translated-text trans-key="button.joinNow" />
               </v-btn>
             </div>
           </v-col>
 
           <v-col :class="$style.heroExplanationContainer" cols="12" md="5" offset-md="6">
             <h1 :class="$style.heroExplanationTitle">
-              Što je Job Fair Meetup?
+              <translated-text trans-key="index.hero.explanation.title" />
             </h1>
             <div :class="$style.heroExplanationText">
-              Job Fair Meetup na jednom mjestu okuplja vrhunska tehnološka poduzeća i uspješne studente
-              s ciljem upoznavanja i razmjene znanja. Sudjelovanjem na talkovima, radionicama i panel
-              raspravama studenti se u opuštenoj atmosferi mogu upoznati s aktualnim tehnološkim temama,
-              problemima i rješenjima te mogućnostima zapošljavanja.
+              <translated-text trans-key="index.hero.explanation.text" />
             </div>
           </v-col>
         </v-row>
@@ -60,7 +55,7 @@
         <v-row :class="$style.joinCardsContainer">
           <v-col cols="12">
             <h1 :class="$style.joinHeader">
-              Sudjeluj i ti!
+              <translated-text trans-key="index.join.header" />
             </h1>
           </v-col>
 
@@ -70,9 +65,11 @@
               aspect-ratio="1.12"
               contain
             />
-            <h3>Umrežavanje izvrsnih</h3>
+            <h3>
+              <translated-text trans-key="index.join.networking.header" />
+            </h3>
             <p>
-              Pronađi posao ili praksu razgovarajući sa zaposlenicima poduzeća u opuštenoj atmosferi
+              <translated-text trans-key="index.join.networking.text" />
             </p>
           </v-col>
 
@@ -82,9 +79,11 @@
               aspect-ratio="1.12"
               contain
             />
-            <h3>Raznovrstan sadržaj</h3>
+            <h3>
+              <translated-text trans-key="index.join.content.header" />
+            </h3>
             <p>
-              Prijavi se na talk, radionicu i panel te usvoji korisna znanja o najnovijim tehnologijama
+              <translated-text trans-key="index.join.content.text" />
             </p>
           </v-col>
 
@@ -94,18 +93,22 @@
               aspect-ratio="1.12"
               contain
             />
-            <h3>Tematska raznolikost</h3>
+            <h3>
+              <translated-text trans-key="index.join.themes.header" />
+            </h3>
             <p>
-              Otkrij što te čeka u raznim tehnološkim industrijama i usmjeri put svoje buduće karijere
+              <translated-text trans-key="index.join.themes.text" />
             </p>
           </v-col>
         </v-row>
 
         <v-row :class="$style.signupContainer">
           <v-col :class="$style.signupContentContainer" class="text-center text-md-left" cols="12" md="4">
-            <h1>Prijavi se</h1>
+            <h1>
+              <translated-text trans-key="index.join.joinNow.header" />
+            </h1>
             <p>
-              Prati nas na društvenim mrežama i među prvima saznaj kada krenu prijave za Job Fair Meetup!
+              <translated-text trans-key="index.join.joinNow.text" />
             </p>
             <div :class="$style.socialIconContainer">
               <v-btn
@@ -140,8 +143,12 @@
                 />
               </v-col>
               <v-col cols="12" md="8">
-                <h5>CV je ulaznica</h5>
-                <p>Predaj svoj CV u bazu životopisa kojoj će imati pristup svi poslodavci</p>
+                <h5>
+                  <translated-text trans-key="index.join.cv.header" />
+                </h5>
+                <p>
+                  <translated-text trans-key="index.join.cv.text" />
+                </p>
               </v-col>
             </v-row>
 
@@ -154,8 +161,12 @@
                 />
               </v-col>
               <v-col cols="12" md="8">
-                <h5>Dođi do svog QR koda</h5>
-                <p>Za ispunjeni životopis u bazi dobivaš jedinstveni QR kod na svoju adresu e-pošte</p>
+                <h5>
+                  <translated-text trans-key="index.join.qrCode.header" />
+                </h5>
+                <p>
+                  <translated-text trans-key="index.join.qrCode.text" />
+                </p>
               </v-col>
             </v-row>
 
@@ -168,8 +179,12 @@
                 />
               </v-col>
               <v-col cols="12" md="8">
-                <h5>Povećaj si vidljivost</h5>
-                <p>Poduzeća mogu skenirati tvoj QR kod i tako brže pronaći tvoj CV u bazi životopisa</p>
+                <h5>
+                  <translated-text trans-key="index.join.visibility.header" />
+                </h5>
+                <p>
+                  <translated-text trans-key="index.join.visibility.text" />
+                </p>
               </v-col>
             </v-row>
           </v-col>
@@ -182,7 +197,7 @@
         <v-row>
           <v-col cols="12">
             <h1 :class="$style.newsHeader">
-              Novosti
+              <translated-text trans-key="index.news.header" />
             </h1>
           </v-col>
         </v-row>
@@ -195,8 +210,8 @@
             md="4"
           >
             <app-news-card
-              :news-item="newsItem"
               :class="$style.newsItem"
+              :news-item="newsItem"
             />
           </v-col>
         </v-row>
@@ -210,7 +225,8 @@
               outlined
               x-large
             >
-              Saznaj više <i :class="$style.rightIcon">></i>
+              <translated-text trans-key="index.news.learnMore" />
+              <i :class="$style.rightIcon">></i>
             </v-btn>
           </v-col>
         </v-row>
@@ -222,10 +238,10 @@
         <v-row>
           <v-col cols="12">
             <h1 :class="$style.participantsHeader">
-              Sudionici
+              <translated-text trans-key="index.participants.header" />
             </h1>
             <p :class="$style.participantsDescription">
-              Klikni na logotip poduzeća koje te zanima i saznaj kada se održava njihov <i>talk</i>, radionica ili panek rasprava!
+              <translated-text trans-key="index.participants.text" />
             </p>
           </v-col>
         </v-row>
@@ -240,8 +256,8 @@
             <div :class="$style.participantContainer">
               <v-img
                 :alt="participant.description"
-                :src="participant.image"
                 :lazy-src="participant.images.small.url"
+                :src="participant.image"
                 :srcset="getSrcSet(participant.images)"
                 aspect-ratio="1.875"
                 contain
@@ -253,10 +269,10 @@
         <v-row>
           <v-col cols="12">
             <h1 :class="$style.participantsHeader">
-              Prijatelji projekta
+              <translated-text trans-key="index.participants.projectFriends.header" />
             </h1>
             <p :class="$style.participantsDescription">
-              Istraži naše prijatelje klikom na njihov logotip!
+              <translated-text trans-key="index.participants.projectFriends.text" />
             </p>
           </v-col>
         </v-row>
@@ -288,6 +304,7 @@
     mapActions,
   } from "vuex";
   import AppNewsCard from "~/components/news/NewsCard";
+  import TranslatedText from "~/components/TranslatedText";
   import {
     ensureArray,
     limitLength,
@@ -304,7 +321,12 @@
 
   export default {
     name: "Index",
-    components: { AppNewsCard },
+
+    components: {
+      TranslatedText,
+      AppNewsCard,
+    },
+
     async asyncData({ store }) {
       const [
         news,

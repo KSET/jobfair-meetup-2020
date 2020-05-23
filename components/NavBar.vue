@@ -28,7 +28,7 @@
         nuxt
         outlined
       >
-        <span :class="$style.navLinkText" v-text="page.name" />
+        <translated-text :trans-key="page.name" :class="$style.navLinkText" />
       </nuxt-link>
 
       <v-menu
@@ -79,30 +79,25 @@
 
           <v-divider />
 
-          <!--          <v-list>-->
-          <!--            <v-list-item>-->
-          <!--              <v-list-item-action>-->
-          <!--                <v-switch v-model="message" color="purple" />-->
-          <!--              </v-list-item-action>-->
-          <!--              <v-list-item-title>Enable messages</v-list-item-title>-->
-          <!--            </v-list-item>-->
-
-          <!--            <v-list-item>-->
-          <!--              <v-list-item-action>-->
-          <!--                <v-switch v-model="hints" color="purple" />-->
-          <!--              </v-list-item-action>-->
-          <!--              <v-list-item-title>Enable hints</v-list-item-title>-->
-          <!--            </v-list-item>-->
-          <!--          </v-list>-->
+          <v-list v-if="user.role === 'admin'">
+            <v-list-item>
+              <v-list-item-action>
+                <v-switch :value="isEditing" color="primary" @change="setEditing($event)" />
+              </v-list-item-action>
+              <v-list-item-title>
+                <translated-text trans-key="header.enableEditing" />
+              </v-list-item-title>
+            </v-list-item>
+          </v-list>
 
           <v-card-actions>
             <v-spacer />
 
             <v-btn text @click="userOpen = false">
-              Cancel
+              <translated-text trans-key="actions.cancel" />
             </v-btn>
             <v-btn color="error" text @click="userOpen = logout()">
-              Logout
+              <translated-text trans-key="actions.auth.logout" />
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -123,6 +118,7 @@
   } from "vuex";
   import MenuIcon from "~/assets/images/icons/menu.svg";
   import JobfairMeetupLogo from "~/assets/images/logo/jobfair.svg";
+  import TranslatedText from "~/components/TranslatedText";
   import {
     getSrcSet,
   } from "~/helpers/image";
@@ -131,6 +127,7 @@
     name: "AppNavBar",
 
     components: {
+      TranslatedText,
       MenuIcon,
       JobfairMeetupLogo,
     },
@@ -143,6 +140,7 @@
       ...mapGetters({
         rawPages: "pages/getPages",
         user: "user/getUser",
+        isEditing: "translations/isEditable",
       }),
 
       HeaderLinkVariants() {
@@ -173,6 +171,7 @@
     methods: {
       ...mapMutations({
         toggleOpen: "nav-drawer/TOGGLE_OPEN",
+        setEditing: "translations/SET_EDITABLE",
       }),
 
       ...mapActions({

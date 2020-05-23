@@ -8,25 +8,25 @@
           :class="$style.header"
           class="text-center my-12"
         >
-          Kontakt
+          <translated-text trans-key="contact.header" />
         </h1>
       </v-col>
     </v-row>
 
     <v-row>
-      <v-col cols="12" md="5" offset-md="1" class="mb-12">
+      <v-col class="mb-12" cols="12" md="5" offset-md="1">
         <v-img
           :src="require('@/assets/images/contact-illustration.svg?inline')"
           aspect-ratio="0.95"
           contain
         />
       </v-col>
-      <v-col class="d-flex" cols="10" offset="1" md="5" offset-md="1">
+      <v-col class="d-flex" cols="10" md="5" offset="1" offset-md="1">
         <div class="align-self-center">
           <h2
             :class="$style.subHeader"
           >
-            Job Fair
+            <translated-text trans-key="contact.jobFair" />
           </h2>
           <div>
             <div :class="$style.linkContainer">
@@ -38,9 +38,9 @@
               />
               <a
                 :class="$style.link"
-                href="mailto:jobfair@fer.hr"
+                :href="`mailto:${trans.email}`"
               >
-                jobfair@fer.hr
+                <translated-text v-model="trans.email" trans-key="contact.jobFair.email" />
               </a>
             </div>
 
@@ -53,11 +53,11 @@
               />
               <a
                 :class="$style.link"
-                href="https://goo.gl/maps/7gyyZn6dZfkM9ojg9"
+                :href="`https://www.google.com/maps/place/${encodeURIComponent(trans.address)}`"
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Unska 3, Zagreb
+                <translated-text v-model="trans.address" trans-key="contact.location.address" />
               </a>
             </div>
           </div>
@@ -66,7 +66,7 @@
             :class="$style.subHeader"
             class="mt-12"
           >
-            Društvene mreže
+            <translated-text trans-key="contact.social.headers" />
           </h2>
           <div>
             <div :class="$style.linkContainer">
@@ -82,7 +82,7 @@
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Instagram
+                <translated-text trans-key="contact.social.instagram" />
               </a>
             </div>
 
@@ -99,7 +99,7 @@
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Facebook
+                <translated-text trans-key="contact.social.facebook" />
               </a>
             </div>
 
@@ -116,7 +116,7 @@
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                YouTube
+                <translated-text trans-key="contact.social.youtube" />
               </a>
             </div>
           </div>
@@ -128,13 +128,22 @@
 
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
+  import TranslatedText from "~/components/TranslatedText";
 
   export default {
     name: "PageKontakt",
 
     components: {
+      TranslatedText,
       AppMaxWidthContainer,
     },
+
+    data: () => ({
+      trans: {
+        email: "",
+        address: "",
+      },
+    }),
   };
 </script>
 

@@ -4,7 +4,7 @@
       <v-row :class="$style.hideOnSmall">
         <v-col>
           <h1 :class="$style.organizatori">
-            Organizatori
+            <translated-text trans-key="footer.organisers" />
           </h1>
         </v-col>
       </v-row>
@@ -13,8 +13,8 @@
           v-for="logo in logos"
           :key="logo.src"
 
-          class="text-center"
           :class="$style.logoCol"
+          class="text-center"
 
           cols="6"
           md="3"
@@ -43,10 +43,10 @@
             alt="JobFair MeetUP"
           >
           <div :class="$style.afterJobfairText">
-            KSET &copy; {{ (new Date).getFullYear() }}
+            <translated-text trans-key="footer.legal.kset" /> &copy; {{ (new Date).getFullYear() }}
           </div>
           <div :class="$style.afterJobfairText">
-            Sva prava pridržana
+            <translated-text trans-key="footer.legal.allRightsReserved" />
           </div>
         </v-col>
         <v-col
@@ -55,9 +55,21 @@
           order="1"
           order-md="2"
         >
-          <div><strong>Preuzmi aplikaciju</strong></div>
-          <div><a href="https://kutt.it/xT6JNg" rel="noopener noreferrer" target="_blank">Play store za Android</a></div>
-          <div><a href="https://kutt.it/rQAtiS" rel="noopener noreferrer" target="_blank">App store za iPhone</a></div>
+          <div>
+            <strong>
+              <translated-text trans-key="footer.apps.header" />
+            </strong>
+          </div>
+          <div>
+            <a href="https://kutt.it/xT6JNg" rel="noopener noreferrer" target="_blank">
+              <translated-text trans-key="footer.apps.android" />
+            </a>
+          </div>
+          <div>
+            <a href="https://kutt.it/rQAtiS" rel="noopener noreferrer" target="_blank">
+              <translated-text trans-key="footer.apps.iphone" />
+            </a>
+          </div>
         </v-col>
         <v-col
           cols="6"
@@ -65,10 +77,20 @@
           order="2"
           order-md="3"
         >
-          <div><strong>Kontakt</strong></div>
-          <div>Job Fair</div>
-          <div><a href="mailto:jobfair@fer.hr">jobfair@fer.hr</a></div>
-          <div>Unska 3, Zagreb</div>
+          <div>
+            <strong>
+              <translated-text trans-key="footer.contact.header" />
+            </strong>
+          </div>
+          <div>
+            <translated-text trans-key="footer.contact.jobfair.text" />
+          </div>
+          <div>
+            <translated-text trans-key="footer.contact.jobfair.email" />
+          </div>
+          <div>
+            <translated-text trans-key="footer.contact.jobfair.location" />
+          </div>
         </v-col>
         <v-col
           cols="6"
@@ -76,7 +98,11 @@
           order="4"
           order-md="4"
         >
-          <div><strong>Prati nas</strong></div>
+          <div>
+            <strong>
+              <translated-text trans-key="footer.followUs" />
+            </strong>
+          </div>
           <div>
             <v-btn
               v-for="icon in socialIcons"
@@ -102,9 +128,11 @@
 </template>
 
 <script>
+  import TranslatedText from "~/components/TranslatedText";
+
   export default {
     name: "AppFooter",
-
+    components: { TranslatedText },
     computed: {
 
       logos() {
