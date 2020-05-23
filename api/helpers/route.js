@@ -83,11 +83,17 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
       res.status(403);
     }
 
-    return res.json(error({
+    const errorData = error({
       status: res.statusCode,
       reason: e.message,
       data: e.data,
-    }));
+    });
+
+    if ("development" === process.env.NODE_ENV && !(e instanceof ApiError)) {
+      errorData._errorObject = e;
+    }
+
+    return res.json(errorData);
   }
 });
 
