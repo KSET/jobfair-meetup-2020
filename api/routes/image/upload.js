@@ -56,6 +56,14 @@ router.post("/", async (req, res) => {
 
       return await this.instance.query(...args);
     },
+
+    async end() {
+      if (!this.instance) {
+        return;
+      }
+
+      await this.instance.release();
+    },
   };
 
   const error = (message, data = {}) => {
@@ -196,6 +204,7 @@ router.post("/", async (req, res) => {
     );
   } catch (e) {
     await client.query("ROLLBACK");
+    await client.end();
 
     console.log("|> UPLOAD ERROR", e);
 
@@ -203,6 +212,7 @@ router.post("/", async (req, res) => {
   }
 
   await client.query("COMMIT");
+  await client.end();
 
   return res.json(files);
 });

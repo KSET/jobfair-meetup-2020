@@ -47,21 +47,28 @@ router.put("/", apiRoute(async ({ body: keys = [] }) => {
 
   await client.query("BEGIN");
 
-  await Promise.all(
-    keys
-      .map(
-        (key) =>
-          client
-            .query(queryTranslationsInsertOne({ key, value: key }))
-            .catch((e) => console.log("|> TRANSLATION KEY ERROR", e))
-        ,
-      )
-    ,
-  );
+  try {
+    await Promise.all(
+      keys
+        .map(
+          (key) =>
+            client
+              .query(queryTranslationsInsertOne({ key, value: key }))
+              .catch((e) => console.log("|> TRANSLATION KEY ERROR", e))
+          ,
+        )
+      ,
+    );
+    await client.query("COMMIT");
 
-  await client.query("COMMIT");
+    return await fetchAllTranslations();
+  } catch (e) {
+    await client.query("ROLLBACK");
 
-  return await fetchAllTranslations();
+    throw e;
+  } finally {
+    await client.release();
+  }
 }));
 
 router.patch("/:key", apiRoute(async ({ body, params }) => {
