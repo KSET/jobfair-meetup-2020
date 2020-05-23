@@ -1,6 +1,9 @@
 <template>
   <app-max-width-container>
-    hello
+    <h1>Admin panel</h1>
+    <v-btn :to="{ name: 'PageAdminPressReleaseList' }">
+      Press releases
+    </v-btn>
   </app-max-width-container>
 </template>
 
