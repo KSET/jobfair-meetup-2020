@@ -25,32 +25,49 @@
     <v-row>
       <v-col cols="12">
         <v-data-iterator
-          hide-default-footer
           :items="releases"
+          hide-default-footer
         >
           <template v-slot:default="props">
             <v-row>
-              <v-col
-                v-for="item in props.items"
-                :key="item.id"
-                cols="12"
-                lg="3"
-                md="4"
-                sm="6"
-              >
-                <v-card>
-                  <v-card-title class="subheading font-weight-bold">
-                    {{ item.title }}
-                  </v-card-title>
-                  <v-card-actions>
-                    <v-btn
-                      :to="{ name: 'PageAdminPressReleaseEdit', params: { id: item.id } }"
-                    >
-                      Edit
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-col>
+              <transition-group name="list" style="display: contents;">
+                <v-col
+                  v-for="item in props.items"
+                  :key="item.id"
+                  cols="12"
+                  lg="3"
+                  md="4"
+                  sm="6"
+                >
+                  <v-card>
+                    <v-card-title class="subheading font-weight-bold">
+                      {{ item.title }}
+                    </v-card-title>
+                    <v-card-text>
+                      {{ item.date }}
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-btn
+                        :loading="item.loading"
+                        color="error"
+                        @click.prevent="deletePressRelease(item.id)"
+                      >
+                        Delete
+                      </v-btn>
+
+                      <v-spacer />
+
+                      <v-btn
+                        :loading="item.loading"
+                        :to="{ name: 'PageAdminPressReleaseEdit', params: { id: item.id } }"
+                        color="warning"
+                      >
+                        Edit
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-col>
+              </transition-group>
             </v-row>
           </template>
         </v-data-iterator>
@@ -59,6 +76,9 @@
   </app-max-width-container>
 </template>
 <script>
+  import {
+    mapActions,
+  } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   export default {
@@ -69,9 +89,70 @@
     },
 
     async asyncData({ store }) {
+      const addProperty =
+        (property, value = null) =>
+          (list) =>
+            list.map(
+              (entry) => ({
+                ...entry,
+                [property]: value,
+              }),
+            )
+      ;
+
       return {
-        releases: await store.dispatch("pressRelease/fetchAllPressReleases"),
+        releases: await store.dispatch("pressRelease/fetchAllPressReleases").then(addProperty("loading", false)),
       };
+    },
+
+    methods: {
+      ...mapActions({
+        doDeletePressRelease: "pressRelease/deletePressRelease",
+      }),
+
+      async deletePressRelease(id) {
+        if (!window.confirm("Are you sure you want to delete that?")) {
+          return false;
+        }
+
+        const release = this.releases.find(({ id: i }) => i === id);
+
+        release.loading = true;
+
+        const { error, errorData } = await this.doDeletePressRelease({ id });
+
+        release.loading = false;
+
+        if (error) {
+          const err =
+            errorData
+              ? errorData.join("\n")
+              : "Something went wrong"
+          ;
+
+          return alert(err);
+        }
+
+        this.$set(this, "releases", this.releases.filter(({ id: i }) => i !== id));
+      },
     },
   };
 </script>
+
+<style lang="scss" scoped>
+  .list-item {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .list-enter-active,
+  .list-leave-active {
+    transition: all .5s;
+  }
+
+  .list-enter,
+  .list-leave-to {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+</style>

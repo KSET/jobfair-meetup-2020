@@ -47,10 +47,16 @@ export const actions = {
     );
   },
 
-  async updatePressRelease({ commit, state }, data) {
+  async updatePressRelease({ commit }, data) {
     return await this.$api.$patch(
       `/press-release/${ data.id }`,
       data,
+    );
+  },
+
+  deletePressRelease({ commit }, { id }) {
+    return this.$api.$delete(
+      `/press-release/${ id }`,
     );
   },
 };

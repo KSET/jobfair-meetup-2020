@@ -2,13 +2,14 @@ import {
   Router,
 } from "express";
 import {
- formatDate,
+  formatDate,
 } from "../../helpers/date";
 import {
   requireAuth,
 } from "../helpers/middleware";
 import {
   queryPressReleaseCreate,
+  queryPressReleaseDeleteById,
   queryPressReleaseGetAll,
   queryPressReleaseGetById,
   queryPressReleaseUpdateById,
@@ -119,6 +120,14 @@ router.patch("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params, b
   }
 
   return newRelease;
+}));
+
+router.delete("/:id", apiRoute(async ({ params }) => {
+  const { id } = params;
+
+  await query(queryPressReleaseDeleteById({ id }));
+
+  return id;
 }));
 
 export default router;

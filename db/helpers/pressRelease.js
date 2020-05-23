@@ -58,6 +58,22 @@ export const queryPressReleaseCreate =
   })
 ;
 
+export const queryPressReleaseDeleteById =
+  ({
+     id,
+   }) => ({
+    text: `
+      delete from
+        press_release
+      where
+        "id" = $1
+    `,
+    values: [
+      id,
+    ],
+  })
+;
+
 export const queryPressReleaseUpdateById =
   (
     id,
