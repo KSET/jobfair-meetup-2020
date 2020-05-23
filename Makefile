@@ -1,7 +1,8 @@
 NODE_MODULES := ./node_modules
 DB_CONTAINER := meetup-db
+WEB_CONTAINER := nuxt
 
-.PHONY: stop start up up-db prod dev down restart reboot rebuild install yarn-install build clean build-containers
+.PHONY: stop start up up-db up-web prod dev down down-web restart restart-web reboot reboot-web rebuild install yarn-install build clean build-containers
 
 stop:
 	docker/compose stop
@@ -15,7 +16,7 @@ up:
 up-db:
 	docker/compose up -d $(DB_CONTAINER)
 
-prod: build reboot
+prod: build up restart-web
 
 dev: $(NODE_MODULES) up-db
 	docker/yarn dev || exit 0
@@ -25,6 +26,9 @@ down:
 	docker/compose down
 
 restart: stop start
+
+restart-web:
+	docker/compose restart $(WEB_CONTAINER)
 
 reboot: down up
 
