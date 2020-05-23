@@ -31,85 +31,7 @@
         <translated-text :trans-key="page.name" :class="$style.navLinkText" />
       </nuxt-link>
 
-      <v-menu
-        v-if="user"
-        v-model="userOpen"
-        :close-on-content-click="false"
-        offset-y
-        transition="scroll-y-transition"
-      >
-        <template #activator="{ on }">
-          <a
-            :class="$style.navLink"
-            v-on="on"
-          >
-            <span :class="$style.navLinkText" v-text="user.name" />
-          </a>
-        </template>
-
-        <v-card>
-          <v-list>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title v-text="user.name" />
-                <v-list-item-subtitle v-text="user.email" />
-              </v-list-item-content>
-            </v-list-item>
-
-            <v-divider inset />
-
-            <v-list-item
-              v-for="company in user.companies"
-              :key="company.id"
-            >
-              <v-list-item-avatar :data-srcset="getSrcSet(company.logo)">
-                <v-img
-                  :lazy-src="company.logo.small.url"
-                  :src="company.logo.original.url"
-                  :srcset="getSrcSet(company.logo)"
-                  fill
-                />
-              </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title v-text="company.brand_name" />
-                <v-list-item-subtitle v-text="company.short_description.substr(0, 50) + '...'" />
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-
-          <v-divider />
-
-          <v-list v-if="user.role === 'admin'">
-            <v-list-item>
-              <v-list-item-action>
-                <v-switch :value="isEditing" color="primary" @change="setEditing($event)" />
-              </v-list-item-action>
-              <v-list-item-title>
-                <translated-text trans-key="header.enableEditing" />
-              </v-list-item-title>
-            </v-list-item>
-
-            <v-list-item>
-              <v-btn
-                :to="{ name: 'PageAdminIndex' }"
-              >
-                <translated-text trans-key="button.adminPanel" />
-              </v-btn>
-            </v-list-item>
-          </v-list>
-
-          <v-card-actions>
-            <v-spacer />
-
-            <v-btn text @click="userOpen = false">
-              <translated-text trans-key="actions.cancel" />
-            </v-btn>
-            <v-btn color="error" text @click="userOpen = logout()">
-              <translated-text trans-key="actions.auth.logout" />
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-menu>
+      <nav-user-module />
     </div>
 
     <v-btn :class="$style.navBurgerButton" icon @click.stop="toggleOpen">
@@ -120,35 +42,27 @@
 
 <script>
   import {
-    mapActions,
     mapGetters,
     mapMutations,
   } from "vuex";
   import MenuIcon from "~/assets/images/icons/menu.svg";
   import JobfairMeetupLogo from "~/assets/images/logo/jobfair.svg";
+  import NavUserModule from "~/components/NavUserModule";
   import TranslatedText from "~/components/TranslatedText";
-  import {
-    getSrcSet,
-  } from "~/helpers/image";
 
   export default {
     name: "AppNavBar",
 
     components: {
+      NavUserModule,
       TranslatedText,
       MenuIcon,
       JobfairMeetupLogo,
     },
 
-    data: () => ({
-      userOpen: false,
-    }),
-
     computed: {
       ...mapGetters({
         rawPages: "pages/getPages",
-        user: "user/getUser",
-        isEditing: "translations/isEditable",
       }),
 
       HeaderLinkVariants() {
@@ -179,20 +93,7 @@
     methods: {
       ...mapMutations({
         toggleOpen: "nav-drawer/TOGGLE_OPEN",
-        setEditing: "translations/SET_EDITABLE",
       }),
-
-      ...mapActions({
-        doLogout: "user/doLogout",
-      }),
-
-      async logout() {
-        await this.doLogout();
-
-        await this.$router.push({ name: "Index" });
-      },
-
-      getSrcSet,
     },
   };
 </script>
@@ -225,40 +126,7 @@
     }
 
     .navLink {
-      $border-size: 4px;
-
-      font-weight: 600;
-      display: flex;
-      box-sizing: border-box;
-      margin: 0 1.2em;
-      padding: 0 .4em;
-      transition-timing-function: $transition-timing-function;
-      transition-duration: 150ms;
-      transition-property: color, border-bottom-color;
-      text-decoration: none;
-      color: $fer-white;
-      border-top: #{$border-size} solid transparent;
-      border-bottom: #{$border-size} solid transparent;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-      will-change: color, border-bottom-color;
-
-      &:active {
-        border-bottom-color: transparentize($fer-yellow, .75);
-      }
-
-      &:global(.nuxt-link-active) {
-        color: fer-hover($fer-yellow);
-        border-bottom-color: fer-hover($fer-yellow);
-      }
-
-      &:global(.nuxt-link-exact-active) {
-        cursor: default;
-      }
-
-      &:hover {
-        color: fer-hover($fer-yellow);
-      }
+      @extend %nav-link;
 
       .navLinkText {
         align-self: center;
