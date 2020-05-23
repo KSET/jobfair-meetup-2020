@@ -46,6 +46,12 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+
+        <v-list-item>
+          <v-list-item-content>
+            <nav-user-module />
+          </v-list-item-content>
+        </v-list-item>
       </v-list-item-group>
     </v-list>
   </v-navigation-drawer>
@@ -58,11 +64,13 @@
   } from "vuex";
 
   import JobfairMeetupLogo from "@/assets/images/logo/jobfair.svg";
+  import NavUserModule from "~/components/NavUserModule";
 
   export default {
     name: "AppNavDrawer",
 
     components: {
+      NavUserModule,
       JobfairMeetupLogo,
     },
 

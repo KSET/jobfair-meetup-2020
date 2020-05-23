@@ -28,6 +28,8 @@
         >
           <span :class="$style.navLinkText" v-text="page.name" />
         </nuxt-link>
+
+        <nav-user-module />
       </div>
     </v-app-bar>
 
@@ -40,13 +42,14 @@
 </template>
 
 <script>
+  import NavUserModule from "~/components/NavUserModule";
   import {
     hid,
   } from "~/helpers/head";
 
   export default {
     name: "LayoutAdmin",
-
+    components: { NavUserModule },
     data: () => ({
       pages: [
         {
