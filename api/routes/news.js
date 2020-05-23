@@ -118,6 +118,13 @@ router.patch("/item/:slug", apiRoute(async ({ params, body }) => {
       : [ prop, `${ capitalize(prop) } must be at least ${ length } characters long` ]
   ;
 
+  const maxLength =
+    (prop, length) =>
+      body[prop] && length > body[prop].length
+      ? false
+      : [ prop, `${ capitalize(prop) } must be at most ${ length } characters long` ]
+  ;
+
   const validDate =
     (prop) => {
       const data = body[prop];
@@ -133,6 +140,7 @@ router.patch("/item/:slug", apiRoute(async ({ params, body }) => {
 
   validations.push(minLength("title", 5));
   validations.push(minLength("description", 5));
+  validations.push(maxLength("description", 130));
   validations.push(minLength("content", 5));
   validations.push(validDate("date"));
 
