@@ -50,4 +50,10 @@ export const actions = {
       news,
     ).catch((e) => e);
   },
+
+  async deleteNewsItem({ commit, state }, { slug }) {
+    return await this.$api.$delete(
+      `/news/item/${ slug }`,
+    ).catch((e) => e);
+  },
 };

@@ -10,6 +10,7 @@ import {
   queryNewsGetBySlug,
   queryNewsUpdateBySlug,
   queryNewsCreate,
+  queryNewsDeleteBySlug,
 } from "../../db/helpers/news";
 import {
   query,
@@ -202,6 +203,22 @@ router.put("/item/", requireAuth({ role: "admin" }), apiRoute(async ({ body, aut
     id: res.id,
     ...newNews,
   };
+}));
+
+router.delete("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
+  const { slug } = params;
+
+  const [ news ] = await query(queryNewsGetBySlug(slug));
+
+  if (!news) {
+    throw new ApiError("not-found", 404, [
+      "News item not found",
+    ]);
+  }
+
+  await query(queryNewsDeleteBySlug(slug));
+
+  return true;
 }));
 
 export default router;

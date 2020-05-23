@@ -122,7 +122,7 @@ router.patch("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params, b
   return newRelease;
 }));
 
-router.delete("/:id", apiRoute(async ({ params }) => {
+router.delete("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
   const { id } = params;
 
   await query(queryPressReleaseDeleteById({ id }));

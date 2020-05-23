@@ -110,18 +110,18 @@
         doDeleteNews: "news/deleteNewsItem",
       }),
 
-      async deleteNews(id) {
+      async deleteNews(slug) {
         if (!window.confirm("Are you sure you want to delete that?")) {
           return false;
         }
 
-        const release = this.releases.find(({ id: i }) => i === id);
+        const news = this.news.find(({ slug: i }) => i === slug);
 
-        release.loading = true;
+        news.loading = true;
 
-        const { error, errorData } = await this.doDeleteNews({ id });
+        const { error, errorData } = await this.doDeleteNews({ slug });
 
-        release.loading = false;
+        news.loading = false;
 
         if (error) {
           const err =
@@ -133,7 +133,7 @@
           return alert(err);
         }
 
-        this.$set(this, "releases", this.releases.filter(({ id: i }) => i !== id));
+        this.$set(this, "news", this.news.filter((item) => item !== news));
       },
     },
   };

@@ -123,3 +123,16 @@ export const queryNewsCreate =
   }
 ;
 
+export const queryNewsDeleteBySlug =
+  (slug) => ({
+    text: `
+      delete from
+        news
+      where
+        "slug" = $1
+    `,
+    values: [
+      slug,
+    ],
+  })
+;
