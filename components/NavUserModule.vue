@@ -18,6 +18,16 @@
           v-on="on"
         >
           <span :class="$style.navLinkText" v-text="user.name" />
+          <v-icon
+            :class="{
+              [$style.navLinkIcon]: true,
+              [$style.navLinkOpen]: userOpen,
+            }"
+            class="ml-1"
+            dense
+          >
+            mdi-chevron-down
+          </v-icon>
         </a>
       </template>
 
@@ -30,42 +40,64 @@
             </v-list-item-content>
           </v-list-item>
 
-          <v-divider inset />
+          <v-divider v-if="user.companies.length" />
 
-          <v-list-item
-            v-for="company in user.companies"
-            :key="company.id"
-          >
-            <v-list-item-avatar :data-srcset="getSrcSet(company.logo)">
-              <v-img
-                :lazy-src="company.logo.small.url"
-                :src="company.logo.original.url"
-                :srcset="getSrcSet(company.logo)"
-                fill
-              />
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title v-text="company.brand_name" />
-              <v-list-item-subtitle v-text="company.short_description.substr(0, 50) + '...'" />
-            </v-list-item-content>
+          <v-list-item v-if="user.companies.length">
+            <v-list subheader>
+              <v-subheader>
+                <translated-text trans-key="nav.user.company.memberOf" />
+              </v-subheader>
+
+              <v-list-item
+                v-for="company in user.companies"
+                :key="company.id"
+              >
+                <v-list-item-avatar :data-srcset="getSrcSet(company.logo)">
+                  <v-img
+                    :lazy-src="company.logo.small.url"
+                    :src="company.logo.original.url"
+                    :srcset="getSrcSet(company.logo)"
+                    fill
+                  />
+                </v-list-item-avatar>
+
+                <v-list-item-content>
+                  <v-list-item-title v-text="company.brand_name" />
+                  <v-list-item-subtitle v-text="company.short_description.substr(0, 50) + '...'" />
+                </v-list-item-content>
+
+                <v-list-item-action>
+                  <v-list-item-action-text>
+                    <v-btn color="primary">
+                      <translated-text trans-key="nav.user.actions.company.enter" />
+                    </v-btn>
+                  </v-list-item-action-text>
+                </v-list-item-action>
+              </v-list-item>
+            </v-list>
           </v-list-item>
         </v-list>
 
-        <v-divider />
+        <v-divider v-if="user.role === 'admin'" />
 
-        <v-list v-if="user.role === 'admin'">
+        <v-list v-if="user.role === 'admin'" subheader>
+          <v-subheader>
+            <translated-text trans-key="nav.user.admin.header" />
+          </v-subheader>
+
           <v-list-item>
             <v-list-item-action>
               <v-switch :value="isEditing" color="primary" @change="setEditing($event)" />
             </v-list-item-action>
             <v-list-item-title>
-              <translated-text trans-key="header.enableEditing" />
+              <translated-text trans-key="nav.user.actions.admin.enableEditing" />
             </v-list-item-title>
           </v-list-item>
 
           <v-list-item>
             <v-btn
               :to="{ name: 'PageAdminIndex' }"
+              color="primary"
             >
               <translated-text trans-key="button.adminPanel" />
             </v-btn>
@@ -154,6 +186,15 @@
 
       .navLinkText {
         align-self: center;
+      }
+
+      .navLinkIcon {
+        transition-property: transform;
+        color: inherit;
+      }
+
+      .navLinkOpen {
+        transform: rotate(180deg);
       }
     }
   }
