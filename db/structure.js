@@ -27,13 +27,13 @@ create table if not exists images
 
 create table if not exists image_variations
 (
-    id        serial              not null,
-    name      text                not null,
-    path      text                not null,
-    width     integer             not null,
-    height    integer             not null,
-    image_id  integer             not null,
-    mime_type varchar default 127 not null,
+    id        serial       not null,
+    name      text         not null,
+    path      text         not null,
+    width     integer      not null,
+    height    integer      not null,
+    image_id  integer      not null,
+    mime_type varchar(127) not null,
     constraint image_variations_pk
         primary key (id),
     constraint image_variations_images_id_fk
