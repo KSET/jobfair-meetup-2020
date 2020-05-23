@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ apiFilePath,
+} from "../../helpers/file";
+import {
   queryFileGetById,
 } from "../../../db/helpers/file";
 import {
@@ -45,6 +48,8 @@ router.get("/:id/info", apiRoute(async (req) => {
       "Image not found",
     ]);
   }
+
+  file.url = apiFilePath({ fileId: file.id });
 
   return file;
 }));
