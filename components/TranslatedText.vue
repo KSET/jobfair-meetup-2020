@@ -38,24 +38,51 @@
       }),
 
       cleanText() {
-        if (!this.text) {
-          return "";
+        return this.cleanUpText(this.text);
+      },
+
+      translation() {
+        if (!this.$el) {
+          return this.cleanText;
         }
 
-        const text = this.text.trim();
-        const brKey = `|${ Math.random().toString(36).substr(3) }|`;
-        const html = text.replace("<br>", `${ brKey }br${ brKey }`);
-        const div = document.createElement("div");
-        div.innerHTML = html;
-
-        return div.textContent.replace(`${ brKey }br${ brKey }`, "<br>");
+        return this.cleanText || this.cleanUpText(this.$el.innerHTML);
       },
+    },
+
+    watch: {
+      text: {
+        handler() {
+          this.$emit("input", this.translation);
+        },
+
+        immediate: true,
+      },
+    },
+
+    mounted() {
+      this.text = this.translation;
     },
 
     methods: {
       ...mapActions({
         updateTranslation: "translations/updateTranslation",
       }),
+
+      cleanUpText(text) {
+        if (!text) {
+          return "";
+        }
+
+        const brKey = `|${ Math.random().toString(36).substr(3) }|`;
+        const html = String(text).trim().replace(/<br>/gi, `${ brKey }br${ brKey }`);
+        const div = document.createElement("div");
+        div.innerHTML = html;
+
+        const eBrKey = brKey.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+
+        return div.textContent.replace(RegExp(`${ eBrKey }br${ eBrKey }`, "gi"), "<br>");
+      },
 
       async handleBlur() {
         const key = this.transKey;
@@ -65,10 +92,20 @@
           return;
         }
 
-        await this.updateTranslation({
+        const { error, errorData } = await this.updateTranslation({
           key,
           value,
         });
+
+        if (error) {
+          const message =
+            errorData
+              ? errorData.join("\n")
+              : "Something went wrong"
+          ;
+
+          return alert(message);
+        }
 
         this.text = null;
       },
@@ -96,6 +133,7 @@
 
   .editing {
     position: relative !important;
+    display: inline-flex;
     overflow: hidden;
     box-sizing: border-box;
     min-height: 1em !important;

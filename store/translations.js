@@ -58,22 +58,23 @@ export const actions = {
   },
 
   async updateTranslation({ commit }, { key, value }) {
-    try {
-      const { data } = await this.$api.$patch(
-        `/translations/${ key }`,
-        {
-          value:
-            value
-              .trim()
-              .replace(/^<br>/gi, "")
-              .replace(/<br>$/gi, "")
-          ,
-        },
-      );
+    const { data, ...rest } = await this.$api.$patch(
+      `/translations/${ key }`,
+      {
+        value:
+          value
+            .trim()
+            .replace(/^(<br>)+/i, "")
+            .replace(/(<br>)+$/i, "")
+        ,
+      },
+    ).catch((err) => err);
 
+    if (data) {
       commit("SET_TRANSLATION", data);
-    } catch {
     }
+
+    return { data, ...rest };
   },
 
   async syncNewTranslations({ commit, state }) {
