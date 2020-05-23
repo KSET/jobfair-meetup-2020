@@ -21,7 +21,7 @@ import {
   apiRoute,
 } from "../helpers/route";
 import {
- requireAuth,
+  requireAuth,
 } from "../helpers/middleware";
 
 const router = Router();
@@ -69,51 +69,15 @@ const processNews =
     }
 ;
 
-
-router.get("/list", apiRoute(async () => {
-  const rawNews = await query(queryNewsGetAll());
-  const rawImages = await query(queryImageGetByIds(...rawNews.map((n) => n.image_id)));
-
-  const images = rawImages.map(processImage);
-
-  return rawNews.map(processNews(images));
-}));
-
-router.get("/item/:slug", apiRoute(async ({ params }) => {
-  const { slug } = params;
-
-  const [ rawNews ] = await query(queryNewsGetBySlug(slug));
-
-  if (!rawNews) {
-    throw new ApiError("not-found", 404);
+const capitalize = (s) => {
+  if ("string" !== typeof s) {
+    return "";
   }
 
-  const rawImages = await query(queryImageGetById(rawNews.image_id));
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
-  const images = rawImages.map(processImage);
-
-  return processNews(images)(rawNews);
-}));
-
-router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ params, body }) => {
-  const validations = [];
-
-  const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
-
-  if (!oldNews) {
-    throw new ApiError("news-not-found", 403, {
-      global: "News not found",
-    });
-  }
-
-  const capitalize = (s) => {
-    if ("string" !== typeof s) {
-      return "";
-    }
-
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-
+const validateNews = (body) => {
   const minLength =
     (prop, length) =>
       body[prop] && length < body[prop].length
@@ -141,13 +105,52 @@ router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ pa
     }
   ;
 
-  validations.push(minLength("title", 5));
-  validations.push(minLength("description", 5));
-  validations.push(maxLength("description", 130));
-  validations.push(minLength("content", 5));
-  validations.push(validDate("date"));
+  const validations = [
+    minLength("title", 5),
+    minLength("description", 5),
+    maxLength("description", 130),
+    minLength("content", 5),
+    validDate("date"),
+  ];
 
-  const errors = validations.filter((e) => false !== e);
+  return validations.filter((e) => false !== e);
+};
+
+router.get("/list", apiRoute(async () => {
+  const rawNews = await query(queryNewsGetAll());
+  const rawImages = await query(queryImageGetByIds(...rawNews.map((n) => n.image_id)));
+
+  const images = rawImages.map(processImage);
+
+  return rawNews.map(processNews(images));
+}));
+
+router.get("/item/:slug", apiRoute(async ({ params }) => {
+  const { slug } = params;
+
+  const [ rawNews ] = await query(queryNewsGetBySlug(slug));
+
+  if (!rawNews) {
+    throw new ApiError("not-found", 404);
+  }
+
+  const rawImages = await query(queryImageGetById(rawNews.image_id));
+
+  const images = rawImages.map(processImage);
+
+  return processNews(images)(rawNews);
+}));
+
+router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ params, body }) => {
+  const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
+
+  if (!oldNews) {
+    throw new ApiError("news-not-found", 403, {
+      global: "News not found",
+    });
+  }
+
+  const errors = validateNews(body);
 
   if (0 < errors.length) {
     throw new ApiError("validation-failed", 403, Object.fromEntries(errors));
