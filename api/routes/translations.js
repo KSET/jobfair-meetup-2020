@@ -74,23 +74,25 @@ router.put("/", apiRoute(async ({ body: keys = [] }) => {
 router.patch("/:key", apiRoute(async ({ body, params }) => {
   const { key } = params;
   const { value } = body;
+
   if (!value) {
     throw new ApiError("value-missing", 403, [
       "Value not set",
     ]);
   }
 
-  const [ translation ] = await query(queryTranslationsGetByKey(key));
+  const [ translation = {} ] = await query(queryTranslationsGetByKey(key));
 
-  if (!translation) {
-    throw new ApiError("translation-not-found", 403, [
-      "Translation not found",
-    ]);
+  if (!translation.key) {
+    translation.key = key;
+    translation.value = value;
+
+    await query(queryTranslationsInsertOne(translation));
+  } else {
+    translation.value = value;
+
+    await query(queryTranslationsUpdateByKey(key, value));
   }
-
-  translation.value = value;
-
-  await query(queryTranslationsUpdateByKey(key, value));
 
   return translation;
 }));
