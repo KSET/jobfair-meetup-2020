@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ formatDate,
+} from "../../helpers/date";
+import {
   requireAuth,
 } from "../helpers/middleware";
 import {
@@ -33,6 +36,7 @@ router.get("/all", apiRoute(() => {
             ...r,
             fileId: file_id,
             url: apiFilePath({ fileId: file_id }),
+            date: formatDate(r.created_at),
           })
           ,
         )
@@ -51,6 +55,7 @@ router.get("/release/:id", apiRoute(async ({ params }) => {
 
   res.fileId = res.file_id;
   res.url = apiFilePath(res);
+  res.date = formatDate(res.created_at);
 
   return res;
 }));
