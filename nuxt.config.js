@@ -80,6 +80,12 @@ export default {
         },
       },
     ],
+    [
+      "@nuxtjs/google-analytics",
+      {
+        id: process.env.GOOGLE_ANALYTICS_KEY,
+      },
+    ],
   ],
   /*
    ** Nuxt.js modules
