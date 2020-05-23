@@ -20,6 +20,9 @@ import {
   ApiError,
   apiRoute,
 } from "../helpers/route";
+import {
+ requireAuth,
+} from "../helpers/middleware";
 
 const router = Router();
 
@@ -92,7 +95,7 @@ router.get("/item/:slug", apiRoute(async ({ params }) => {
   return processNews(images)(rawNews);
 }));
 
-router.patch("/item/:slug", apiRoute(async ({ params, body }) => {
+router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ params, body }) => {
   const validations = [];
 
   const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));

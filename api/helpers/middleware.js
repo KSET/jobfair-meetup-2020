@@ -28,19 +28,29 @@ export const injectAuthData =
 export const requireAuth =
   ({
      fullUserData = false,
+     role = null,
    } = {}) =>
     async (req, res, next) => {
       await injectAuthData({ fullUserData })(req);
 
-      if (req.authUser) {
-        return next();
+      if (!req.authUser) {
+        res.status(401);
+
+        return res.json(error({
+          reason: "authorization-required",
+          status: 401,
+        }));
       }
 
-      res.status(401);
+      if (role && req.authUser.role !== role) {
+        res.status(401);
 
-      return res.json(error({
-        reason: "authorization-required",
-        status: 401,
-      }));
+        return res.json(error({
+          reason: "authorization-required",
+          status: 401,
+        }));
+      }
+
+      return next();
     }
 ;

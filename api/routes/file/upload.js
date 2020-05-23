@@ -31,7 +31,7 @@ const mkdir = promisify(mkdirCb);
 
 const router = Router();
 
-router.use(requireAuth());
+router.use(requireAuth({ role: "admin" }));
 
 router.post("/", apiRoute(async ({ files, authUser }) => {
   const client = {
