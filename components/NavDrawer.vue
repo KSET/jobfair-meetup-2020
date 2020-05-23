@@ -35,14 +35,13 @@
                 outlined
                 ripple
               >
-                {{ page.name }}
+                <translated-text :trans-key="page.name" />
               </v-btn>
-              <span
+              <translated-text
                 v-else
                 :class="$style.navItem"
-              >
-                {{ page.name }}
-              </span>
+                :trans-key="page.name"
+              />
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -65,11 +64,13 @@
 
   import JobfairMeetupLogo from "@/assets/images/logo/jobfair.svg";
   import NavUserModule from "~/components/NavUserModule";
+  import TranslatedText from "~/components/TranslatedText";
 
   export default {
     name: "AppNavDrawer",
 
     components: {
+      TranslatedText,
       NavUserModule,
       JobfairMeetupLogo,
     },
