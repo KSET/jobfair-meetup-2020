@@ -5,11 +5,17 @@ const pool = new Pool({
 });
 
 export const query =
-  (text, params) =>
-    pool
-      .query(text, params)
-      .then(({ rows }) => rows || [])
-      .catch(() => [])
+  (text, params) => {
+    try {
+      return pool
+        .query(text, params)
+        .then(({ rows }) => rows || []);
+    } catch (e) {
+      console.log("|> QUERY ERROR", e);
+
+      return [];
+    }
+  }
 ;
 
 export const getClient =
