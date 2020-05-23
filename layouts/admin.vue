@@ -6,9 +6,9 @@
           v-ripple
           :class="$style.logoLink"
           :to="{ name: 'Index' }"
-          light
-          color="primary"
           class="black--text"
+          color="primary"
+          light
         >
           &larr; Back to site
         </v-btn>
@@ -64,6 +64,10 @@
         {
           name: "News",
           to: { name: "PageAdminNewsList" },
+        },
+        {
+          name: "Translations",
+          to: { name: "PageAdminTranslationsList" },
         },
       ],
     }),
