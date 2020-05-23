@@ -16,7 +16,14 @@ export const queryNewsGetBySlug =
 
 export const queryNewsGetAll =
   () => ({
-    text: "select * from news",
+    text: `
+      select
+        *
+      from
+        news
+      order by
+        "date" desc
+    `,
   })
 ;
 
