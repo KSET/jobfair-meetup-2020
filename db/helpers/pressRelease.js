@@ -10,6 +10,8 @@ export const queryPressReleaseGetAll =
         press_release
       left join
         files on "files"."id" = "press_release"."file_id"
+      order by
+        press_release.created_at desc
     `,
   })
 ;
