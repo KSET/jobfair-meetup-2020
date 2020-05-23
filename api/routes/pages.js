@@ -10,27 +10,27 @@ const router = Router();
 router.get("/list", apiRoute(() => {
   return [
     {
-      name: "Blog",
+      name: "page.name.blog",
       to: { name: "PageBlogHome" },
     },
     {
-      name: "O MeetUPu",
+      name: "page.name.about",
       to: { name: "PageAbout" },
     },
     {
-      name: "Sudionici",
+      name: "page.name.participants",
       to: { name: "PageSudionici" },
     },
     {
-      name: "Kontakt",
+      name: "page.name.contact",
       to: { name: "PageKontakt" },
     },
     {
-      name: "Press",
+      name: "page.name.press",
       to: { name: "PagePress" },
     },
     {
-      name: "Prijavi se",
+      name: "button.joinNow",
       href: "https://jobfair.fer.unizg.hr/",
     },
   ];
