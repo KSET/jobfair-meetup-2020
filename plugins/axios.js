@@ -1,11 +1,11 @@
-const baseUrl =
-  process.server
-  ? "http://localhost:3000"
-  : ""
-;
-
-export default function({ $axios }, inject) {
+export default function({ $axios, isDev }, inject) {
   const api = $axios.create({});
+
+  const baseUrl =
+    process.server
+    ? `http://localhost:${ isDev ? "3000" : process.env.PORT }`
+    : ""
+  ;
 
   api.setBaseURL(`${ baseUrl }/api`);
   api.setHeader("Content-Type", "application/json");
