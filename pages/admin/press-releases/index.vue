@@ -43,9 +43,14 @@
                     <v-card-title class="subheading font-weight-bold">
                       {{ item.title }}
                     </v-card-title>
-                    <v-card-text>
-                      {{ item.date }}
-                    </v-card-text>
+
+                    <v-divider />
+
+                    <v-list dense>
+                      <v-list-item>{{ item.date }}</v-list-item>
+                      <v-list-item><a :href="item.url" target="_blank">{{ item.name }}</a></v-list-item>
+                    </v-list>
+
                     <v-card-actions>
                       <v-btn
                         :loading="item.loading"
