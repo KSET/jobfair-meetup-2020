@@ -27,7 +27,9 @@ const fileUploadMiddleware = fileUpload({
     fileSize: 12 * 1024 * 1024,
   },
   limitHandler: apiRoute(() => {
-    return "file-too-big";
+    throw new ApiError("file-too-big", 413, [
+      "The file is too big. Max file size is 12MB.",
+    ]);
   }),
 });
 
