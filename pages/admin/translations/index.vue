@@ -19,7 +19,7 @@
             flat
             hide-details
             label="Search"
-            prepend-inner-icon="mdi-search"
+            prepend-inner-icon="mdi-magnify"
             solo-inverted
           />
         </v-toolbar>
