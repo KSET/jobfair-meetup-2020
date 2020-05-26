@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app dark elevate-on-scroll>
+  <v-app-bar :class="$style.container" app dark elevate-on-scroll>
     <v-toolbar-title>
       <nuxt-link v-ripple :class="$style.logoLink" :to="{ name: 'Index' }">
         <jobfair-meetup-logo />
@@ -28,7 +28,7 @@
         nuxt
         outlined
       >
-        <translated-text :trans-key="page.name" :class="$style.navLinkText" />
+        <translated-text :class="$style.navLinkText" :trans-key="page.name" />
       </nuxt-link>
 
       <nav-user-module />
@@ -101,48 +101,51 @@
 <style lang="scss" module>
   @import "../assets/styles/include/all";
 
-  $nav-height: 64px;
+  .container {
 
-  .logoLink {
-    display: flex;
-    padding: .3em;
-    border-radius: 4px;
-  }
+    $nav-height: 64px;
 
-  .navBurgerButton {
-    display: none;
-
-    @include media(sm) {
-      display: initial;
+    .logoLink {
+      display: flex;
+      padding: .3em;
+      border-radius: 4px;
     }
-  }
 
-  .navLinkContainer {
-    display: flex;
-    align-self: stretch;
-
-    @include media(sm) {
+    .navBurgerButton {
       display: none;
-    }
 
-    .navLink {
-      @extend %nav-link;
-
-      .navLinkText {
-        align-self: center;
+      @include media(sm) {
+        display: initial;
       }
     }
 
-    .navLinkButton {
-      align-self: center;
-      margin: 0 1.2em;
-    }
-  }
+    .navLinkContainer {
+      display: flex;
+      align-self: stretch;
 
-  :global(.v-toolbar__content) {
-    max-width: $content-max-width;
-    margin: 0 auto;
-    padding-top: 0;
-    padding-bottom: 0;
+      @include media(sm) {
+        display: none;
+      }
+
+      .navLink {
+        @extend %nav-link;
+
+        .navLinkText {
+          align-self: center;
+        }
+      }
+
+      .navLinkButton {
+        align-self: center;
+        margin: 0 1.2em;
+      }
+    }
+
+    :global(.v-toolbar__content) {
+      max-width: $content-max-width;
+      margin: 0 auto;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
   }
 </style>
