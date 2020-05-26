@@ -2,24 +2,24 @@ import {
   Router,
 } from "express";
 import {
- injectAuthData,
-} from "../helpers/middleware";
-import {
   graphQlQuery,
 } from "../helpers/axios";
 import {
-  apiRoute,
+  injectAuthData,
+} from "../helpers/middleware";
+import {
   ApiError,
+  apiRoute,
 } from "../helpers/route";
 
 const router = Router();
 
-router.get("/proxy", injectAuthData, apiRoute((req) => {
-  if (!req.params.query) {
+router.post("/proxy", injectAuthData(), apiRoute((req) => {
+  if (!req.body.query) {
     throw new ApiError("no-query");
   }
 
-  return graphQlQuery(req.params, req.authHeader);
+  return graphQlQuery(req.body, req.authHeader);
 }));
 
 export default router;
