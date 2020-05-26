@@ -1,5 +1,5 @@
 <template>
-  <app-max-width-container>
+  <app-max-width-container class="mb-6">
     <v-data-iterator
       :items="filteredTranslations"
       :items-per-page.sync="itemsPerPage"
