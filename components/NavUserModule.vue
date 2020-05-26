@@ -62,7 +62,7 @@
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                  <v-list-item-title v-text="company.brand_name" />
+                  <v-list-item-title v-text="company.brand_name || company.name" />
                   <v-list-item-subtitle v-text="company.short_description.substr(0, 50) + '...'" />
                 </v-list-item-content>
 
