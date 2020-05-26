@@ -22,7 +22,7 @@
 
     .contentContainer {
       max-width: $content-max-width;
-      margin: 0 auto;
+      margin: 0 auto 2em;
       padding: 0 2em;
 
       @include media(sm) {
