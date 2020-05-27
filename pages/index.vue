@@ -367,17 +367,17 @@
         return [
           {
             name: "Instagram",
-            href: "#",
+            href: this.getSetting("Instagram URL"),
             src: require("@/assets/images/icons/ig.svg?inline"),
           },
           {
             name: "Facebook",
-            href: "#",
+            href: this.getSetting("Facebook URL"),
             src: require("@/assets/images/icons/fb.svg?inline"),
           },
           {
             name: "YouTube",
-            href: "#",
+            href: this.getSetting("Youtube URL"),
             src: require("@/assets/images/icons/yt.svg?inline"),
           },
         ];
