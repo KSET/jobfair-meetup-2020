@@ -316,7 +316,7 @@
           (object, key) =>
             fuzzySearch(
               query,
-              dotGet(object, key).toLowerCase(),
+              String(dotGet(object, key) || "").toLowerCase(),
             )
         ;
 
