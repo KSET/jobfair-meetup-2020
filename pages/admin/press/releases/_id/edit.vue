@@ -2,7 +2,7 @@
   <PageAdminPressReleaseCreate :release="release" />
 </template>
 <script>
-  import PageAdminPressReleaseCreate from "~/pages/admin/press-releases/new";
+  import PageAdminPressReleaseCreate from "~/pages/admin/press/releases/new";
 
   export default {
     name: "PageAdminPressReleaseEdit",
