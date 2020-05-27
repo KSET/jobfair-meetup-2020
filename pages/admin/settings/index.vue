@@ -10,6 +10,7 @@
         <v-row
           v-for="setting in settings"
           :key="setting.key"
+          class="my-n6"
         >
           <v-col class="mt-7" cols="10">
             <v-text-field
@@ -22,7 +23,7 @@
               outlined
             />
           </v-col>
-          <v-col class="d-flex align-center justify-center" cols="2">
+          <v-col class="d-flex align-center justify-left" cols="2">
             <v-btn
               color="success"
               @click="saveSetting(setting)"
@@ -52,7 +53,7 @@
               outlined
             />
           </v-col>
-          <v-col class="d-flex align-center justify-center" cols="2">
+          <v-col class="d-flex align-center justify-left" cols="2">
             <v-btn
               :loading="newSetting.loading"
               color="success"
