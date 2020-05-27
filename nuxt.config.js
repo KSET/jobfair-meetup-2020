@@ -71,16 +71,6 @@ export default {
     "@nuxtjs/stylelint-module",
     "@nuxtjs/vuetify",
     [
-      "nuxt-imagemin",
-      {
-        optipng: null,
-        gifsicle: null,
-        pngquant: {
-          strip: true,
-        },
-      },
-    ],
-    [
       "@nuxtjs/google-analytics",
       {
         id: process.env.GOOGLE_ANALYTICS_KEY,
