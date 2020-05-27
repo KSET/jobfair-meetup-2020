@@ -26,7 +26,7 @@ export default {
    ** Headers of the page
    */
   head: {
-    titleTemplate: "%s - JobFair MeetUP",
+    titleTemplate: "%s | JobFair MeetUP",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, minimal-ui" },
