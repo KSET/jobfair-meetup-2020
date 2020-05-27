@@ -28,7 +28,7 @@
               <v-btn
                 :class="$style.heroButton"
                 color="primary"
-                href="https://jobfair.fer.unizg.hr"
+                :href="getSetting('Join Now URL', '#')"
                 large
                 rel="noopener noreferrer"
                 target="_blank"
@@ -302,6 +302,7 @@
 <script>
   import {
     mapActions,
+    mapGetters,
   } from "vuex";
   import AppNewsCard from "~/components/news/NewsCard";
   import TranslatedText from "~/components/TranslatedText";
@@ -346,6 +347,10 @@
     },
 
     computed: {
+      ...mapGetters({
+        getSetting: "settings/getSetting",
+      }),
+
       titleTexts() {
         return [
           "talk",

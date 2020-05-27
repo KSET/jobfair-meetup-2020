@@ -31,7 +31,7 @@ router.get("/list", apiRoute(() => {
     },
     {
       name: "button.joinNow",
-      href: "https://jobfair.fer.unizg.hr/",
+      setting: "Join Now URL",
     },
   ];
 }));

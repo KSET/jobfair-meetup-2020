@@ -78,7 +78,7 @@
               />
               <a
                 :class="$style.link"
-                href="#"
+                :href="getSetting('Instagram URL')"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -95,7 +95,7 @@
               />
               <a
                 :class="$style.link"
-                href="#"
+                :href="getSetting('Facebook URL')"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -112,7 +112,7 @@
               />
               <a
                 :class="$style.link"
-                href="#"
+                :href="getSetting('Youtube URL')"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -127,6 +127,9 @@
 </template>
 
 <script>
+  import {
+    mapGetters,
+  } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
 
@@ -144,6 +147,12 @@
         address: "",
       },
     }),
+
+    computed: {
+      ...mapGetters({
+        getSetting: "settings/getSetting",
+      }),
+    },
   };
 </script>
 

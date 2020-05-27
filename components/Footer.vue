@@ -61,12 +61,12 @@
             </strong>
           </div>
           <div>
-            <a href="https://kutt.it/xT6JNg" rel="noopener noreferrer" target="_blank">
+            <a :href="getSetting('Play Store URL')" rel="noopener noreferrer" target="_blank">
               <translated-text trans-key="footer.apps.android" />
             </a>
           </div>
           <div>
-            <a href="https://kutt.it/rQAtiS" rel="noopener noreferrer" target="_blank">
+            <a :href="getSetting('App Store URL')" rel="noopener noreferrer" target="_blank">
               <translated-text trans-key="footer.apps.iphone" />
             </a>
           </div>
@@ -128,12 +128,22 @@
 </template>
 
 <script>
+  import {
+    mapGetters,
+  } from "vuex";
   import TranslatedText from "~/components/TranslatedText";
 
   export default {
     name: "AppFooter",
-    components: { TranslatedText },
+
+    components: {
+      TranslatedText,
+    },
+
     computed: {
+      ...mapGetters({
+        getSetting: "settings/getSetting",
+      }),
 
       logos() {
         return [
@@ -165,17 +175,17 @@
         return [
           {
             name: "Instagram",
-            href: "#",
+            href: this.getSetting("Instagram URL"),
             src: require("@/assets/images/icons/instagram.svg?inline"),
           },
           {
             name: "Facebook",
-            href: "#",
+            href: this.getSetting("Facebook URL"),
             src: require("@/assets/images/icons/facebook.svg?inline"),
           },
           {
             name: "Youtube",
-            href: "#",
+            href: this.getSetting("Youtube URL"),
             src: require("@/assets/images/icons/youtube.svg?inline"),
           },
         ];

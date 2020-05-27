@@ -19,8 +19,26 @@ export const mutations = {
 };
 
 export const actions = {
-  async fetchPages({ commit }) {
-    const { data } = await this.$api.$get("/pages/list");
+  async fetchPages({ commit, rootGetters }) {
+    const { data: rawData } = await this.$api.$get("/pages/list");
+
+    const getSetting = rootGetters["settings/getSetting"];
+
+    const data =
+      rawData
+        .map(
+          ({ setting, ...rest }) => {
+            if (!setting) {
+              return rest;
+            }
+
+            return ({
+              ...rest,
+              href: getSetting(setting, "#"),
+            });
+          },
+        )
+    ;
 
     await commit("SET_PAGES", data);
 
