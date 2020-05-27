@@ -105,6 +105,7 @@ create table if not exists press_release
 create table if not exists press_gallery
 (
     id          serial                                             not null,
+    "order"     integer                                            not null,
     title       text                                               not null,
     description text                                               not null,
     image_id    integer                                            not null,
