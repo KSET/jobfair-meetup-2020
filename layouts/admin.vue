@@ -69,6 +69,10 @@
           name: "Translations",
           to: { name: "PageAdminTranslationsList" },
         },
+        {
+          name: "Settings",
+          to: { name: "PageAdminSettingsList" },
+        },
       ],
     }),
 

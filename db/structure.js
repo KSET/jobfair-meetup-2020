@@ -113,4 +113,16 @@ create table if not exists press_gallery
     constraint press_gallery_pk
         primary key (id)
 );
+
+create table if not exists settings
+(
+    id    serial       not null,
+    key   varchar(255) not null,
+    value text         not null,
+    constraint settings_pk
+        primary key (id)
+);
+
+create unique index if not exists settings_key_uindex
+    on settings (key);
 `;

@@ -9,5 +9,6 @@ export const actions = {
     await dispatch("pages/fetchPages");
     await dispatch("user/nuxtServerInit");
     await dispatch("translations/nuxtServerInit");
+    await dispatch("settings/nuxtServerInit");
   },
 };
