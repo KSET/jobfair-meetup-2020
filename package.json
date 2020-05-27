@@ -59,7 +59,6 @@
     "loader-utils": "^2.0.0",
     "node-sass": "^4.14.1",
     "normalize-path": "^3.0.0",
-    "nuxt-imagemin": "^1.0.0",
     "nuxt-purgecss": "^1.0.0",
     "nuxt-svg-loader": "^1.2.0",
     "sass-loader": "^8.0.2",
