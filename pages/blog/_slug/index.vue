@@ -191,14 +191,20 @@
     },
 
     head() {
-      const { title, text } = this.news || {};
+      const { title, description, images } = this.news || {};
+
+      const image =
+        images
+          ? images.default.url
+          : "";
 
       return {
         title,
         meta: [
           ...generateMetadata({
             title,
-            description: text,
+            image,
+            description,
           }),
         ],
       };

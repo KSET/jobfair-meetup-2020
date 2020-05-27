@@ -19,7 +19,7 @@
   import AppNavDrawer from "@/components/NavDrawer";
   import AppFooter from "@/components/Footer";
   import {
-    hid,
+    generateMetadata,
   } from "~/helpers/head";
 
   export default {
@@ -47,9 +47,12 @@
 
     head() {
       return {
-        title: "Welcome",
         meta: [
-          hid({ name: "og:locale", content: "hr_HR" }),
+          ...generateMetadata({
+            title: "Welcome",
+            locale: "hr",
+            image: require("@/assets/images/facebook-share.jpg"),
+          }),
         ],
       };
     },

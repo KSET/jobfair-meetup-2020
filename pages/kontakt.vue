@@ -132,6 +132,9 @@
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
+  import {
+    generateMetadata,
+  } from "~/helpers/head";
 
   export default {
     name: "PageKontakt",
@@ -153,6 +156,15 @@
         getSetting: "settings/getSetting",
       }),
     },
+
+    head: () => ({
+      title: "Kontakt",
+      meta: [
+        ...generateMetadata({
+          title: "Kontakt",
+        }),
+      ],
+    }),
   };
 </script>
 

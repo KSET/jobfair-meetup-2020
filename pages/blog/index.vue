@@ -65,6 +65,9 @@
     ensureArray,
   } from "~/helpers/data";
   import {
+    generateMetadata,
+  } from "~/helpers/head";
+  import {
     getSrcSet,
   } from "~/helpers/image";
   import {
@@ -100,9 +103,12 @@
 
     head: () => ({
       title: "Blog - Home",
-      page: {
-        description: "JobFair Meetup blog",
-      },
+      meta: [
+        ...generateMetadata({
+          title: "Blog - Home",
+          description: "JobFair MeetUP Blog",
+        }),
+      ],
     }),
   };
 </script>

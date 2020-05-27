@@ -324,6 +324,9 @@
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
+  import {
+    generateMetadata,
+  } from "~/helpers/head";
 
   export default {
     name: "PageAbout",
@@ -335,6 +338,11 @@
 
     head: () => ({
       title: "O MeetUPu",
+      meta: [
+        ...generateMetadata({
+          title: "O MeetUPu",
+        }),
+      ],
     }),
   };
 </script>

@@ -173,6 +173,9 @@
     dotGet,
   } from "~/helpers/data";
   import {
+    generateMetadata,
+  } from "~/helpers/head";
+  import {
     getSrcSet,
   } from "~/helpers/image";
 
@@ -335,6 +338,15 @@
         );
       },
     },
+
+    head: () => ({
+      title: "Sudionici",
+      meta: [
+        ...generateMetadata({
+          title: "Sudionici",
+        }),
+      ],
+    }),
   };
 </script>
 

@@ -102,6 +102,9 @@
   import {
     formatDate,
   } from "~/helpers/date";
+  import {
+    generateMetadata,
+  } from "~/helpers/head";
 
   export default {
     name: "PagePress",
@@ -128,6 +131,15 @@
         pressReleases: await store.dispatch("pressRelease/fetchAllPressReleases").then(parseDates),
       };
     },
+
+    head: () => ({
+      title: "Press",
+      meta: [
+        ...generateMetadata({
+          title: "Press",
+        }),
+      ],
+    }),
   };
 </script>
 

@@ -90,6 +90,9 @@
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
+  import {
+    generateMetadata,
+  } from "~/helpers/head";
 
   export default {
     name: "PageSudioniciInfo",
@@ -161,6 +164,31 @@
 
     validate({ store, params }) {
       return store.dispatch("companies/fetchEvent", { id: params.id, type: params.type });
+    },
+
+    head() {
+      const { title: eventTitle, name, company } = this.eventObj || {};
+      const { type } = (this.$route || {}).params || {};
+
+      const c =
+        company
+          ? company.brand_name || company.name
+          : ""
+      ;
+
+      const capitalize = (str) => str.slice(0, 1).toUpperCase() + str.slice(1);
+
+      const n = eventTitle || name;
+      const title = `${ n } | ${ capitalize(type) } by ${ c }`;
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+          }),
+        ],
+      };
     },
   };
 </script>

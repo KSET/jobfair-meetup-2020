@@ -9,6 +9,11 @@ const renameMap = {
   type: "og:type",
 };
 
+const mappedContent = {
+  "og:title": (title) => `${ title } | JobFair MeetUP`,
+};
+
+const getMappedContent = (key, content) => mappedContent[key] ? mappedContent[key](content) : content;
 const getRenamedKey = (key) => renameMap[key] || key;
 const getKeyAliases = (key) => aliasMap[key] || [];
 const getKeyWithAliases = (key) => [ key, ...getKeyAliases(key) ];
@@ -20,9 +25,12 @@ export const generateMetadata =
     Object
       .entries(pageData)
       .map(
-        ([ key, content ]) =>
-          [ String(getRenamedKey(key)), String(content) ]
-        ,
+        ([ key, content ]) => {
+          const newKey = String(getRenamedKey(key));
+          const newContent = String(getMappedContent(newKey, content));
+
+          return [ newKey, newContent ];
+        },
       )
       .flatMap(
         ([ key, content ]) =>
