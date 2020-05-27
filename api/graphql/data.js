@@ -91,3 +91,26 @@ export const loginData = {
   ),
   ...tokenData,
 };
+
+export const presentationData = {
+  ...basicFields(
+    "id",
+    "description",
+    "occures_at",
+    "location",
+    "title",
+    "topic",
+    "presenter_bio",
+  ),
+  presenter_photo: basicImage,
+};
+
+export const workshopData = {
+  ...basicFields(
+    "id",
+    "description",
+    "occures_at",
+    "location",
+    "name",
+  ),
+};

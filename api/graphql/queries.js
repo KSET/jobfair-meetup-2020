@@ -2,6 +2,8 @@ import {
   companyData,
   userData,
   basicUserData,
+  presentationData,
+  workshopData,
 } from "./data";
 import {
   createObject,
@@ -24,5 +26,23 @@ export const currentUserQuery = () => ({
 export const participantsQuery = () => ({
   query: `{ ${ createObject({
     companies: companyData,
+  }) } }`,
+});
+
+export const participantEventsQuery = () => ({
+  query: `{ ${ createObject({
+    companies: companyData,
+    presentations: {
+      ...presentationData,
+      company: {
+        id: "required",
+      },
+    },
+    workshops: {
+      ...workshopData,
+      company: {
+        id: "required",
+      },
+    },
   }) } }`,
 });
