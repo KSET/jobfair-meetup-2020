@@ -9,7 +9,7 @@
     <v-row>
       <v-col cols="12">
         <v-btn
-          :to="{ name: 'PageAdminIndex' }"
+          :to="{ name: 'PageAdminPressIndex' }"
         >
           Back
         </v-btn>

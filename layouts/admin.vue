@@ -58,8 +58,8 @@
           exact: true,
         },
         {
-          name: "Press releases",
-          to: { name: "PageAdminPressReleaseList" },
+          name: "Press",
+          to: { name: "PageAdminPressIndex" },
         },
         {
           name: "News",
