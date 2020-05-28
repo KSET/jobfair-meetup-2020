@@ -176,7 +176,7 @@
               <translated-text trans-key="meetup.newTech.header" />
             </h3>
             <p>
-              <translated-text trans-key="meetup.newTech.header" />
+              <translated-text trans-key="meetup.newTech.text" />
             </p>
           </v-col>
         </v-row>
