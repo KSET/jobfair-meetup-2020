@@ -16,7 +16,7 @@ up:
 up-db:
 	docker/compose up -d $(DB_CONTAINER)
 
-prod: build up restart-web
+prod: build reboot
 
 dev: $(NODE_MODULES) up-db
 	docker/yarn dev || exit 0
