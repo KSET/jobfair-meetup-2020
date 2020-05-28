@@ -167,14 +167,14 @@
     },
 
     head() {
-      const { title: eventTitle, name, company } = this.eventObj || {};
-      const { type } = (this.$route || {}).params || {};
+      if (!this.$route) {
+        return {};
+      }
 
-      const c =
-        company
-          ? company.brand_name || company.name
-          : ""
-      ;
+      const { title: eventTitle, name, company } = this.eventObj;
+      const { type } = this.$route.params;
+
+      const c = company.brand_name || company.name;
 
       const capitalize = (str) => str.slice(0, 1).toUpperCase() + str.slice(1);
 
