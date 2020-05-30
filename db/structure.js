@@ -1,4 +1,4 @@
-export default `
+export const base = `
 create table if not exists translations
 (
     id         serial                                             not null,
@@ -105,7 +105,6 @@ create table if not exists press_release
 create table if not exists press_gallery
 (
     id          serial                                             not null,
-    "order"     integer                                            not null,
     title       text                                               not null,
     description text                                               not null,
     image_id    integer                                            not null,
@@ -126,4 +125,46 @@ create table if not exists settings
 
 create unique index if not exists settings_key_uindex
     on settings (key);
+
+create table if not exists db_versions
+(
+    id      serial                                             not null,
+    "name"  varchar(255)                                       not null,
+    date    timestamp with time zone default CURRENT_TIMESTAMP not null,
+    constraint db_versions_pk
+        primary key (id)
+);
+
+create unique index if not exists db_versions_name_uindex
+    on db_versions (name);
 `;
+
+
+export const versions = [
+  {
+    name: "start",
+    up: `
+    alter table
+      press_gallery
+    add
+      "order"
+      integer
+      default 0
+      not null
+    ;
+
+    update
+      press_gallery
+    set
+      "order" = id
+    ;
+  `,
+    down: `
+    alter table
+      press_gallery
+    drop column
+      "order"
+    ;
+  `,
+  },
+];
