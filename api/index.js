@@ -121,9 +121,9 @@ query(dbBase)
           )
       ;
 
-      const versionStartIndex = Math.max(0, lastVersionIndex);
+      const remainingVersions = dbVersions.slice(lastVersionIndex + 1);
 
-      for (const version of dbVersions.slice(versionStartIndex)) {
+      for (const version of remainingVersions) {
         console.log("\t", "Migration:", version.name);
 
         await client.query({
@@ -148,11 +148,11 @@ query(dbBase)
       }
 
       await client.query("COMMIT");
-      console.error("|> Migrations done");
+      console.log("|> Migrations done");
     } catch (e) {
       await client.query("ROLLBACK");
-      console.error("|> Migration error! Aborting...");
-      console.error(e);
+      console.log("|> Migration error! Aborting...");
+      console.log(e);
     } finally {
       await client.end();
     }
