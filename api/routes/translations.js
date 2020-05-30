@@ -43,11 +43,13 @@ router.put("/", apiRoute(async ({ body: keys = [] }) => {
     throw new ApiError("invalid-keys");
   }
 
-  const client = await getClient();
-
-  await client.query("BEGIN");
+  const client = getClient();
 
   try {
+    await client.connect();
+
+    await client.query("BEGIN");
+
     await Promise.all(
       keys
         .map(
@@ -67,7 +69,7 @@ router.put("/", apiRoute(async ({ body: keys = [] }) => {
 
     throw e;
   } finally {
-    await client.release();
+    await client.end();
   }
 }));
 

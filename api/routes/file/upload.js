@@ -34,41 +34,7 @@ const router = Router();
 router.use(requireAuth({ role: "admin" }));
 
 router.post("/", apiRoute(async ({ files, authUser }) => {
-  const client = {
-    _instance: null,
-
-    async connect() {
-      this._instance = await getClient();
-
-      return this._instance;
-    },
-
-    async query(...args) {
-      if (!this._instance) {
-        return;
-      }
-
-      return await (
-        this
-          ._instance
-          .query(...args)
-          .then(({ rows }) => rows)
-          .catch(async (e) => {
-            await this._instance.query("ROLLBACK");
-
-            throw e;
-          })
-      );
-    },
-
-    async end() {
-      if (!this._instance) {
-        return;
-      }
-
-      await this._instance.release();
-    },
-  };
+  const client = getClient();
 
   try {
     const { file } = files;

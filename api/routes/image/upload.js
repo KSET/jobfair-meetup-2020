@@ -40,31 +40,7 @@ router.use(requireAuth({ role: "admin" }));
 
 router.post("/", async (req, res) => {
   const files = {};
-  const client = {
-    instance: null,
-
-    async connect() {
-      this.instance = await getClient();
-
-      return this.instance;
-    },
-
-    async query(...args) {
-      if (!this.instance) {
-        return;
-      }
-
-      return await this.instance.query(...args);
-    },
-
-    async end() {
-      if (!this.instance) {
-        return;
-      }
-
-      await this.instance.release();
-    },
-  };
+  const client = getClient();
 
   const error = (message, data = {}) => {
     res.status(415);

@@ -19,7 +19,41 @@ export const query =
 ;
 
 export const getClient =
-  () =>
-    pool
-      .connect()
+  () => ({
+    _instance: null,
+
+    async connect() {
+      if (!this._instance) {
+        this._instance = await pool.connect();
+      }
+
+      return this._instance;
+    },
+
+    async query(...args) {
+      if (!this._instance) {
+        return;
+      }
+
+      return await (
+        this
+          ._instance
+          .query(...args)
+          .then(({ rows }) => rows)
+          .catch(async (e) => {
+            await this._instance.query("ROLLBACK");
+
+            throw e;
+          })
+      );
+    },
+
+    async end() {
+      if (!this._instance) {
+        return;
+      }
+
+      await this._instance.release();
+    },
+  })
 ;
