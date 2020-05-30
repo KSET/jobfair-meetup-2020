@@ -74,12 +74,11 @@ router.post("/", async (req, res) => {
 
     await client.query("BEGIN");
 
-    const createImageResponse = await client.query(queryImageCreate({
+    const [ { id: imageId } ] = await client.query(queryImageCreate({
       name: file.name,
       creatorId: req.authUser.id,
     }));
 
-    const [ { id: imageId } ] = createImageResponse.rows;
     const dir = localFolderPath({ imageId });
 
     await mkdir(dir, { recursive: true });
@@ -111,7 +110,7 @@ router.post("/", async (req, res) => {
               imageId,
               mimeType: file.mimetype,
             }))
-            .then(({ rows: [ row ] }) => row)
+            .then(([ row ]) => row)
     ;
 
     const uploadGif = async ({ file }) => {
