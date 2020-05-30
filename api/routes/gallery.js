@@ -22,6 +22,9 @@ import {
   ApiError,
   apiRoute,
 } from "../helpers/route";
+import {
+  requireAuth,
+} from "../helpers/middleware";
 
 const router = Router();
 
@@ -60,7 +63,7 @@ router.get("/list", apiRoute(async () => {
   );
 }));
 
-router.post("/", apiRoute(async ({ body }) => {
+router.post("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
   const { id, order, title, description, imageId } = body;
 
   const item = Object.fromEntries(
@@ -109,7 +112,7 @@ router.post("/", apiRoute(async ({ body }) => {
   return item;
 }));
 
-router.post("/swap", apiRoute(async ({ body }) => {
+router.post("/swap", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
@@ -133,7 +136,7 @@ router.post("/swap", apiRoute(async ({ body }) => {
   return true;
 }));
 
-router.delete("/:id", apiRoute(async ({ params }) => {
+router.delete("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
   const { id } = params;
 
   const [ gallery ] = await query(queryGalleryGetById({ id }));
