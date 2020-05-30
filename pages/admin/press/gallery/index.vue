@@ -3,10 +3,15 @@
     <v-row>
       <v-col>
         <h1>Gallery</h1>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
         <v-btn
-          @click="doRefreshGallery"
+          :to="{ name: 'PageAdminPressIndex' }"
         >
-          Refresh
+          Back
         </v-btn>
       </v-col>
     </v-row>
@@ -80,10 +85,10 @@
           <v-col cols="6">
             <v-card>
               <v-img
-                :src="imagePreview"
+                :src="fileUrl"
                 aspect-ratio="1.78"
                 class="ma-2"
-                contain
+                cover
               />
 
               <v-card-title>
@@ -123,7 +128,7 @@
                   :disabled="loading"
                   :loading="loading"
                   color="warning"
-                  @click.prevent="doCancel"
+                  @click.prevent="clearInputs"
                 >
                   Cancel
                 </v-btn>
@@ -170,6 +175,13 @@
     );
   };
 
+  const defaultPost = () => ({
+    id: null,
+    imageId: null,
+    title: "",
+    description: "",
+  });
+
   export default {
     name: "PageAdminPressGalleryList",
 
@@ -186,14 +198,10 @@
     data: () => ({
       loading: false,
 
-      post: {
-        id: null,
-        imageId: null,
-        title: "",
-        description: "",
-      },
+      post: defaultPost(),
 
       file: null,
+      fileUrl: image404,
       fileError: "",
 
       acceptedImageTypes: [ "image/jpeg", "image/png", "image/gif" ],
@@ -202,14 +210,6 @@
     computed: {
       postList() {
         return [ ...this.items ].sort(({ order: a }, { order: b }) => a - b);
-      },
-
-      imagePreview() {
-        if (!this.file || this.fileError || !this.acceptedImageTypes.includes(this.file.type)) {
-          return image404;
-        }
-
-        return URL.createObjectURL(this.file);
       },
 
       formValid() {
@@ -231,6 +231,7 @@
     watch: {
       file(file) {
         this.fileError = "";
+        this.fileUrl = image404;
 
         if (!file) {
           return;
@@ -238,7 +239,10 @@
 
         if (!this.acceptedImageTypes.includes(file.type)) {
           this.fileError = "Invalid image type.";
+          return;
         }
+
+        this.fileUrl = URL.createObjectURL(file);
       },
     },
 
@@ -289,22 +293,23 @@
       },
 
       doSelectItem(item) {
-        const { id, title, description, imageId } = item;
+        const { id, title, description, imageId, images } = item;
 
         this.clearEditing();
 
         item.editing = true;
 
+        this.fileUrl = images.default;
         this.$set(this, "post", { id, title, description, imageId });
       },
 
-      doCancel() {
+      clearInputs() {
         this.clearEditing();
 
-        this.post.title = "";
-        this.post.description = "";
-        this.post.imageId = null;
+        this.$set(this, "post", defaultPost());
+
         this.file = null;
+        this.fileUrl = image404;
       },
 
       async doUpload() {
@@ -350,7 +355,7 @@
             return alert(msg);
           }
 
-          await this.doCancel();
+          await this.clearInputs();
           await this.doRefreshGallery();
         } finally {
           this.loading = false;
