@@ -22,6 +22,12 @@
         >
           Press releases
         </v-btn>
+        <v-btn
+          :to="{ name: 'PageAdminPressGalleryList' }"
+          class="ml-3"
+        >
+          Press gallery
+        </v-btn>
       </v-col>
     </v-row>
   </app-max-width-container>

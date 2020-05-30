@@ -39,6 +39,8 @@ export const actions = {
   },
 
   async fetchImageVariationInfo(_context, imageUrl) {
-    return await this.$api.$get(`${ imageUrl }/info`);
+    const url = imageUrl.replace(/^\/api/, "");
+
+    return await this.$api.$get(`${ url }/info`);
   },
 };
