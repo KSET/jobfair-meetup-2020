@@ -6,6 +6,7 @@ import {
 } from "../helpers/image";
 import {
   queryImageGetByIds,
+  deleteImageById,
 } from "../../db/helpers/image";
 import {
   queryGalleryCreate,
@@ -16,6 +17,7 @@ import {
   queryGalleryDeleteById,
 } from "../../db/helpers/gallery";
 import {
+  getClient,
   query,
 } from "../../db/methods";
 import {
@@ -139,17 +141,41 @@ router.post("/swap", requireAuth({ role: "admin" }), apiRoute(async ({ body }) =
 router.delete("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
   const { id } = params;
 
-  const [ gallery ] = await query(queryGalleryGetById({ id }));
+  const client = getClient();
 
-  if (!gallery) {
-    throw new ApiError("not-found", 404, [
-      "Gallery not found",
-    ]);
+  try {
+    await client.connect();
+
+    await client.query("BEGIN");
+
+    const [ gallery ] = await client.query(queryGalleryGetById({ id }));
+
+    if (!gallery) {
+      throw new ApiError("not-found", 404, [
+        "Gallery not found",
+      ]);
+    }
+
+    await client.query(queryGalleryDeleteById({ id }));
+    const dlSuccess = await deleteImageById(client, { id: gallery.image_id });
+
+    if (!dlSuccess) {
+      throw new ApiError("image-delete", 403, [
+        "Something went wrong while deleting the image",
+      ]);
+    }
+
+    await client.query("COMMIT");
+
+    return true;
+  } catch (e) {
+    await client.query("ROLLBACK");
+    console.log(e);
+
+    throw e;
+  } finally {
+    await client.end();
   }
-
-  await query(queryGalleryDeleteById({ id }));
-
-  return true;
 }));
 
 export default router;

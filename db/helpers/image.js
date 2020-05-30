@@ -1,3 +1,15 @@
+import {
+  rmdir as rmdirOld,
+} from "fs";
+import {
+  dirname,
+} from "path";
+import {
+  promisify,
+} from "util";
+
+const rmdir = promisify(rmdirOld);
+
 export const queryImageCreate =
   ({
      name,
@@ -89,3 +101,39 @@ export const queryImageVariationGetByNameAndImage =
       imageId,
     ],
   });
+
+export const queryImageDeleteById =
+  ({
+     id,
+   }) => ({
+    text: `
+      delete from
+        images
+      where
+        id = $1
+    `,
+    values: [
+      id,
+    ],
+  })
+;
+
+export const deleteImageById =
+  async (
+    client,
+    {
+      id,
+    },
+  ) => {
+    const [ image ] = await client.query(queryImageGetById(id));
+
+    if (!image) {
+      return false;
+    }
+
+    await client.query(queryImageDeleteById({ id }));
+    await rmdir(dirname(image.path), { recursive: true });
+
+    return true;
+  }
+;
