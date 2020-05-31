@@ -85,12 +85,68 @@
 
     <v-row>
       <v-col cols="12" md="6">
-        <h2 :class="$style.subHeader">
-          <translated-text trans-key="press.gallery.header" />
-        </h2>
-        <p>
-          <translated-text trans-key="press.gallery.text" />
-        </p>
+        <v-row>
+          <v-col cols="12">
+            <h2 :class="$style.subHeader">
+              <translated-text trans-key="press.gallery.header" />
+            </h2>
+            <p>
+              <translated-text trans-key="press.gallery.text" />
+            </p>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col
+            v-for="image in galleryImages"
+            :key="image.id"
+            cols="6"
+          >
+            <v-img
+              :class="$style.galleryImage"
+              :lazy-src="thumbSrc(image.images)"
+              :src="image.images.default"
+              aspect-ratio="1.78"
+              cover
+              @click="openModal(image)"
+            />
+          </v-col>
+        </v-row>
+
+        <v-dialog
+          v-model="modal"
+          max-width="1000"
+        >
+          <v-card
+            v-if="selectedImage"
+          >
+            <v-img
+              :class="$style.modalImage"
+              :lazy-src="thumbSrc(selectedImage.images)"
+              :src="selectedImage.images.default"
+              contain
+            />
+
+            <v-card-title>
+              {{ selectedImage.title }}
+            </v-card-title>
+
+            <v-card-text>
+              {{ selectedImage.description }}
+            </v-card-text>
+
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                color="green darken-1"
+                text
+                @click="modal = false"
+              >
+                <translated-text trans-key="press.gallery.modal.close" />
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
   </app-max-width-container>
@@ -129,7 +185,48 @@
 
       return {
         pressReleases: await store.dispatch("pressRelease/fetchAllPressReleases").then(parseDates),
+        galleryImages: await store.dispatch("gallery/fetchAllItems"),
       };
+    },
+
+    data: () => ({
+      selectedImage: null,
+      modal: false,
+    }),
+
+    methods: {
+      thumbSrc(item) {
+        const { default: _, ...imageObj } = item;
+        const images =
+          Object
+            .entries(imageObj)
+            .map(
+              ([ k, v ]) =>
+                [
+                  Number(k.replace(/[^\d]/gi, "")),
+                  v,
+                ]
+              ,
+            )
+        ;
+
+        if (0 === images.length) {
+          return "";
+        }
+
+        return (
+          images
+            .sort(([ a ], [ b ]) => a - b)
+            .shift()
+            .pop()
+        );
+      },
+
+      openModal(image) {
+        this.selectedImage = image;
+
+        this.modal = true;
+      },
     },
 
     head: () => ({
@@ -200,6 +297,10 @@
         text-decoration: none;
         color: $fer-dark-blue;
       }
+    }
+
+    .galleryImage {
+      border-radius: 4px;
     }
   }
 </style>
