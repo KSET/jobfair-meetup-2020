@@ -27,8 +27,8 @@
             <div :class="$style.heroButtonContainer">
               <v-btn
                 :class="$style.heroButton"
-                color="primary"
                 :href="getSetting('Join Now URL', '#')"
+                color="primary"
                 large
                 rel="noopener noreferrer"
                 target="_blank"
@@ -221,12 +221,13 @@
             <v-btn
               :class="$style.rightButton"
               :to="{ name: 'PageBlogHome' }"
-              color="primary"
               outlined
               x-large
             >
               <translated-text trans-key="index.news.learnMore" />
-              <i :class="$style.rightIcon">></i>
+              <v-icon :class="$style.rightIcon">
+                mdi-chevron-right
+              </v-icon>
             </v-btn>
           </v-col>
         </v-row>
@@ -634,24 +635,31 @@
         text-align: center;
 
         .rightButton {
+          transition-timing-function: $transition-bounce-function;
+          transition-duration: 300ms;
+          transition-property: color;
+          color: $fer-yellow;
 
           .rightIcon {
             font-size: 200%;
             position: relative;
-            bottom: .1em;
-            margin-left: .4rem;
-            padding-right: .4rem;
-            transition-timing-function: cubic-bezier(.35, 1.55, .65, 1);
-            transition-duration: 250ms;
-            transition-property: padding-right, margin-left;
+            top: -1px;
+            margin-right: -.2em;
+            transition-timing-function: $transition-bounce-function;
+            transition-duration: 300ms;
+            transition-property: transform;
           }
 
           &:hover {
+            color: fer-hover($fer-yellow);
 
             .rightIcon {
-              margin-left: .8rem;
-              padding-right: 0;
+              transform: translateX(.3em);
             }
+          }
+
+          &:active {
+            color: fer-active($fer-yellow);
           }
         }
       }
