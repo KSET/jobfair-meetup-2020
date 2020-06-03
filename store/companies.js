@@ -48,6 +48,12 @@ export const actions = {
       workshops: rawWorkshops,
     } = data;
 
+    if (!rawCompanies || !rawPresentations || !rawWorkshops) {
+      console.log("|> COMPANY FETCH ERROR", new Error("company-fetch-error"), { rawWorkshops, rawPresentations, rawCompanies });
+
+      return [];
+    }
+
     const companies = Object.fromEntries(
       rawCompanies
         .map(({ id, ...rest }) => [ id, rest ]),
