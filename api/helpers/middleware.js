@@ -4,6 +4,7 @@ import {
 } from "./token";
 import {
   hasPermission,
+  roleNames,
 } from "./permissions";
 import {
   error,
@@ -31,7 +32,7 @@ export const injectAuthData =
 export const requireAuth =
   ({
      fullUserData = false,
-     role = "nobody",
+     role = roleNames.BASE,
    } = {}) =>
     async (req, res, next) => {
       await injectAuthData({ fullUserData })(req);

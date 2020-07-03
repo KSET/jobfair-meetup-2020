@@ -1,15 +1,27 @@
-export const roles = [
-  "nobody",
-  "student",
-  "account_manager",
-  "moderator",
-  "admin",
-];
+export const roleNames = {
+  BASE: "nobody",
+  STUDENT: "student",
+  ACCOUNT_MANAGER: "account_manager",
+  MODERATOR: "moderator",
+  ADMIN: "admin",
+};
+
+export const roles = Object.values(roleNames);
+
+const roleNameToIndex = Object.fromEntries(
+  roles
+    .map(
+      (v, i) =>
+        [ v, i ]
+      ,
+    )
+  ,
+);
 
 export const hasPermission =
   (minimumRoleName, currentRoleName) =>
-    roles.indexOf(minimumRoleName) <= roles.indexOf(currentRoleName);
+    roleNameToIndex[minimumRoleName] <= roleNameToIndex[currentRoleName];
 
 
-export const isAdmin = (roleName) => hasPermission("admin", roleName);
-export const isModerator = (roleName) => hasPermission("moderator", roleName);
+export const isAdmin = (roleName) => hasPermission(roleNames.ADMIN, roleName);
+export const isModerator = (roleName) => hasPermission(roleNames.MODERATOR, roleName);
