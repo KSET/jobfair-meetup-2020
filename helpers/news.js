@@ -6,7 +6,7 @@ import {
 } from "~/helpers/data";
 
 export const processNewsItem =
-  ({ date, ...newsItem }) =>
+  ({ date = "", ...newsItem } = {}) =>
     ({
       ...newsItem,
       date: formatDate(date),

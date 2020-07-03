@@ -10,7 +10,9 @@
           </v-col>
         </v-row>
 
-        <v-row>
+        <v-row
+          v-if="headNews"
+        >
           <v-col>
             <v-card
               :to="{ name: 'PageBlogPost', params: { slug: headNews.slug } }"
@@ -39,7 +41,10 @@
           </v-col>
         </v-row>
 
-        <v-row :class="$style.restNews">
+        <v-row
+          v-if="restNews.length > 0"
+          :class="$style.restNews"
+        >
           <v-col
             v-for="news in restNews"
             :key="news.id"
@@ -51,6 +56,14 @@
               :elevation="0"
               :news-item="news"
             />
+          </v-col>
+        </v-row>
+
+        <v-row v-if="!headNews">
+          <v-col>
+            <h1 class="font-weight-light">
+              <translated-text trans-key="blog.noNews" />
+            </h1>
           </v-col>
         </v-row>
       </v-col>
@@ -90,7 +103,13 @@
 
     computed: {
       headNews() {
-        return processNewsItem(this.news.slice(0, 1).pop());
+        const headNews = this.news.slice(0, 1).pop();
+
+        if (!headNews) {
+          return null;
+        }
+
+        return processNewsItem(headNews);
       },
 
       restNews() {
