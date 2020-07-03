@@ -5,7 +5,7 @@
         <v-row>
           <v-col>
             <h1 :class="$style.header">
-              Blog
+              <translated-text trans-key="blog.header" />
             </h1>
           </v-col>
         </v-row>
@@ -61,6 +61,7 @@
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import AppNewsCard from "~/components/news/NewsCard";
+  import TranslatedText from "~/components/TranslatedText";
   import {
     ensureArray,
   } from "~/helpers/data";
@@ -77,7 +78,7 @@
   export default {
     name: "PageBlogHome",
 
-    components: { AppMaxWidthContainer, AppNewsCard },
+    components: { TranslatedText, AppMaxWidthContainer, AppNewsCard },
 
     async asyncData({ store }) {
       const news = await store.dispatch("news/fetchNews").then(ensureArray);
