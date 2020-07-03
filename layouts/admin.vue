@@ -42,6 +42,9 @@
 </template>
 
 <script>
+  import {
+    mapGetters,
+  } from "vuex";
   import NavUserModule from "~/components/NavUserModule";
   import {
     hid,
@@ -50,31 +53,12 @@
   export default {
     name: "LayoutAdmin",
     components: { NavUserModule },
-    data: () => ({
-      pages: [
-        {
-          name: "Home",
-          to: { name: "PageAdminIndex" },
-          exact: true,
-        },
-        {
-          name: "Press",
-          to: { name: "PageAdminPressIndex" },
-        },
-        {
-          name: "News",
-          to: { name: "PageAdminNewsList" },
-        },
-        {
-          name: "Translations",
-          to: { name: "PageAdminTranslationsList" },
-        },
-        {
-          name: "Settings",
-          to: { name: "PageAdminSettingsList" },
-        },
-      ],
-    }),
+
+    computed: {
+      ...mapGetters({
+        pages: "adminPages/getPages",
+      }),
+    },
 
     head() {
       return {
