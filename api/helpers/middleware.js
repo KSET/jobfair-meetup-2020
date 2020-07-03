@@ -3,6 +3,9 @@ import {
   fetchAuthenticatedUser,
 } from "./token";
 import {
+  hasPermission,
+} from "./permissions";
+import {
   error,
 } from "./route";
 
@@ -28,7 +31,7 @@ export const injectAuthData =
 export const requireAuth =
   ({
      fullUserData = false,
-     role = null,
+     role = "nobody",
    } = {}) =>
     async (req, res, next) => {
       await injectAuthData({ fullUserData })(req);
@@ -42,7 +45,7 @@ export const requireAuth =
         }));
       }
 
-      if (role && req.authUser.role !== role) {
+      if (false === hasPermission(role, req.authUser.role)) {
         res.status(401);
 
         return res.json(error({
