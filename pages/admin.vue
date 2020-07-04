@@ -6,6 +6,6 @@
   export default {
     layout: "admin",
 
-    middleware: "is-admin",
+    middleware: "is-moderator",
   };
 </script>

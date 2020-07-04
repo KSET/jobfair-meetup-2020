@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ roleNames,
+} from "../helpers/permissions";
+import {
   queryImageGetById,
   queryImageGetByIds,
 } from "../../db/helpers/image";
@@ -23,7 +26,7 @@ import {
   apiRoute,
 } from "../helpers/route";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../helpers/middleware";
 
 const router = Router();
@@ -143,7 +146,9 @@ router.get("/item/:slug", apiRoute(async ({ params }) => {
   return processNews(images)(rawNews);
 }));
 
-router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ params, body }) => {
+const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+
+authRouter.patch("/item/:slug", apiRoute(async ({ params, body }) => {
   const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
 
   if (!oldNews) {
@@ -168,7 +173,7 @@ router.patch("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ pa
   };
 }));
 
-router.put("/item/", requireAuth({ role: "admin" }), apiRoute(async ({ body, authUser }) => {
+authRouter.put("/item/", apiRoute(async ({ body, authUser }) => {
   if (!body.imageId) {
     throw new ApiError("image-required", 403, {
       global: "Image is required",
@@ -205,7 +210,7 @@ router.put("/item/", requireAuth({ role: "admin" }), apiRoute(async ({ body, aut
   };
 }));
 
-router.delete("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
+authRouter.delete("/item/:slug", apiRoute(async ({ params }) => {
   const { slug } = params;
 
   const [ news ] = await query(queryNewsGetBySlug(slug));
@@ -220,5 +225,7 @@ router.delete("/item/:slug", requireAuth({ role: "admin" }), apiRoute(async ({ p
 
   return true;
 }));
+
+router.use(authRouter);
 
 export default router;

@@ -5,7 +5,7 @@ import {
   formatDate,
 } from "../../helpers/date";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../helpers/middleware";
 import {
   queryPressReleaseCreate,
@@ -24,6 +24,9 @@ import {
 import {
   apiFilePath,
 } from "../helpers/file";
+import {
+  roleNames,
+} from "../helpers/permissions";
 
 const router = Router();
 
@@ -61,7 +64,9 @@ router.get("/release/:id", apiRoute(async ({ params }) => {
   return res;
 }));
 
-router.put("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
+const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+
+authRouter.put("/", apiRoute(async ({ body }) => {
   const { title, fileId } = body;
 
   if (!title) {
@@ -87,7 +92,7 @@ router.put("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
   return true;
 }));
 
-router.patch("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params, body }) => {
+authRouter.patch("/:id", apiRoute(async ({ params, body }) => {
   const { id } = params;
   const { title, fileId } = body;
 
@@ -122,12 +127,14 @@ router.patch("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params, b
   return newRelease;
 }));
 
-router.delete("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
+authRouter.delete("/:id", apiRoute(async ({ params }) => {
   const { id } = params;
 
   await query(queryPressReleaseDeleteById({ id }));
 
   return id;
 }));
+
+router.use(authRouter);
 
 export default router;

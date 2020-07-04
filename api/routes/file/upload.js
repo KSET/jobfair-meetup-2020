@@ -5,14 +5,11 @@ import {
   promisify,
 } from "util";
 import {
-  Router,
-} from "express";
-import {
   apiRoute,
   ApiError,
 } from "../../helpers/route";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../../helpers/middleware";
 import {
   apiFilePath,
@@ -26,12 +23,13 @@ import {
   queryFileGetByHashAndPath,
   queryFileCreate,
 } from "../../../db/helpers/file";
+import {
+ roleNames,
+} from "../../helpers/permissions";
 
 const mkdir = promisify(mkdirCb);
 
-const router = Router();
-
-router.use(requireAuth({ role: "admin" }));
+const router = new AuthRouter({ role: roleNames.MODERATOR });
 
 router.post("/", apiRoute(async ({ files, authUser }) => {
   const client = getClient();

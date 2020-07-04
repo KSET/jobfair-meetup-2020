@@ -1,4 +1,8 @@
 import Vue from "vue";
+import {
+  isAdmin,
+  isModerator,
+} from "~/api/helpers/permissions";
 
 export const state = () => (
   {
@@ -19,6 +23,14 @@ export const getters = {
 
   getRefreshToken({ refreshToken }) {
     return refreshToken;
+  },
+
+  isModerator({ user }) {
+    return isModerator(user.role);
+  },
+
+  isAdmin({ user }) {
+    return isAdmin(user.role);
   },
 };
 

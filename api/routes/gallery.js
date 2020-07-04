@@ -25,8 +25,11 @@ import {
   apiRoute,
 } from "../helpers/route";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../helpers/middleware";
+import {
+  roleNames,
+} from "../helpers/permissions";
 
 const router = Router();
 
@@ -65,7 +68,9 @@ router.get("/list", apiRoute(async () => {
   );
 }));
 
-router.post("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
+const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+
+authRouter.post("/", apiRoute(async ({ body }) => {
   const { id, order, title, description, imageId } = body;
 
   const item = Object.fromEntries(
@@ -114,7 +119,7 @@ router.post("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
   return item;
 }));
 
-router.post("/swap", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
+authRouter.post("/swap", apiRoute(async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
@@ -138,7 +143,7 @@ router.post("/swap", requireAuth({ role: "admin" }), apiRoute(async ({ body }) =
   return true;
 }));
 
-router.delete("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params }) => {
+authRouter.delete("/:id", apiRoute(async ({ params }) => {
   const { id } = params;
 
   const client = getClient();
@@ -177,5 +182,7 @@ router.delete("/:id", requireAuth({ role: "admin" }), apiRoute(async ({ params }
     await client.end();
   }
 }));
+
+router.use(authRouter);
 
 export default router;

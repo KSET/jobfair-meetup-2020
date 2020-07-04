@@ -1,16 +1,13 @@
 import {
-  Router,
-} from "express";
-import {
   apiRoute,
 } from "../../helpers/route";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../../helpers/middleware";
 
-const router = Router();
+const router = new AuthRouter({ fullUserData: true });
 
-router.get("/", requireAuth({ fullUserData: true }), apiRoute((req) => {
+router.get("/", apiRoute((req) => {
   return req.authUser;
 }));
 

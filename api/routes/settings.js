@@ -2,7 +2,7 @@ import {
   Router,
 } from "express";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../helpers/middleware";
 import {
   apiRoute,
@@ -17,6 +17,9 @@ import {
   querySettingsCreate,
   querySettingsGetByKey,
 } from "../../db/helpers/settings";
+import {
+ roleNames,
+} from "../helpers/permissions";
 
 const router = Router();
 
@@ -24,7 +27,9 @@ router.get("/list", apiRoute(() => {
   return query(querySettingsGetAll());
 }));
 
-router.post("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
+const authRouter = new AuthRouter({ role: roleNames.ADMIN });
+
+authRouter.post("/", apiRoute(async ({ body }) => {
   const { key, value } = body;
 
   if (!key || !value) {
@@ -50,5 +55,7 @@ router.post("/", requireAuth({ role: "admin" }), apiRoute(async ({ body }) => {
 
   return setting;
 }));
+
+router.use(authRouter);
 
 export default router;

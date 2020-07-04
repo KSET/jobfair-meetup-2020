@@ -5,7 +5,7 @@ import {
   apiRoute,
 } from "../helpers/route";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../helpers/middleware";
 import {
   roleNames,
@@ -42,7 +42,9 @@ router.get("/list", apiRoute(() => {
   ];
 }));
 
-router.get("/admin", requireAuth({ role: roleNames.MODERATOR }), apiRoute(() => {
+const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+
+authRouter.get("/admin", apiRoute(() => {
   return [
     {
       name: "Home",
@@ -69,5 +71,7 @@ router.get("/admin", requireAuth({ role: roleNames.MODERATOR }), apiRoute(() => 
     },
   ].map(({ requiredRole = roleNames.MODERATOR, ...entry }) => ({ ...entry, requiredRole }));
 }));
+
+router.use(authRouter);
 
 export default router;

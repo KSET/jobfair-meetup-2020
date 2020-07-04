@@ -78,14 +78,14 @@
           </v-list-item>
         </v-list>
 
-        <v-divider v-if="user.role === 'admin'" />
+        <v-divider v-if="canViewAdminPanel" />
 
-        <v-list v-if="user.role === 'admin'" subheader>
+        <v-list v-if="canViewAdminPanel" subheader>
           <v-subheader>
             <translated-text trans-key="nav.user.admin.header" />
           </v-subheader>
 
-          <v-list-item>
+          <v-list-item v-if="canEditText">
             <v-list-item-action>
               <v-switch :value="isEditing" color="primary" @change="setEditing($event)" />
             </v-list-item-action>
@@ -145,7 +145,17 @@
       ...mapGetters({
         user: "user/getUser",
         isEditing: "translations/isEditable",
+        isModerator: "user/isModerator",
+        isAdmin: "user/isAdmin",
       }),
+
+      canViewAdminPanel() {
+        return this.isModerator;
+      },
+
+      canEditText() {
+        return this.isAdmin;
+      },
     },
 
     methods: {

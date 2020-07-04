@@ -4,12 +4,12 @@ import {
 import {
   promisify,
 } from "util";
-import {
-  Router,
-} from "express";
 import sharp from "sharp";
 import {
-  requireAuth,
+ roleNames,
+} from "../../helpers/permissions";
+import {
+  AuthRouter,
 } from "../../helpers/middleware";
 import {
   apiFilePath,
@@ -26,7 +26,7 @@ import {
 
 const mkdir = promisify(mkdirCb);
 
-const router = Router();
+const router = new AuthRouter({ role: roleNames.MODERATOR });
 
 const extensionMap = {
   "image/gif": "gif",
@@ -35,8 +35,6 @@ const extensionMap = {
 };
 
 const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
-
-router.use(requireAuth({ role: "admin" }));
 
 router.post("/", async (req, res) => {
   const files = {};

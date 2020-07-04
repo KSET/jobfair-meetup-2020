@@ -1,4 +1,7 @@
 import {
+  Router,
+} from "express";
+import {
   extractAuthorizationToken,
   fetchAuthenticatedUser,
 } from "./token";
@@ -58,3 +61,11 @@ export const requireAuth =
       return next();
     }
 ;
+
+export const AuthRouter = function AuthRouter(authConfig) {
+  const router = new Router();
+
+  router.use(requireAuth(authConfig));
+
+  return router;
+};

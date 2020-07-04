@@ -2,7 +2,7 @@ import {
   Router,
 } from "express";
 import {
-  requireAuth,
+  AuthRouter,
 } from "../../helpers/middleware";
 import {
   ApiError,
@@ -17,14 +17,6 @@ import {
 
 const router = Router();
 
-router.get("/jwt", requireAuth(), (req, res) => {
-  if (req.authHeader) {
-    res.write(req.authHeader);
-  }
-
-  res.end();
-});
-
 router.post("/refresh", apiRoute(async (req) => {
   const { token, refreshToken } = req.body;
 
@@ -36,5 +28,17 @@ router.post("/refresh", apiRoute(async (req) => {
     throw new ApiError("something-went-wrong");
   }
 }));
+
+const authRouter = new AuthRouter();
+
+authRouter.get("/jwt", (req, res) => {
+  if (req.authHeader) {
+    res.write(req.authHeader);
+  }
+
+  res.end();
+});
+
+router.use(authRouter);
 
 export default router;
