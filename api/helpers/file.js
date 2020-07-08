@@ -23,3 +23,34 @@ export const localFilePath =
       `${ md5 }.${ name }`,
     )
 ;
+
+export const fileDbToEntry =
+  (
+    {
+      id,
+      ...dbEntry
+    },
+  ) => ({
+    ...dbEntry,
+    id,
+    url: apiFilePath({ fileId: id }),
+  })
+;
+
+export const filesToEntries =
+  (
+    ...dbFiles
+  ) =>
+    Object.fromEntries(
+      dbFiles
+        .flat()
+        .map(
+          (dbFile) => ([
+            dbFile.id,
+            fileDbToEntry(dbFile),
+          ])
+          ,
+        )
+      ,
+    )
+;

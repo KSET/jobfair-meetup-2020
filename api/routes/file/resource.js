@@ -2,7 +2,7 @@ import {
   Router,
 } from "express";
 import {
- apiFilePath,
+  fileDbToEntry,
 } from "../../helpers/file";
 import {
   queryFileGetById,
@@ -49,9 +49,7 @@ router.get("/:id/info", apiRoute(async (req) => {
     ]);
   }
 
-  file.url = apiFilePath({ fileId: file.id });
-
-  return file;
+  return fileDbToEntry(file);
 }));
 
 export default router;
