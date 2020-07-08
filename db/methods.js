@@ -18,42 +18,100 @@ export const query =
   }
 ;
 
+export class Client {
+  #instance;
+
+  #inTransaction = false;
+
+  static async connected() {
+    return await (new Client()).connect();
+  }
+
+  static async inTransaction() {
+    const client = await Client.connected();
+
+    return await client.startTransaction();
+  }
+
+  async connect() {
+    if (!this.#instance) {
+      this.#instance = await pool.connect();
+    }
+
+    return this;
+  }
+
+  async startTransaction() {
+    if (!this.#inTransaction) {
+      await this.query("BEGIN");
+
+      this.#inTransaction = true;
+    }
+
+    return this;
+  }
+
+  async query(...args) {
+    if (!this.#instance) {
+      return;
+    }
+
+    return await (
+      this
+        .#instance
+        .query(...args)
+        .then(({ rows }) => rows)
+        .catch(async (e) => {
+          await this.query("ROLLBACK");
+
+          throw e;
+        })
+    );
+  }
+
+  async queryOne(...args) {
+    const res = await this.query(...args);
+
+    if (!res) {
+      return;
+    }
+
+    return res.pop();
+  }
+
+  async commit(end = false) {
+    await this.query("COMMIT");
+
+    this.#inTransaction = false;
+
+    if (end) {
+      await this.end();
+    }
+  }
+
+  async rollback(end = false) {
+    await this.query("ROLLBACK");
+
+    this.#inTransaction = false;
+
+    if (end) {
+      await this.end();
+    }
+  }
+
+  async end() {
+    if (!this.#instance) {
+      return;
+    }
+
+    if (this.#inTransaction) {
+      await this.commit();
+    }
+
+    await this.#instance.release();
+  }
+}
+
 export const getClient =
-  () => ({
-    _instance: null,
-
-    async connect() {
-      if (!this._instance) {
-        this._instance = await pool.connect();
-      }
-
-      return this._instance;
-    },
-
-    async query(...args) {
-      if (!this._instance) {
-        return;
-      }
-
-      return await (
-        this
-          ._instance
-          .query(...args)
-          .then(({ rows }) => rows)
-          .catch(async (e) => {
-            await this._instance.query("ROLLBACK");
-
-            throw e;
-          })
-      );
-    },
-
-    async end() {
-      if (!this._instance) {
-        return;
-      }
-
-      await this._instance.release();
-    },
-  })
+  () => new Client()
 ;
