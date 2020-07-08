@@ -57,6 +57,23 @@ export const queryFileGetById =
   })
 ;
 
+export const queryFileGetByIds =
+  (
+    ...ids
+  ) => ({
+    text: `
+      select
+        *
+      from
+        files
+      where
+        "id" = ANY($1::int[])
+    `,
+    values: [
+      ids.flat(),
+    ],
+  });
+
 export const queryFileGetByHashAndPath =
   ({
      hash,
