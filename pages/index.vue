@@ -573,9 +573,20 @@
             margin-right: 1em;
             color: #ffffff;
             background-color: transparent;
+            transition-property: opacity;
+            transition-duration: 250ms;
+            transition-timing-function: $transition-timing-function;
 
             &:last-child {
               margin-right: 0;
+            }
+
+            &:hover {
+              opacity: .7;
+            }
+
+            &:active {
+              opacity: 1;
             }
           }
 
