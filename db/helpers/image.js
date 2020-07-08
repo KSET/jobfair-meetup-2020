@@ -27,7 +27,8 @@ export const queryImageGetById =
   (id) => ({
     text: `
       select
-        *
+        *,
+        i."name" as original_name
       from
           images i
       left join
@@ -46,7 +47,8 @@ export const queryImageGetByIds =
   (...ids) => ({
     text: `
       select
-        *
+        *,
+        i."name" as original_name
       from
           images i
       left join
