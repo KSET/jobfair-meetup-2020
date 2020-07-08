@@ -125,7 +125,4 @@ query(dbBase)
   })
 ;
 
-export default {
-  path: "/api",
-  handler: app,
-};
+export default app;

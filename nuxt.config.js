@@ -92,7 +92,10 @@ export default {
   ],
 
   serverMiddleware: [
-    "~/api/index.js",
+    {
+      path: "/api",
+      handler: "~/api/index.js",
+    },
   ],
   /*
    ** Axios module configuration
