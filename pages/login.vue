@@ -85,6 +85,7 @@
 <script>
   import {
     mapActions,
+    mapGetters,
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
@@ -114,9 +115,17 @@
       },
     }),
 
+    computed: {
+      ...mapGetters({
+        user: "user/getUser",
+        isModerator: "user/isModerator",
+      }),
+    },
+
     methods: {
       ...mapActions({
         doLogin: "user/doLogin",
+        fetchAdminPages: "adminPages/fetchPages",
       }),
 
       async login() {
@@ -167,6 +176,10 @@
             );
           } catch (e) {
           }
+        }
+
+        if (this.isModerator) {
+          await this.fetchAdminPages({ role: this.user.role });
         }
 
         return await this.$router.push(redirectTo);

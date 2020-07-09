@@ -23,7 +23,7 @@ export const mutations = {
 };
 
 export const actions = {
-  async fetchPages({ commit, rootGetters }, { userRole = roleNames.ADMIN }) {
+  async fetchPages({ commit, rootGetters }, { userRole = roleNames.ADMIN } = {}) {
     const { data: rawData } = await this.$api.$get("/pages/admin");
 
     const getSetting = rootGetters["settings/getSetting"];
