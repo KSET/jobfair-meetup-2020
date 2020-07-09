@@ -14,7 +14,10 @@
     >
       <template #activator="{ on }">
         <a
-          :class="$style.navLink"
+          :class="{
+            [$style.navLink]: true,
+            [$style.noPadding]: noPadding,
+          }"
           v-on="on"
         >
           <span :class="$style.navLinkText" v-text="user.name" />
@@ -137,6 +140,14 @@
       TranslatedText,
     },
 
+    props: {
+      noPadding: {
+        required: false,
+        type: Boolean,
+        default: true,
+      },
+    },
+
     data: () => ({
       userOpen: false,
     }),
@@ -206,6 +217,12 @@
       .navLinkOpen {
         transform: rotate(180deg);
       }
+    }
+
+    .noPadding {
+      padding: 0 !important;
+      margin: 0 !important;
+      border-bottom: none;
     }
   }
 </style>

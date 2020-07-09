@@ -50,24 +50,29 @@ authRouter.get("/admin", apiRoute(() => {
       name: "Home",
       to: { name: "PageAdminIndex" },
       exact: true,
+      icon: "mdi-home",
     },
     {
       name: "Press",
       to: { name: "PageAdminPressIndex" },
+      icon: "mdi-account-voice",
     },
     {
       name: "News",
       to: { name: "PageAdminNewsList" },
+      icon: "mdi-newspaper",
     },
     {
       name: "Translations",
       to: { name: "PageAdminTranslationsList" },
       requiredRole: roleNames.ADMIN,
+      icon: "mdi-transcribe",
     },
     {
       name: "Settings",
       to: { name: "PageAdminSettingsList" },
       requiredRole: roleNames.ADMIN,
+      icon: "mdi-cog",
     },
   ].map(({ requiredRole = roleNames.MODERATOR, ...entry }) => ({ ...entry, requiredRole }));
 }));
