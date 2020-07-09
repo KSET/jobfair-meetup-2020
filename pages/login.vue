@@ -20,6 +20,8 @@
         >
           <v-text-field
             v-model="email"
+            :disabled="isLoading"
+            :loading="isLoading"
             :rules="validationRules.email"
             label="Email"
             light
@@ -27,6 +29,8 @@
           />
           <v-text-field
             v-model="password"
+            :disabled="isLoading"
+            :loading="isLoading"
             :rules="validationRules.password"
             label="Password"
             light
@@ -37,6 +41,15 @@
         </v-form>
       </v-card-text>
       <v-card-actions>
+        <transition name="scroll-x-transition">
+          <span
+            v-if="showTimeError"
+            class="font-weight-light ml-3 no-select"
+          >
+            Still processing...
+          </span>
+        </transition>
+
         <v-btn
           :disabled="!isValid"
           :loading="isLoading"
@@ -86,6 +99,8 @@
       isValid: false,
       isLoading: false,
       hasError: false,
+      showTimeError: false,
+      timer: null,
       email: "",
       password: "",
       validationRules: {
@@ -106,10 +121,25 @@
 
       async login() {
         const { email, password } = this;
+        const startTimer =
+          () =>
+            setTimeout(
+              () => {
+                this.showTimeError = true;
+              },
+              1500,
+            )
+        ;
 
         this.hasError = false;
         this.isLoading = true;
+        this.showTimeError = false;
+        this.timer = startTimer();
+
         const success = await this.doLogin({ email, password });
+
+        clearTimeout(this.timer);
+        this.showTimeError = false;
         this.isLoading = false;
 
         const { r } = this.$route.query;

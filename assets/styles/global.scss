@@ -71,3 +71,9 @@ html > body > div {
     }
   }
 }
+
+.no-select {
+  cursor: default !important;
+  user-select: none;
+  pointer-events: none;
+}
