@@ -26,7 +26,11 @@
             <h2 :class="$style.subHeader" class="d-flex">
               <translated-text trans-key="press.pressKit.header" />
               <a :class="$style.pressKitDownload" href="#" target="_blank">
-                <v-icon dense>mdi-download</v-icon>
+                <v-img
+                  :class="$style.icon"
+                  :src="downloadIconSrc"
+                  contain
+                />
                 <translated-text trans-key="press.pressKit.download" />
               </a>
             </h2>
@@ -66,7 +70,12 @@
                   :href="release.url"
                   target="_blank"
                 >
-                  <v-icon>mdi-download</v-icon>
+                  <v-img
+                    class="mt-n1"
+                    :class="$style.icon"
+                    :src="downloadIconSrc"
+                    contain
+                  />
                 </a>
               </v-col>
               <v-col cols="11">
@@ -161,6 +170,7 @@
   import {
     generateMetadata,
   } from "~/helpers/head";
+  import downloadIconSrc from "@/assets/images/icons/icon-download.svg?inline";
 
   export default {
     name: "PagePress",
@@ -193,6 +203,12 @@
       selectedImage: null,
       modal: false,
     }),
+
+    computed: {
+      downloadIconSrc() {
+        return downloadIconSrc;
+      },
+    },
 
     methods: {
       thumbSrc(item) {
@@ -301,6 +317,15 @@
 
     .galleryImage {
       border-radius: 4px;
+    }
+
+    .icon {
+      position: relative;
+      top: 4px;
+      width: 1.2em;
+      height: 1.2em;
+      display: inline-block;
+      margin: 0 .3em;
     }
   }
 </style>
