@@ -25,14 +25,35 @@ import {
 } from "express";
 
 /**
+ * @param {boolean} error - Whether the response is an error
+ * @param {number} status - The status for the operation (200 for success)
+ * @param {*} data - The data for the response
+ */
+export const response =
+  ({
+     error,
+     status,
+     data,
+   }) =>
+    ({
+      error,
+      status,
+      data,
+    })
+;
+
+/**
  * @param {*} data
  * @returns {SuccessResponse}
  */
-export const success = (data) => ({
-  error: false,
-  status: 200,
-  data,
-});
+export const success =
+  (data) =>
+    response({
+      error: false,
+      status: 200,
+      data,
+    })
+;
 
 /**
  * @param {number} status
@@ -40,13 +61,18 @@ export const success = (data) => ({
  * @param {*} data
  * @returns {ErrorResponse}
  */
-export const error = ({ reason, status = 403, data = null }) => ({
-  error: true,
-  status,
-  data: null,
-  reason,
-  errorData: data,
-});
+export const error =
+  ({ reason, status = 403, data = null }) =>
+    ({
+      ...response({
+        error: true,
+        status,
+        data: null,
+      }),
+      reason,
+      errorData: data,
+    })
+;
 
 
 export class ApiError extends Error {
