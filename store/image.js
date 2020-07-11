@@ -34,6 +34,7 @@ export const actions = {
       return {
         error: false,
         images: res,
+        data: res,
       };
     }
   },
