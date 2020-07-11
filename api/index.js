@@ -27,14 +27,6 @@ const fileUploadMiddleware = fileUpload({
   tempFileDir: "/tmp/",
   createParentPath: true,
   abortOnLimit: true,
-  limits: {
-    fileSize: 12 * 1024 * 1024,
-  },
-  limitHandler: apiRoute(() => {
-    throw new ApiError("file-too-big", 413, [
-      "The file is too big. Max file size is 12MB.",
-    ]);
-  }),
 });
 
 const app = express();

@@ -6,7 +6,7 @@ import {
 } from "util";
 import sharp from "sharp";
 import {
- roleNames,
+  roleNames,
 } from "../../helpers/permissions";
 import {
   AuthRouter,
@@ -66,6 +66,10 @@ router.post("/", async (req, res) => {
       return error(`Invalid file type. Only ${ Object.values(extensionMap).map((ext) => `.${ ext }`).join(", ") } supported.`, {
         mimeType: file.mimetype,
       });
+    }
+
+    if (file.size > 7 * 1024 * 1024) {
+      return error("Image too large");
     }
 
     await client.connect();
