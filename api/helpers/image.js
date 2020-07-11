@@ -76,11 +76,11 @@ export const imagesToEntries =
               name,
               creatorId,
               date: new Date(created_at),
-              variations: [],
+              variations: {},
             };
           }
 
-          acc[key].variations.push(image);
+          acc[key].variations[image.name] = image;
 
           return acc;
         },
