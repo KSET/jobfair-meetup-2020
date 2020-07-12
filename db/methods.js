@@ -23,10 +23,16 @@ export class Client {
 
   #inTransaction = false;
 
+  /**
+   * @returns {Promise<Client>}
+   */
   static async connected() {
     return await (new Client()).connect();
   }
 
+  /**
+   * @returns {Promise<Client>}
+   */
   static async inTransaction() {
     const client = await Client.connected();
 

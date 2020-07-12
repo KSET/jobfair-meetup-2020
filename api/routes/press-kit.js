@@ -1,6 +1,16 @@
 import {
+  readFile as readFileAsync,
+} from "fs";
+import {
+  join as pathJoin,
+} from "path";
+import {
+  promisify,
+} from "util";
+import {
   Router,
 } from "express";
+import AdmZip from "adm-zip";
 import {
   queryFileGetByIds,
 } from "../../db/helpers/file";
@@ -21,6 +31,7 @@ import {
   query,
 } from "../../db/methods";
 import {
+  localFolderPath,
   filesToEntries,
 } from "../helpers/file";
 import {
@@ -38,6 +49,8 @@ import {
 } from "../helpers/route";
 
 const router = new Router();
+
+const readFile = promisify(readFileAsync);
 
 router.get("/all", apiRoute(async () => {
   const rawPressKits = await query(queryPressKitGetAll());
@@ -192,6 +205,33 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
 
     throw e;
   }
+}));
+
+authRouter.post("/generate-zip", apiRoute(async () => {
+  const pressKits = await query(queryPressKitGetAll());
+
+  const fileIds = new Set();
+
+  for (const rawPressKit of pressKits) {
+    fileIds.add(rawPressKit.file_id);
+  }
+
+  const rawFiles = await query(queryFileGetByIds(Array.from(fileIds)));
+  const files = filesToEntries(rawFiles);
+
+  pressKits.forEach((pressKit) => {
+    pressKit.file = files[pressKit.file_id];
+  });
+
+  const zip = new AdmZip();
+
+  for (const { title, file } of pressKits) {
+    zip.addFile(file.name, await readFile(file.path), title);
+  }
+
+  zip.writeZip(pathJoin(localFolderPath(), "press-kit.zip"));
+
+  return true;
 }));
 
 router.use(authRouter);

@@ -5,6 +5,10 @@ export const getters = {};
 export const mutations = {};
 
 export const actions = {
+  async generateZip() {
+    return await this.$api.$post("/press-kit/generate-zip").catch((e) => e);
+  },
+
   async createPressKit(_context, { title, fileId, imageId }) {
     return await this.$api.$post("/press-kit", { title, fileId, imageId }).catch((e) => e);
   },

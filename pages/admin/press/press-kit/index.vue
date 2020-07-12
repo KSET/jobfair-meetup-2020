@@ -250,6 +250,8 @@
         loading: false,
         status: "",
 
+        zipLoading: false,
+
         acceptedImageTypes: [ "image/jpeg", "image/png", "image/gif" ],
       };
     },
@@ -324,6 +326,7 @@
         doCreatePressKit: "pressKit/createPressKit",
         doDeletePressKit: "pressKit/deletePressKit",
         doSwapPressKit: "pressKit/swapPressKit",
+        doGeneratePressKit: "pressKit/generateZip",
       }),
 
       async uploadFile() {
@@ -384,18 +387,7 @@
         await this.refreshPressKits();
       },
 
-      async submitForm() {
-        this.loading = true;
-
-        const success = await this.doUploads();
-
-        this.loading = false;
-
-        if (!success) {
-          return false;
-        }
-
-        this.loading = true;
+      async createPressKit() {
         this.status = "Creating new kit item...";
 
         const { error, errorData } = await this.doCreatePressKit({
@@ -405,7 +397,6 @@
         });
 
         this.status = "";
-        this.loading = false;
 
         if (error) {
           const message =
@@ -415,6 +406,36 @@
           ;
 
           alert(message);
+          return false;
+        }
+
+        return true;
+      },
+
+      async doSubmitForm() {
+        if (!(await this.doUploads())) {
+          return false;
+        }
+
+        if (!(await this.createPressKit())) {
+          return false;
+        }
+
+        if (!(await this.regenerateZipFile())) {
+          return false;
+        }
+
+        return true;
+      },
+
+      async submitForm() {
+        this.loading = true;
+
+        const success = await this.doSubmitForm();
+
+        this.loading = false;
+
+        if (!success) {
           return false;
         }
 
@@ -465,6 +486,29 @@
 
         this.$set(this, "items", kits);
         this.itemsLoading = false;
+      },
+
+      async regenerateZipFile() {
+        this.zipLoading = true;
+        this.status = "Generating zip...";
+
+        const { error, errorData } = await this.doGeneratePressKit();
+
+        this.status = "";
+        this.zipLoading = false;
+
+        if (error) {
+          const msg =
+            Array.isArray(errorData)
+              ? errorData.join("\n")
+              : "Something went wrong"
+          ;
+
+          alert(msg);
+          return false;
+        }
+
+        return true;
       },
 
       async moveItem(item, offset) {
