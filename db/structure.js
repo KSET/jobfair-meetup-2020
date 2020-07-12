@@ -137,6 +137,25 @@ create table if not exists db_versions
 
 create unique index if not exists db_versions_name_uindex
     on db_versions (name);
+
+create table if not exists press_kit
+(
+    id           serial                                           not null,
+    title        text                                             not null,
+    file_id      integer                                          not null,
+    image_id     integer                                          not null,
+    "order"      integer                                          not null,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
+    constraint press_kit_pk
+        primary key (id),
+    constraint press_kit_files_id_fk
+        foreign key (file_id) references files
+            on update cascade on delete cascade,
+    constraint press_kit_images_id_fk
+        foreign key (image_id) references images
+            on update cascade on delete cascade
+);
+
 `;
 
 

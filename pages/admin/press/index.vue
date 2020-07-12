@@ -28,6 +28,12 @@
         >
           Press gallery
         </v-btn>
+        <v-btn
+          :to="{ name: 'PageAdminPressKitList' }"
+          class="ml-3"
+        >
+          Press kit
+        </v-btn>
       </v-col>
     </v-row>
   </app-max-width-container>

@@ -36,6 +36,26 @@
             </h2>
           </v-col>
         </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <v-row>
+              <v-col
+                v-for="item of pressKitItems"
+                :key="item.id"
+
+                cols="6"
+              >
+                <jf-press-kit
+                  :image-url="item.image.variations.default.url"
+                  :lazy-image-url="item.image.variations.thumb.url"
+                  :file-url="item.file.url"
+                  :title="item.title"
+                />
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
       </v-col>
 
       <v-col cols="12" md="4" offset-md="2">
@@ -163,6 +183,7 @@
 
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
+  import JfPressKit from "~/components/press/JfPressKit";
   import TranslatedText from "~/components/TranslatedText";
   import {
     formatDate,
@@ -176,6 +197,7 @@
     name: "PagePress",
 
     components: {
+      JfPressKit,
       AppMaxWidthContainer,
       TranslatedText,
     },
@@ -196,6 +218,7 @@
       return {
         pressReleases: await store.dispatch("pressRelease/fetchAllPressReleases").then(parseDates),
         galleryImages: await store.dispatch("gallery/fetchAllItems"),
+        pressKitItems: await store.dispatch("pressKit/fetchAllItems"),
       };
     },
 
