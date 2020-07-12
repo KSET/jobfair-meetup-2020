@@ -36,6 +36,10 @@ const extensionMap = {
 
 const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
 
+const maxImageSizeMb = 7;
+const maxImageSizeKb = maxImageSizeMb * 1024;
+const maxImageSize = maxImageSizeKb * 1024;
+
 router.post("/", async (req, res) => {
   const files = {};
   const client = getClient();
@@ -68,8 +72,8 @@ router.post("/", async (req, res) => {
       });
     }
 
-    if (file.size > 7 * 1024 * 1024) {
-      return error("Image too large");
+    if (file.size > maxImageSize) {
+      return error(`Image too large (Max ${ maxImageSizeMb }MB)`);
     }
 
     await client.connect();
