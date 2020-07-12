@@ -39,6 +39,22 @@ export const actions = {
     }
   },
 
+  async uploadImageWithData({ dispatch }, file) {
+    const { error, message, data: images } = await dispatch("uploadImage", file);
+
+    if (error) {
+      return {
+        error: true,
+        errorData: [
+          message,
+        ],
+        data: null,
+      };
+    }
+
+    return await dispatch("fetchImageVariationInfo", images.default);
+  },
+
   async fetchImageVariationInfo(_context, imageUrl) {
     const url = imageUrl.replace(/^\/api/, "");
 
