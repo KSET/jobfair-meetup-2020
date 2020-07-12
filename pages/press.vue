@@ -25,7 +25,7 @@
           <v-col cols="12">
             <h2 :class="$style.subHeader" class="d-flex">
               <translated-text trans-key="press.pressKit.header" />
-              <a :class="$style.pressKitDownload" href="#" target="_blank">
+              <a :class="$style.pressKitDownload" href="/api/press-kit/press-kit.zip" target="_blank">
                 <v-img
                   :class="$style.icon"
                   :src="downloadIconSrc"

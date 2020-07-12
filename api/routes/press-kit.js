@@ -2,9 +2,6 @@ import {
   readFile as readFileAsync,
 } from "fs";
 import {
-  join as pathJoin,
-} from "path";
-import {
   promisify,
 } from "util";
 import {
@@ -31,12 +28,14 @@ import {
   query,
 } from "../../db/methods";
 import {
-  localFolderPath,
   filesToEntries,
 } from "../helpers/file";
 import {
   imagesToEntries,
 } from "../helpers/image";
+import {
+  zipLocation,
+} from "../helpers/pressKit";
 import {
   AuthRouter,
 } from "../helpers/middleware";
@@ -94,6 +93,10 @@ router.get("/all", apiRoute(async () => {
     ,
   );
 }));
+
+router.get("/press-kit.zip", (req, res) => {
+  return res.sendFile(zipLocation());
+});
 
 const authRouter = new AuthRouter({
   role: roleNames.MODERATOR,
@@ -229,7 +232,7 @@ authRouter.post("/generate-zip", apiRoute(async () => {
     zip.addFile(file.name, await readFile(file.path), title);
   }
 
-  zip.writeZip(pathJoin(localFolderPath(), "press-kit.zip"));
+  zip.writeZip(zipLocation());
 
   return true;
 }));
