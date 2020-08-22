@@ -2,7 +2,7 @@
  * @readonly
  * @enum {String}
  */
-export const roleNames = {
+export const RoleNames = {
   BASE: "nobody",
   STUDENT: "student",
   ACCOUNT_MANAGER: "account_manager",
@@ -10,7 +10,7 @@ export const roleNames = {
   ADMIN: "admin",
 };
 
-export const roles = Object.values(roleNames);
+export const roles = Object.values(RoleNames);
 
 const roleNameToIndex = Object.fromEntries(
   roles
@@ -27,5 +27,5 @@ export const hasPermission =
     roleNameToIndex[minimumRoleName] <= roleNameToIndex[currentRoleName];
 
 
-export const isAdmin = (roleName) => hasPermission(roleNames.ADMIN, roleName);
-export const isModerator = (roleName) => hasPermission(roleNames.MODERATOR, roleName);
+export const isAdmin = (roleName) => hasPermission(RoleNames.ADMIN, roleName);
+export const isModerator = (roleName) => hasPermission(RoleNames.MODERATOR, roleName);

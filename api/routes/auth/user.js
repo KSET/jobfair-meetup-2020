@@ -1,14 +1,11 @@
 import {
-  apiRoute,
-} from "../../helpers/route";
-import {
-  AuthRouter,
-} from "../../helpers/middleware";
+ AuthRouter,
+} from "~/api/helpers/route";
 
 const router = new AuthRouter({ fullUserData: true });
 
-router.get("/", apiRoute((req) => {
+router.get("/", (req) => {
   return req.authUser;
-}));
+});
 
 export default router;

@@ -1,15 +1,10 @@
 import {
-  Router,
-} from "express";
-import {
  HttpStatus,
 } from "../helpers/http";
 import {
-  AuthRouter,
-} from "../helpers/middleware";
-import {
-  apiRoute,
   ApiError,
+  Router,
+  AuthRouter,
 } from "../helpers/route";
 import {
   query,
@@ -21,18 +16,18 @@ import {
   querySettingsGetByKey,
 } from "../../db/helpers/settings";
 import {
- roleNames,
+ RoleNames,
 } from "../helpers/permissions";
 
-const router = Router();
+const router = new Router();
 
-router.get("/list", apiRoute(() => {
+router.get("/list", () => {
   return query(querySettingsGetAll());
-}));
+});
 
-const authRouter = new AuthRouter({ role: roleNames.ADMIN });
+const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.ADMIN });
 
-authRouter.post("/", apiRoute(async ({ body }) => {
+authRouter.post("/", async ({ body }) => {
   const { key, value } = body;
 
   if (!key || !value) {
@@ -57,8 +52,6 @@ authRouter.post("/", apiRoute(async ({ body }) => {
   }
 
   return setting;
-}));
+});
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;

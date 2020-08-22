@@ -1,7 +1,4 @@
 import {
-  Router,
-} from "express";
-import {
  HttpStatus,
 } from "../helpers/http";
 import {
@@ -25,18 +22,16 @@ import {
 } from "../../db/methods";
 import {
   ApiError,
-  apiRoute,
+  Router,
+  AuthRouter,
 } from "../helpers/route";
 import {
-  AuthRouter,
-} from "../helpers/middleware";
-import {
-  roleNames,
+  RoleNames,
 } from "../helpers/permissions";
 
-const router = Router();
+const router = new Router();
 
-router.get("/list", apiRoute(async () => {
+router.get("/list", async () => {
   const galleryItems = await query(queryGalleryGetAll());
 
   if (0 === galleryItems.length) {
@@ -69,11 +64,11 @@ router.get("/list", apiRoute(async () => {
       images: galleryImages(imageId),
     }),
   );
-}));
+});
 
-const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
 
-authRouter.post("/", apiRoute(async ({ body }) => {
+authRouter.post("/", async ({ body }) => {
   const { id, order, title, description, imageId } = body;
 
   const item = Object.fromEntries(
@@ -120,9 +115,9 @@ authRouter.post("/", apiRoute(async ({ body }) => {
   }
 
   return item;
-}));
+});
 
-authRouter.post("/swap", apiRoute(async ({ body }) => {
+authRouter.post("/swap", async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
@@ -144,9 +139,9 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
   await query(queryGalleryUpdateById(b, { order: A.order }));
 
   return true;
-}));
+});
 
-authRouter.delete("/:id", apiRoute(async ({ params }) => {
+authRouter.delete("/:id", async ({ params }) => {
   const { id } = params;
 
   const client = getClient();
@@ -184,8 +179,6 @@ authRouter.delete("/:id", apiRoute(async ({ params }) => {
   } finally {
     await client.end();
   }
-}));
+});
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;

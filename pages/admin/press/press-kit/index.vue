@@ -134,8 +134,8 @@
               />
 
               <v-file-input
-                :disabled="loading || file.loading"
                 v-model="file.file"
+                :disabled="loading || file.loading"
                 :error-messages="file.error"
                 :loading="loading || file.loading"
                 label="Datoteka"
@@ -146,13 +146,13 @@
               />
 
               <v-file-input
+                v-model="image.file"
                 :disabled="loading || image.loading"
                 :error-messages="image.error"
                 :loading="loading || image.loading"
                 :rules="inputRules.image"
                 accept="image/*"
                 label="Slika za preview"
-                v-model="image.file"
                 prepend-icon="mdi-camera-outline"
                 required
                 show-size

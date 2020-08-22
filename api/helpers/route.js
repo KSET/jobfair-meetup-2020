@@ -1,32 +1,37 @@
-/**
- * @typedef {Object} SuccessResponse
- * @property {boolean} error - Whether an error occurred
- * @property {number} status - The response status code (200 - OK, everything else - error)
- * @property {*} data - Any response data
- */
-
-/**
- * @typedef {Object} ErrorResponse
- * @property {boolean} error - Whether an error occurred
- * @property {number} status - The response status code (200 - OK, everything else - error)
- * @property {string} reason - The reason for the error (eg. error text)
- * @property {*} errorData - Any response data
- */
-
-
 import {
   readdirSync,
 } from "fs";
 import {
   join as joinPath,
 } from "path";
+import express from "express";
 import {
-  Router,
-} from "express";
+  HttpStatus,
+} from "./http";
+import {
+  requireAuth,
+} from "./middleware";
+
+const ExpressRouter = express.Router;
+
+/**
+ * @typedef {Object} SuccessResponse
+ * @property {boolean} error - Whether an error occurred
+ * @property {StatusCode} status - The response status code (200 - OK, everything else - error)
+ * @property {*} data - Any response data
+ */
+
+/**
+ * @typedef {Object} ErrorResponse
+ * @property {boolean} error - Whether an error occurred
+ * @property {StatusCode} status - The response status code (200 - OK, everything else - error)
+ * @property {string} reason - The reason for the error (eg. error text)
+ * @property {*} errorData - Any response data
+ */
 
 /**
  * @param {boolean} error - Whether the response is an error
- * @param {number} status - The status for the operation (200 for success)
+ * @param {StatusCode} status - The status for the operation (200 for success)
  * @param {*} data - The data for the response
  */
 export const response =
@@ -37,8 +42,8 @@ export const response =
    }) =>
     ({
       error,
-      status,
       data,
+      status,
     })
 ;
 
@@ -50,7 +55,7 @@ export const success =
   (data) =>
     response({
       error: false,
-      status: 200,
+      status: HttpStatus.Success.Ok,
       data,
     })
 ;
@@ -62,25 +67,25 @@ export const success =
  * @returns {ErrorResponse}
  */
 export const error =
-  ({ reason, status = 403, data = null }) =>
+  ({ reason, status = HttpStatus.Error.Client.Forbidden, data = null }) =>
     ({
       ...response({
         error: true,
         status,
         data: null,
       }),
+      statusInfo: HttpStatus.codeToInfo(status),
       reason,
       errorData: data,
     })
 ;
 
-
 export class ApiError extends Error {
-  statusCode;
+  statusCode = HttpStatus.Error.Client.ImATeapot;
 
-  data;
+  data = null;
 
-  constructor(message, statusCode = 418, data = null) {
+  constructor(message, statusCode = HttpStatus.Error.Client.ImATeapot, data = null) {
     super(message);
     this.statusCode = statusCode;
     this.data = data;
@@ -106,11 +111,13 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
     if (e.statusCode) {
       res.status(e.statusCode);
     } else {
-      res.status(403);
+      res.status(HttpStatus.Error.Client.Forbidden);
     }
 
+    const status = res.statusCode;
+
     const errorData = error({
-      status: res.statusCode,
+      status,
       reason: e.message,
       data: e.data,
     });
@@ -124,7 +131,7 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
 });
 
 export const registerRoutesInFolder = (folder) => {
-  const router = new Router();
+  const router = new ExpressRouter();
 
   // Register all .js files in routes directory as express routes
   readdirSync(folder)
@@ -143,18 +150,199 @@ export const registerRoutesInFolder = (folder) => {
           .join(".")
       ;
 
-      // Register route
-      router.use(`/${ routeName }`, require(filePath).default);
+      const routePath = `/${ routeName }`;
+      const getHandler = () => {
+        const router = require(filePath).default;
+
+        if (router instanceof Router) {
+          return router.expose();
+        }
+
+        return router;
+      };
+
+      router.use(routePath, getHandler());
     })
   ;
 
   return router;
 };
 
+export const registerRoutesInFolderJs =
+  (jsFilePath) =>
+    registerRoutesInFolder(
+      jsFilePath.replace(/.js$/i, ""),
+    )
+;
+
 export const registerFolderAsRoute = (baseDir, folderName) => {
-  const router = new Router();
+  const router = new ExpressRouter();
 
   router.use(folderName, registerRoutesInFolder(joinPath(baseDir, folderName)));
 
   return router;
 };
+
+export class Router {
+  /**
+   * @type {express.Router}
+   */
+  #router = null;
+
+  constructor() {
+    this.#router = new ExpressRouter();
+  }
+
+  /// //////// REQUEST METHODS START ///////////
+  all(path, ...handlers) {
+    return this.addRoute("all", path, handlers);
+  }
+
+  get(path, ...handlers) {
+    return this.addRoute("get", path, handlers);
+  }
+
+  getRaw(path, ...handlers) {
+    this.#router.get(path, ...handlers);
+
+    return this;
+  }
+
+  post(path, ...handlers) {
+    return this.addRoute("post", path, handlers);
+  }
+
+  postRaw(path, ...handlers) {
+    this.#router.post(path, ...handlers);
+
+    return this;
+  }
+
+  put(path, ...handlers) {
+    return this.addRoute("put", path, handlers);
+  }
+
+  delete(path, ...handlers) {
+    return this.addRoute("delete", path, handlers);
+  }
+
+  patch(path, ...handlers) {
+    return this.addRoute("patch", path, handlers);
+  }
+
+  options(path, ...handlers) {
+    return this.addRoute("options", path, handlers);
+  }
+
+  head(path, ...handlers) {
+    return this.addRoute("head", path, handlers);
+  }
+
+  /// //////// REQUEST METHODS END ///////////
+
+  use(...handlers) {
+    const exposedHandlers =
+      handlers
+        .map((handler) => {
+          if (handler instanceof Router) {
+            handler = handler.expose();
+          }
+
+          return handler;
+        })
+    ;
+
+    this.#router.use(...exposedHandlers);
+
+    return this;
+  }
+
+  /**
+   * Alias for {@link use}
+   */
+  with(...handlers) {
+    return this.use(...handlers);
+  }
+
+  /**
+   * @param {String} requestMethod
+   * @param {String} path
+   * @param {Array} handlersList
+   *
+   * @returns {Router}
+   */
+  addRoute(requestMethod, path, handlersList) {
+    const handler = handlersList.pop();
+
+    this.#router[requestMethod](path, ...[ ...handlersList, apiRoute(handler) ]);
+
+    return this;
+  }
+
+  /**
+   * @return {express.Router}
+   */
+  expose() {
+    return this.#router;
+  }
+
+  /**
+   * @param {express.Router} router
+   *
+   * @return {Router}
+   */
+  _setRouter(router) {
+    this.#router = router;
+
+    return this;
+  }
+}
+
+export class AuthRouter extends Router {
+  /**
+   * @type {express.Router|null}
+   */
+  #boundRouter = null;
+
+  /**
+   * @param {AuthConfig} authConfig
+   */
+  constructor(authConfig) {
+    super();
+
+    this.use(requireAuth(authConfig));
+  }
+
+  /**
+   * @param {Router|express.Router} newRouter
+   * @returns {AuthRouter}
+   */
+  bindToRouter(newRouter) {
+    if (newRouter instanceof Router) {
+      this.#boundRouter = newRouter.expose();
+    } else {
+      this.#boundRouter = newRouter;
+    }
+
+    return this;
+  }
+
+  /**
+   * @param {Router|express.Router} router
+   * @param {AuthConfig} authConfig
+   * @returns {AuthRouter}
+   */
+  static boundToRouter(router, authConfig) {
+    const self = new this();
+
+    return self.bindToRouter(router);
+  }
+
+  expose() {
+    if (null !== this.#boundRouter) {
+      this.#boundRouter.use(super.expose());
+    }
+
+    return super.expose();
+  }
+}

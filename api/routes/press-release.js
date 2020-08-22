@@ -1,15 +1,9 @@
 import {
-  Router,
-} from "express";
-import {
  HttpStatus,
 } from "../helpers/http";
 import {
   formatDate,
 } from "../../helpers/date";
-import {
-  AuthRouter,
-} from "../helpers/middleware";
 import {
   queryPressReleaseCreate,
   queryPressReleaseDeleteById,
@@ -21,19 +15,20 @@ import {
   query,
 } from "../../db/methods";
 import {
-  apiRoute,
   ApiError,
+  Router,
+  AuthRouter,
 } from "../helpers/route";
 import {
   apiFilePath,
 } from "../helpers/file";
 import {
-  roleNames,
+  RoleNames,
 } from "../helpers/permissions";
 
-const router = Router();
+const router = new Router();
 
-router.get("/all", apiRoute(() => {
+router.get("/all", () => {
   /* eslint-disable camelcase */
   return query(queryPressReleaseGetAll())
     .then(
@@ -50,9 +45,9 @@ router.get("/all", apiRoute(() => {
       ,
     );
   /* eslint-enable camelcase */
-}));
+});
 
-router.get("/release/:id", apiRoute(async ({ params }) => {
+router.get("/release/:id", async ({ params }) => {
   const { id } = params;
   const [ res ] = await query(queryPressReleaseGetById({ id }));
 
@@ -65,11 +60,11 @@ router.get("/release/:id", apiRoute(async ({ params }) => {
   res.date = formatDate(res.created_at);
 
   return res;
-}));
+});
 
-const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
 
-authRouter.put("/", apiRoute(async ({ body }) => {
+authRouter.put("/", async ({ body }) => {
   const { title, fileId } = body;
 
   if (!title) {
@@ -93,9 +88,9 @@ authRouter.put("/", apiRoute(async ({ body }) => {
   }
 
   return true;
-}));
+});
 
-authRouter.patch("/:id", apiRoute(async ({ params, body }) => {
+authRouter.patch("/:id", async ({ params, body }) => {
   const { id } = params;
   const { title, fileId } = body;
 
@@ -128,16 +123,14 @@ authRouter.patch("/:id", apiRoute(async ({ params, body }) => {
   }
 
   return newRelease;
-}));
+});
 
-authRouter.delete("/:id", apiRoute(async ({ params }) => {
+authRouter.delete("/:id", async ({ params }) => {
   const { id } = params;
 
   await query(queryPressReleaseDeleteById({ id }));
 
   return id;
-}));
+});
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;

@@ -1,11 +1,8 @@
 import {
-  Router,
-} from "express";
-import {
- HttpStatus,
+  HttpStatus,
 } from "../helpers/http";
 import {
- roleNames,
+  RoleNames,
 } from "../helpers/permissions";
 import {
   queryImageGetById,
@@ -26,13 +23,11 @@ import {
 } from "../helpers/image";
 import {
   ApiError,
-  apiRoute,
-} from "../helpers/route";
-import {
+  Router,
   AuthRouter,
-} from "../helpers/middleware";
+} from "../helpers/route";
 
-const router = Router();
+const router = new Router();
 
 const processImage =
   ({ image_id: imageId, name, width, height }) => ({
@@ -124,16 +119,16 @@ const validateNews = (body) => {
   return validations.filter((e) => false !== e);
 };
 
-router.get("/list", apiRoute(async () => {
+router.get("/list", async () => {
   const rawNews = await query(queryNewsGetAll());
   const rawImages = await query(queryImageGetByIds(...rawNews.map((n) => n.image_id)));
 
   const images = rawImages.map(processImage);
 
   return rawNews.map(processNews(images));
-}));
+});
 
-router.get("/item/:slug", apiRoute(async ({ params }) => {
+router.get("/item/:slug", async ({ params }) => {
   const { slug } = params;
 
   const [ rawNews ] = await query(queryNewsGetBySlug(slug));
@@ -147,11 +142,11 @@ router.get("/item/:slug", apiRoute(async ({ params }) => {
   const images = rawImages.map(processImage);
 
   return processNews(images)(rawNews);
-}));
+});
 
-const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
 
-authRouter.patch("/item/:slug", apiRoute(async ({ params, body }) => {
+authRouter.patch("/item/:slug", async ({ params, body }) => {
   const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
 
   if (!oldNews) {
@@ -174,9 +169,9 @@ authRouter.patch("/item/:slug", apiRoute(async ({ params, body }) => {
   return {
     slug: res.slug,
   };
-}));
+});
 
-authRouter.put("/item/", apiRoute(async ({ body, authUser }) => {
+authRouter.put("/item/", async ({ body, authUser }) => {
   if (!body.imageId) {
     throw new ApiError("image-required", HttpStatus.Error.Forbidden, {
       global: "Image is required",
@@ -211,9 +206,9 @@ authRouter.put("/item/", apiRoute(async ({ body, authUser }) => {
     id: res.id,
     ...newNews,
   };
-}));
+});
 
-authRouter.delete("/item/:slug", apiRoute(async ({ params }) => {
+authRouter.delete("/item/:slug", async ({ params }) => {
   const { slug } = params;
 
   const [ news ] = await query(queryNewsGetBySlug(slug));
@@ -227,8 +222,6 @@ authRouter.delete("/item/:slug", apiRoute(async ({ params }) => {
   await query(queryNewsDeleteBySlug(slug));
 
   return true;
-}));
+});
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;

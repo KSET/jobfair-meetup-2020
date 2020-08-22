@@ -4,12 +4,9 @@ import {
 import {
   promisify,
 } from "util";
-import {
-  Router,
-} from "express";
 import AdmZip from "adm-zip";
 import {
- HttpStatus,
+  HttpStatus,
 } from "../helpers/http";
 import {
   queryFileGetByIds,
@@ -40,21 +37,19 @@ import {
   zipLocation,
 } from "../helpers/pressKit";
 import {
-  AuthRouter,
-} from "../helpers/middleware";
-import {
-  roleNames,
+  RoleNames,
 } from "../helpers/permissions";
 import {
-  apiRoute,
   ApiError,
+  AuthRouter,
+  Router,
 } from "../helpers/route";
 
 const router = new Router();
 
 const readFile = promisify(readFileAsync);
 
-router.get("/all", apiRoute(async () => {
+router.get("/all", async () => {
   const rawPressKits = await query(queryPressKitGetAll());
 
   const fileIds = new Set();
@@ -95,17 +90,17 @@ router.get("/all", apiRoute(async () => {
     })
     ,
   );
-}));
+});
 
-router.get("/press-kit.zip", (req, res) => {
+router.getRaw("/press-kit.zip", (req, res) => {
   return res.sendFile(zipLocation());
 });
 
-const authRouter = new AuthRouter({
-  role: roleNames.MODERATOR,
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: RoleNames.MODERATOR,
 });
 
-authRouter.post("/", apiRoute(async ({ body }) => {
+authRouter.post("/", async ({ body }) => {
   const {
     title,
     fileId,
@@ -131,9 +126,9 @@ authRouter.post("/", apiRoute(async ({ body }) => {
   await client.commit(true);
 
   return newKit;
-}));
+});
 
-authRouter.delete("/:id", apiRoute(async ({ params }) => {
+authRouter.delete("/:id", async ({ params }) => {
   const { id } = params;
 
   if (!id) {
@@ -168,9 +163,9 @@ authRouter.delete("/:id", apiRoute(async ({ params }) => {
 
     throw e;
   }
-}));
+});
 
-authRouter.post("/swap", apiRoute(async ({ body }) => {
+authRouter.post("/swap", async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
@@ -211,9 +206,9 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
 
     throw e;
   }
-}));
+});
 
-authRouter.post("/generate-zip", apiRoute(async () => {
+authRouter.post("/generate-zip", async () => {
   const pressKits = await query(queryPressKitGetAll());
 
   const fileIds = new Set();
@@ -238,8 +233,6 @@ authRouter.post("/generate-zip", apiRoute(async () => {
   zip.writeZip(zipLocation());
 
   return true;
-}));
+});
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;

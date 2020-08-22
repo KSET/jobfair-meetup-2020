@@ -1,7 +1,4 @@
 import {
-  Router,
-} from "express";
-import {
  HttpStatus,
 } from "./http";
 import {
@@ -10,7 +7,7 @@ import {
 } from "./token";
 import {
   hasPermission,
-  roleNames,
+  RoleNames,
 } from "./permissions";
 import {
   error,
@@ -52,7 +49,7 @@ export const injectAuthData =
 export const requireAuth =
   ({
      fullUserData = false,
-     role = roleNames.BASE,
+     role = RoleNames.BASE,
    } = {}) =>
     async (req, res, next) => {
       await injectAuthData({ fullUserData })(req);
@@ -78,11 +75,3 @@ export const requireAuth =
       return next();
     }
 ;
-
-export const AuthRouter = function AuthRouter(authConfig) {
-  const router = new Router();
-
-  router.use(requireAuth(authConfig));
-
-  return router;
-};

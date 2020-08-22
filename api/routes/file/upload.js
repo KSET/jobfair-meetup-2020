@@ -8,12 +8,9 @@ import {
  HttpStatus,
 } from "../../helpers/http";
 import {
-  apiRoute,
   ApiError,
-} from "../../helpers/route";
-import {
   AuthRouter,
-} from "../../helpers/middleware";
+} from "../../helpers/route";
 import {
   apiFilePath,
   localFilePath,
@@ -27,14 +24,14 @@ import {
   queryFileCreate,
 } from "../../../db/helpers/file";
 import {
- roleNames,
+ RoleNames,
 } from "../../helpers/permissions";
 
 const mkdir = promisify(mkdirCb);
 
-const router = new AuthRouter({ role: roleNames.MODERATOR });
+const authRouter = new AuthRouter({ role: RoleNames.MODERATOR });
 
-router.post("/", apiRoute(async ({ files, authUser }) => {
+authRouter.post("/", async ({ files, authUser }) => {
   const client = getClient();
 
   try {
@@ -89,6 +86,6 @@ router.post("/", apiRoute(async ({ files, authUser }) => {
     await client.query("ROLLBACK");
     await client.end();
   }
-}));
+});
 
-export default router;
+export default authRouter;

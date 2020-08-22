@@ -1,19 +1,14 @@
 import {
   Router,
-} from "express";
-import {
-  apiRoute,
+  AuthRouter,
 } from "../helpers/route";
 import {
-  AuthRouter,
-} from "../helpers/middleware";
-import {
-  roleNames,
+  RoleNames,
 } from "../helpers/permissions";
 
-const router = Router();
+const router = new Router();
 
-router.get("/list", apiRoute(() => {
+router.get("/list", () => {
   return [
     {
       name: "page.name.blog",
@@ -40,11 +35,11 @@ router.get("/list", apiRoute(() => {
       setting: "Join Now URL",
     },
   ];
-}));
+});
 
-const authRouter = new AuthRouter({ role: roleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
 
-authRouter.get("/admin", apiRoute(() => {
+authRouter.get("/admin", () => {
   return [
     {
       name: "Home",
@@ -65,18 +60,16 @@ authRouter.get("/admin", apiRoute(() => {
     {
       name: "Translations",
       to: { name: "PageAdminTranslationsList" },
-      requiredRole: roleNames.ADMIN,
+      requiredRole: RoleNames.ADMIN,
       icon: "mdi-transcribe",
     },
     {
       name: "Settings",
       to: { name: "PageAdminSettingsList" },
-      requiredRole: roleNames.ADMIN,
+      requiredRole: RoleNames.ADMIN,
       icon: "mdi-cog",
     },
-  ].map(({ requiredRole = roleNames.MODERATOR, ...entry }) => ({ ...entry, requiredRole }));
-}));
+  ].map(({ requiredRole = RoleNames.MODERATOR, ...entry }) => ({ ...entry, requiredRole }));
+});
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;

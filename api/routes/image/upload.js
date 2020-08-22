@@ -6,11 +6,11 @@ import {
 } from "util";
 import sharp from "sharp";
 import {
-  roleNames,
-} from "../../helpers/permissions";
+ AuthRouter,
+} from "../../helpers/route";
 import {
-  AuthRouter,
-} from "../../helpers/middleware";
+  RoleNames,
+} from "../../helpers/permissions";
 import {
   apiFilePath,
   localFilePath,
@@ -26,7 +26,7 @@ import {
 
 const mkdir = promisify(mkdirCb);
 
-const router = new AuthRouter({ role: roleNames.MODERATOR });
+const router = new AuthRouter({ role: RoleNames.MODERATOR });
 
 const extensionMap = {
   "image/gif": "gif",
@@ -40,7 +40,7 @@ const maxImageSizeMb = 7;
 const maxImageSizeKb = maxImageSizeMb * 1024;
 const maxImageSize = maxImageSizeKb * 1024;
 
-router.post("/", async (req, res) => {
+router.postRaw("/", async (req, res) => {
   const files = {};
   const client = getClient();
 

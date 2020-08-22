@@ -1,12 +1,7 @@
 import {
-  Router,
-} from "express";
-import {
-  AuthRouter,
-} from "../../helpers/middleware";
-import {
   ApiError,
-  apiRoute,
+  Router,
+  AuthRouter,
 } from "../../helpers/route";
 import {
   graphQlQuery,
@@ -14,10 +9,13 @@ import {
 import {
   refreshTokenMutation,
 } from "../../graphql/mutations";
+import {
+  RoleNames,
+} from "~/api/helpers/permissions";
 
-const router = Router();
+const router = new Router();
 
-router.post("/refresh", apiRoute(async (req) => {
+router.post("/refresh", async (req) => {
   const { token, refreshToken } = req.body;
 
   try {
@@ -27,11 +25,13 @@ router.post("/refresh", apiRoute(async (req) => {
   } catch (e) {
     throw new ApiError("something-went-wrong");
   }
-}));
+});
 
-const authRouter = new AuthRouter();
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: RoleNames.BASE,
+});
 
-authRouter.get("/jwt", (req, res) => {
+authRouter.getRaw("/jwt", (req, res) => {
   if (req.authHeader) {
     res.write(req.authHeader);
   }
@@ -39,6 +39,4 @@ authRouter.get("/jwt", (req, res) => {
   res.end();
 });
 
-router.use(authRouter);
-
-export default router;
+export default authRouter;
