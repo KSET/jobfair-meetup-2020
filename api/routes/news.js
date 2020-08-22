@@ -134,7 +134,7 @@ router.get("/item/:slug", async ({ params }) => {
   const [ rawNews ] = await query(queryNewsGetBySlug(slug));
 
   if (!rawNews) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound);
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
   }
 
   const rawImages = await query(queryImageGetById(rawNews.image_id));
@@ -214,7 +214,7 @@ authRouter.delete("/item/:slug", async ({ params }) => {
   const [ news ] = await query(queryNewsGetBySlug(slug));
 
   if (!news) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
       "News item not found",
     ]);
   }

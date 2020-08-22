@@ -52,7 +52,7 @@ router.get("/release/:id", async ({ params }) => {
   const [ res ] = await query(queryPressReleaseGetById({ id }));
 
   if (!res) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound);
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
   }
 
   res.fileId = res.file_id;

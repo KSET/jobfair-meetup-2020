@@ -28,7 +28,7 @@ router.get("/:id", async (req, res) => {
   }));
 
   if (!file) {
-    res.status(HttpStatus.Error.NotFound);
+    res.status(HttpStatus.Error.Client.NotFound);
     return res.end();
   }
 
@@ -47,7 +47,7 @@ router.get("/:id/info", apiRoute(async (req) => {
   }));
 
   if (!file) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
       "Image not found",
     ]);
   }

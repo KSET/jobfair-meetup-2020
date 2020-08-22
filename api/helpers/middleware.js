@@ -55,20 +55,20 @@ export const requireAuth =
       await injectAuthData({ fullUserData })(req);
 
       if (!req.authUser) {
-        res.status(HttpStatus.Error.Unauthorized);
+        res.status(HttpStatus.Error.Client.Unauthorized);
 
         return res.json(error({
           reason: "authorization-required",
-          status: HttpStatus.Error.Unauthorized,
+          status: HttpStatus.Error.Client.Unauthorized,
         }));
       }
 
       if (false === hasPermission(role, req.authUser.role)) {
-        res.status(HttpStatus.Error.Unauthorized);
+        res.status(HttpStatus.Error.Client.Unauthorized);
 
         return res.json(error({
           reason: "authorization-required",
-          status: HttpStatus.Error.Unauthorized,
+          status: HttpStatus.Error.Client.Unauthorized,
         }));
       }
 

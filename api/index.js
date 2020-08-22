@@ -46,7 +46,7 @@ app.use(routes);
 
 // Fallback route (404)
 app.use("*", apiRoute(() => {
-  throw new ApiError("not-found", HttpStatus.Error.NotFound);
+  throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
 }));
 
 const client = getClient();

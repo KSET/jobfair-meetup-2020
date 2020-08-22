@@ -11,7 +11,7 @@ import {
 } from "../../graphql/mutations";
 import {
   RoleNames,
-} from "~/api/helpers/permissions";
+} from "../../helpers/permissions";
 
 const router = new Router();
 

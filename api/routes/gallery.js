@@ -121,7 +121,7 @@ authRouter.post("/swap", async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
       "Both images must be provided",
     ]);
   }
@@ -130,7 +130,7 @@ authRouter.post("/swap", async ({ body }) => {
   const [ B ] = await query(queryGalleryGetById({ id: b }));
 
   if (!A || !B) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
       "Item not found",
     ]);
   }
@@ -154,7 +154,7 @@ authRouter.delete("/:id", async ({ params }) => {
     const [ gallery ] = await client.query(queryGalleryGetById({ id }));
 
     if (!gallery) {
-      throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+      throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
         "Gallery not found",
       ]);
     }

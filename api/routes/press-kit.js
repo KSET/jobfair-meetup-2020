@@ -169,7 +169,7 @@ authRouter.post("/swap", async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
       "Both press kit items must be provided",
     ]);
   }
@@ -186,7 +186,7 @@ authRouter.post("/swap", async ({ body }) => {
     ]);
 
     if (!A || !B) {
-      throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+      throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
         "Item not found",
       ]);
     }

@@ -341,6 +341,8 @@ export class AuthRouter extends Router {
   expose() {
     if (null !== this.#boundRouter) {
       this.#boundRouter.use(super.expose());
+      this._setRouter(this.#boundRouter);
+      this.#boundRouter = null;
     }
 
     return super.expose();

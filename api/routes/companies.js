@@ -83,7 +83,7 @@ router.get("/events/:type/:id", apiRoute(async ({ params }) => {
   const obj = objList.find(({ id: i }) => Number(i) === Number(id));
 
   if (!obj) {
-    throw new ApiError("event-not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("event-not-found", HttpStatus.Error.Client.NotFound, [
       "Event not found",
     ]);
   }

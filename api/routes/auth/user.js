@@ -1,6 +1,6 @@
 import {
  AuthRouter,
-} from "~/api/helpers/route";
+} from "../../helpers/route";
 
 const router = new AuthRouter({ fullUserData: true });
 

@@ -23,7 +23,7 @@ router.get("/:id", apiRoute(async ({ params }) => {
   const res = await query(queryImageGetById(id));
 
   if (!res || !res.length) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound);
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
   }
 
   return res;
@@ -38,7 +38,7 @@ router.get("/:imageId/:name", async (req, res) => {
   }));
 
   if (!image) {
-    res.status(HttpStatus.Error.NotFound);
+    res.status(HttpStatus.Error.Client.NotFound);
     return res.end();
   }
 
@@ -56,7 +56,7 @@ router.get("/:imageId/:name/info", apiRoute(async (req) => {
   }));
 
   if (!image) {
-    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
+    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
       "Image not found",
     ]);
   }
