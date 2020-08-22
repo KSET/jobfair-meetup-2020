@@ -1,14 +1,14 @@
 <template>
   <v-footer absolute app dark>
     <v-container :class="$style.container" fluid>
-      <v-row :class="$style.hideOnSmall">
+      <v-row v-if="showLogos" :class="$style.hideOnSmall">
         <v-col>
           <h1 :class="$style.organizatori">
             <translated-text trans-key="footer.organisers" />
           </h1>
         </v-col>
       </v-row>
-      <v-row :class="[ $style.logoRow, $style.hideOnSmall ]">
+      <v-row v-if="showLogos" :class="[ $style.logoRow, $style.hideOnSmall ]">
         <v-col
           v-for="logo in logos"
           :key="logo.src"
@@ -27,7 +27,7 @@
           >
         </v-col>
       </v-row>
-      <v-row :class="$style.hideOnSmall">
+      <v-row v-if="showLogos" :class="$style.hideOnSmall">
         <v-divider :class="$style.spacer" />
       </v-row>
       <v-row :class="$style.bottomPart">
@@ -145,6 +145,10 @@
         getSetting: "settings/getSetting",
       }),
 
+      showLogos() {
+        return "Index" === this.$route.name;
+      },
+
       logos() {
         return [
           {
@@ -197,95 +201,95 @@
 </script>
 
 <style lang="scss" module>
-  @import "../assets/styles/include/all";
+@import "../assets/styles/include/all";
 
-  .container {
-    width: 95%;
-    max-width: $content-max-width;
+.container {
+  width: 95%;
+  max-width: $content-max-width;
 
-    @include media(sm) {
-      max-width: 100%;
-    }
-
-    a {
-      text-decoration: none;
-      color: $fer-white;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+  @include media(sm) {
+    max-width: 100%;
   }
 
-  .organizatori {
-    font-size: 2.5em;
-    margin-bottom: 1em;
-    text-align: center;
-    color: $fer-yellow;
+  a {
+    text-decoration: none;
+    color: $fer-white;
 
-    @include media(sm) {
-      font-size: 2em;
+    &:hover {
+      text-decoration: underline;
     }
   }
+}
 
-  .logoRow {
-    width: 60%;
-    margin: 0 auto;
+.organizatori {
+  font-size: 2.5em;
+  margin-bottom: 1em;
+  text-align: center;
+  color: $fer-yellow;
 
-    @include media(sm) {
-      width: 100%;
-    }
+  @include media(sm) {
+    font-size: 2em;
+  }
+}
 
-    .logoCol {
-      align-self: center;
+.logoRow {
+  width: 60%;
+  margin: 0 auto;
 
-      .logo {
-        height: 3em;
-      }
-    }
+  @include media(sm) {
+    width: 100%;
   }
 
-  .spacer {
-    border-color: rgba(255, 255, 255, .42) !important;
-  }
+  .logoCol {
+    align-self: center;
 
-  .bottomPart {
-    font-size: 87.5%;
-    margin-top: 1.5em;
-
-    strong {
-      display: block;
-      margin-bottom: .3em;
+    .logo {
+      height: 3em;
     }
   }
+}
 
-  .jobfairLogo {
-    $height: 3em;
-    $aspect-ratio: 110 / 40;
+.spacer {
+  border-color: rgba(255, 255, 255, .42) !important;
+}
 
-    width: $height * $aspect-ratio;
-    height: $height;
-    margin-bottom: 1em;
+.bottomPart {
+  font-size: 87.5%;
+  margin-top: 1.5em;
+
+  strong {
+    display: block;
+    margin-bottom: .3em;
+  }
+}
+
+.jobfairLogo {
+  $height: 3em;
+  $aspect-ratio: 110 / 40;
+
+  width: $height * $aspect-ratio;
+  height: $height;
+  margin-bottom: 1em;
+}
+
+.afterJobfairText {
+  font-size: 90%;
+  opacity: .7;
+}
+
+.socialIcon {
+  margin-right: 1.5em;
+
+  &:last-child {
+    margin-right: initial;
+  }
+}
+
+@include media(md) {
+
+  .hideOnSmall {
+    display: none;
   }
 
-  .afterJobfairText {
-    font-size: 90%;
-    opacity: .7;
-  }
-
-  .socialIcon {
-    margin-right: 1.5em;
-
-    &:last-child {
-      margin-right: initial;
-    }
-  }
-
-  @include media(md) {
-
-    .hideOnSmall {
-      display: none;
-    }
-
-  }
+}
 </style>

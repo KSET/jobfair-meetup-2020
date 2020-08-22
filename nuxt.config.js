@@ -29,7 +29,7 @@ export default {
     titleTemplate: "%s | JobFair MeetUP",
     meta: [
       { charset: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1, minimal-ui" },
+      { name: "viewport", content: "width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86, minimal-ui" },
       { hid: "description", name: "description", content: process.env.npm_package_description || "" },
       { hid: "theme-color", name: "theme-color", content: "#00003f" },
       { hid: "background-color", name: "background-color", content: "#00003f" },

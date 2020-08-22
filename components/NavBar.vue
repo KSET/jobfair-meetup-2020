@@ -103,8 +103,6 @@
 
   .container {
 
-    $nav-height: 64px;
-
     .logoLink {
       display: flex;
       padding: .3em;

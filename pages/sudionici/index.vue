@@ -15,13 +15,15 @@
       <template v-slot:header>
         <v-row>
           <v-col
+            v-for="filter in filterValues"
+            :key="filter.name"
+
+            :class="$style.filterContainer"
             class="d-flex"
             cols="12"
             md="auto"
           >
             <v-btn
-              v-for="filter in filterValues"
-              :key="filter.name"
               :class="{
                 [$style.filter]: true,
                 [$style.filterSelected]: filter.value === filterType
@@ -65,8 +67,8 @@
           >
             <v-card
               :class="$style.cardContainer"
-              flat
               :to="{ name: 'PageSudioniciInfo', params: { type: event.type, id: event.id } }"
+              flat
             >
               <v-img
                 :lazy-src="event.company.logo.small.url"
@@ -361,6 +363,13 @@
     color: $fer-dark-blue;
   }
 
+  .filterContainer {
+
+    & + & {
+      padding-top: 0;
+    }
+  }
+
   .filter {
     align-self: center;
     margin: 0 .8em;
@@ -381,6 +390,11 @@
       opacity: 1;
       color: $fer-dark-blue;
       border-bottom-color: $fer-black;
+    }
+
+    @include media(sm) {
+      padding-left: .1em !important;
+      padding-right: .1em !important;
     }
   }
 

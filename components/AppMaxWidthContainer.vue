@@ -26,7 +26,7 @@
       padding: 0 2em;
 
       @include media(sm) {
-        max-width: 91.5%;
+        max-width: 98%;
       }
     }
   }

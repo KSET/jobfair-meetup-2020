@@ -23,7 +23,7 @@
 
         <v-row>
           <v-col cols="12">
-            <h2 :class="$style.subHeader" class="d-flex">
+            <h2 :class="[ $style.subHeader, $style.pressKitHeader ]">
               <translated-text trans-key="press.pressKit.header" />
               <a :class="$style.pressKitDownload" href="/api/press-kit/press-kit.zip" target="_blank">
                 <v-img
@@ -299,17 +299,25 @@
       color: $fer-dark-blue;
     }
 
-    .pressKitDownload {
-      font-size: 1rem;
-      font-weight: 600;
-      position: relative;
-      top: .5em;
-      margin-left: auto;
-      text-decoration: none;
-      color: inherit;
+    .pressKitHeader {
+      display: flex;
 
-      > :global(*) {
+      .pressKitDownload {
+        font-size: 1rem;
+        font-weight: 600;
+        position: relative;
+        top: .5em;
+        margin-left: auto;
+        text-decoration: none;
         color: inherit;
+      }
+
+      @include media(sm) {
+        flex-direction: column;
+
+        .pressKitDownload {
+          margin-left: initial;
+        }
       }
     }
 

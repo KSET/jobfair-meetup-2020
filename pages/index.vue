@@ -416,7 +416,7 @@
       background-color: $fer-dark-blue;
       background-image: url("../assets/images/index-bg.svg?inline");
       background-repeat: no-repeat;
-      background-position: center -60px;
+      background-position: center #{-$nav-height};
       background-size: #{$page-max-width} #{$min-height};
 
       @include media(md) {
@@ -525,6 +525,7 @@
         > h3 {
           font-size: 125%;
           color: $fer-dark-blue;
+          padding-bottom: 4px;
         }
 
         > p {

@@ -53,7 +53,7 @@
               />
               <a
                 :class="$style.link"
-                :href="`https://www.google.com/maps/place/${encodeURIComponent(trans.address)}`"
+                :href="`https://www.google.com/maps/search/${encodeURIComponent(trans.address.replace('<br>', ' '))}`"
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -186,6 +186,8 @@
 
     .linkContainer {
       font-size: 125%;
+      display: grid;
+      grid-template-columns: auto 1fr;
 
       & + .linkContainer {
         margin-top: .69em;
