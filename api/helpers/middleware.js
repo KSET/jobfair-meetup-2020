@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "./http";
+import {
   extractAuthorizationToken,
   fetchAuthenticatedUser,
 } from "./token";
@@ -12,6 +15,16 @@ import {
 import {
   error,
 } from "./route";
+
+/**
+ * @typedef {Object} AuthData
+ * @property {boolean} [fullUserData] - Whether to fetch user data from remote or just validate token (default: false)
+ */
+
+/**
+ * @typedef {AuthData} AuthConfig
+ * @property {string} [role] - Which is the minimum role required to view the route (default: nobody)
+ */
 
 export const injectAuthData =
   ({
@@ -32,6 +45,10 @@ export const injectAuthData =
     }
 ;
 
+/**
+ * @param {AuthRouter}
+ * @return {function(...[*]=)}
+ */
 export const requireAuth =
   ({
      fullUserData = false,
@@ -41,20 +58,20 @@ export const requireAuth =
       await injectAuthData({ fullUserData })(req);
 
       if (!req.authUser) {
-        res.status(401);
+        res.status(HttpStatus.Error.Unauthorized);
 
         return res.json(error({
           reason: "authorization-required",
-          status: 401,
+          status: HttpStatus.Error.Unauthorized,
         }));
       }
 
       if (false === hasPermission(role, req.authUser.role)) {
-        res.status(401);
+        res.status(HttpStatus.Error.Unauthorized);
 
         return res.json(error({
           reason: "authorization-required",
-          status: 401,
+          status: HttpStatus.Error.Unauthorized,
         }));
       }
 

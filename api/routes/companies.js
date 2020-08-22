@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+  HttpStatus,
+} from "../helpers/http";
+import {
   participantsQuery,
   participantEventsQuery,
 } from "../graphql/queries";
@@ -50,7 +53,7 @@ router.get("/events/:type/:id", apiRoute(async ({ params }) => {
   const { type, id } = params;
 
   if (!type || !id) {
-    throw new ApiError("no-params", 403, [
+    throw new ApiError("no-params", HttpStatus.Error.Forbidden, [
       "Type and ID are required params",
     ]);
   }
@@ -72,7 +75,7 @@ router.get("/events/:type/:id", apiRoute(async ({ params }) => {
   const { companies, [transformedType]: objList } = await graphQlQuery(participantEventsQuery());
 
   if (!objList) {
-    throw new ApiError("no-type", 403, [
+    throw new ApiError("no-type", HttpStatus.Error.Forbidden, [
       `Event type not found: ${ transformedType }`,
     ]);
   }
@@ -80,7 +83,7 @@ router.get("/events/:type/:id", apiRoute(async ({ params }) => {
   const obj = objList.find(({ id: i }) => Number(i) === Number(id));
 
   if (!obj) {
-    throw new ApiError("event-not-found", 404, [
+    throw new ApiError("event-not-found", HttpStatus.Error.NotFound, [
       "Event not found",
     ]);
   }

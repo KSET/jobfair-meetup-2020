@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../helpers/http";
+import {
   formatDate,
 } from "../../helpers/date";
 import {
@@ -54,7 +57,7 @@ router.get("/release/:id", apiRoute(async ({ params }) => {
   const [ res ] = await query(queryPressReleaseGetById({ id }));
 
   if (!res) {
-    throw new ApiError("not-found", 404);
+    throw new ApiError("not-found", HttpStatus.Error.NotFound);
   }
 
   res.fileId = res.file_id;
@@ -70,13 +73,13 @@ authRouter.put("/", apiRoute(async ({ body }) => {
   const { title, fileId } = body;
 
   if (!title) {
-    throw new ApiError("no-title", 403, [
+    throw new ApiError("no-title", HttpStatus.Error.Forbidden, [
       "The title is missing",
     ]);
   }
 
   if (!fileId) {
-    throw new ApiError("no-file", 403, [
+    throw new ApiError("no-file", HttpStatus.Error.Forbidden, [
       "The file is missing",
     ]);
   }
@@ -84,7 +87,7 @@ authRouter.put("/", apiRoute(async ({ body }) => {
   const [ release ] = await query(queryPressReleaseCreate({ title, fileId }));
 
   if (!release) {
-    throw new ApiError("something-went-wrong", 403, [
+    throw new ApiError("something-went-wrong", HttpStatus.Error.Forbidden, [
       "Something went wrong. Please try again",
     ]);
   }
@@ -97,13 +100,13 @@ authRouter.patch("/:id", apiRoute(async ({ params, body }) => {
   const { title, fileId } = body;
 
   if (!title) {
-    throw new ApiError("no-title", 403, [
+    throw new ApiError("no-title", HttpStatus.Error.Forbidden, [
       "The title is missing",
     ]);
   }
 
   if (!fileId) {
-    throw new ApiError("no-file", 403, [
+    throw new ApiError("no-file", HttpStatus.Error.Forbidden, [
       "The file is missing",
     ]);
   }
@@ -111,7 +114,7 @@ authRouter.patch("/:id", apiRoute(async ({ params, body }) => {
   const [ release ] = await query(queryPressReleaseGetById({ id }));
 
   if (!release) {
-    throw new ApiError("no-press-release", 403, [
+    throw new ApiError("no-press-release", HttpStatus.Error.Forbidden, [
       "Press release not found",
     ]);
   }
@@ -119,7 +122,7 @@ authRouter.patch("/:id", apiRoute(async ({ params, body }) => {
   const [ newRelease ] = await query(queryPressReleaseUpdateById(id, { title, fileId }));
 
   if (!newRelease) {
-    throw new ApiError("no-press-release", 403, [
+    throw new ApiError("no-press-release", HttpStatus.Error.Forbidden, [
       "Something went wrong. Please try again",
     ]);
   }

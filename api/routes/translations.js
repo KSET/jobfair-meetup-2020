@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../helpers/http";
+import {
   queryTranslationsGetAll,
   queryTranslationsGetByKey,
   queryTranslationsInsertOne,
@@ -78,7 +81,7 @@ router.patch("/:key", apiRoute(async ({ body, params }) => {
   const { value } = body;
 
   if (!value) {
-    throw new ApiError("value-missing", 403, [
+    throw new ApiError("value-missing", HttpStatus.Error.Forbidden, [
       "Value not set",
     ]);
   }

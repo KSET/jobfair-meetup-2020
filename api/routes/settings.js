@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../helpers/http";
+import {
   AuthRouter,
 } from "../helpers/middleware";
 import {
@@ -33,7 +36,7 @@ authRouter.post("/", apiRoute(async ({ body }) => {
   const { key, value } = body;
 
   if (!key || !value) {
-    throw new ApiError("no-params", 403, [
+    throw new ApiError("no-params", HttpStatus.Error.Forbidden, [
       "Key and value are required",
     ]);
   }

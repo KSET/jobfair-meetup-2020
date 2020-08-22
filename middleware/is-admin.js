@@ -1,4 +1,7 @@
 import {
+ HttpStatus,
+} from "../api/helpers/http";
+import {
  isAdmin,
 } from "~/api/helpers/permissions";
 
@@ -7,7 +10,7 @@ export default function({ store, error }) {
 
   if (!user || !isAdmin(user.role)) {
     error({
-      statusCode: 404,
+      statusCode: HttpStatus.Error.NotFound,
     });
   }
 }

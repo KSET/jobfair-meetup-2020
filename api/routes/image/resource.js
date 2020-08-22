@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../../helpers/http";
+import {
   queryImageGetById,
   queryImageVariationGetByNameAndImage,
 } from "../../../db/helpers/image";
@@ -20,7 +23,7 @@ router.get("/:id", apiRoute(async ({ params }) => {
   const res = await query(queryImageGetById(id));
 
   if (!res || !res.length) {
-    throw new ApiError("not-found", 404);
+    throw new ApiError("not-found", HttpStatus.Error.NotFound);
   }
 
   return res;
@@ -35,7 +38,7 @@ router.get("/:imageId/:name", async (req, res) => {
   }));
 
   if (!image) {
-    res.status(404);
+    res.status(HttpStatus.Error.NotFound);
     return res.end();
   }
 
@@ -53,7 +56,7 @@ router.get("/:imageId/:name/info", apiRoute(async (req) => {
   }));
 
   if (!image) {
-    throw new ApiError("not-found", 404, [
+    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
       "Image not found",
     ]);
   }

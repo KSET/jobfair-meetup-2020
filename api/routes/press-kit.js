@@ -9,6 +9,9 @@ import {
 } from "express";
 import AdmZip from "adm-zip";
 import {
+ HttpStatus,
+} from "../helpers/http";
+import {
   queryFileGetByIds,
 } from "../../db/helpers/file";
 import {
@@ -150,7 +153,7 @@ authRouter.delete("/:id", apiRoute(async ({ params }) => {
     const dlSuccess = await deleteImageById(client, { id: item.image_id });
 
     if (!dlSuccess) {
-      throw new ApiError("image-delete", 403, [
+      throw new ApiError("image-delete", HttpStatus.Error.Forbidden, [
         "Something went wrong while deleting the image",
       ]);
     }
@@ -171,7 +174,7 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
-    throw new ApiError("not-found", 404, [
+    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
       "Both press kit items must be provided",
     ]);
   }
@@ -188,7 +191,7 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
     ]);
 
     if (!A || !B) {
-      throw new ApiError("not-found", 404, [
+      throw new ApiError("not-found", HttpStatus.Error.NotFound, [
         "Item not found",
       ]);
     }

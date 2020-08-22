@@ -6,6 +6,9 @@ import express from "express";
 import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import {
+  HttpStatus,
+} from "../api/helpers/http";
 
 import {
   getClient,
@@ -43,7 +46,7 @@ app.use(routes);
 
 // Fallback route (404)
 app.use("*", apiRoute(() => {
-  throw new ApiError("not-found", 404);
+  throw new ApiError("not-found", HttpStatus.Error.NotFound);
 }));
 
 const client = getClient();

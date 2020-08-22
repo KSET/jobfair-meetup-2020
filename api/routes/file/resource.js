@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../../helpers/http";
+import {
   fileDbToEntry,
 } from "../../helpers/file";
 import {
@@ -25,7 +28,7 @@ router.get("/:id", async (req, res) => {
   }));
 
   if (!file) {
-    res.status(404);
+    res.status(HttpStatus.Error.NotFound);
     return res.end();
   }
 
@@ -44,7 +47,7 @@ router.get("/:id/info", apiRoute(async (req) => {
   }));
 
   if (!file) {
-    throw new ApiError("not-found", 404, [
+    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
       "Image not found",
     ]);
   }

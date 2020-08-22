@@ -5,6 +5,9 @@ import {
   promisify,
 } from "util";
 import {
+ HttpStatus,
+} from "../../helpers/http";
+import {
   apiRoute,
   ApiError,
 } from "../../helpers/route";
@@ -38,7 +41,7 @@ router.post("/", apiRoute(async ({ files, authUser }) => {
     const { file } = files;
 
     if (!file) {
-      throw new ApiError("no-file", 403, [
+      throw new ApiError("no-file", HttpStatus.Error.Forbidden, [
         "No file provided",
       ]);
     }

@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../helpers/http";
+import {
   apiFilePath,
 } from "../helpers/image";
 import {
@@ -103,7 +106,7 @@ authRouter.post("/", apiRoute(async ({ body }) => {
     const [ gallery ] = await query(queryGalleryGetById({ id }));
 
     if (!gallery) {
-      throw new ApiError("gallery-not-found", 403, [
+      throw new ApiError("gallery-not-found", HttpStatus.Error.Forbidden, [
         "Gallery not found",
       ]);
     }
@@ -123,7 +126,7 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
   const { a, b } = body;
 
   if (!a || !b) {
-    throw new ApiError("not-found", 404, [
+    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
       "Both images must be provided",
     ]);
   }
@@ -132,7 +135,7 @@ authRouter.post("/swap", apiRoute(async ({ body }) => {
   const [ B ] = await query(queryGalleryGetById({ id: b }));
 
   if (!A || !B) {
-    throw new ApiError("not-found", 404, [
+    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
       "Item not found",
     ]);
   }
@@ -156,7 +159,7 @@ authRouter.delete("/:id", apiRoute(async ({ params }) => {
     const [ gallery ] = await client.query(queryGalleryGetById({ id }));
 
     if (!gallery) {
-      throw new ApiError("not-found", 404, [
+      throw new ApiError("not-found", HttpStatus.Error.NotFound, [
         "Gallery not found",
       ]);
     }
@@ -165,7 +168,7 @@ authRouter.delete("/:id", apiRoute(async ({ params }) => {
     const dlSuccess = await deleteImageById(client, { id: gallery.image_id });
 
     if (!dlSuccess) {
-      throw new ApiError("image-delete", 403, [
+      throw new ApiError("image-delete", HttpStatus.Error.Forbidden, [
         "Something went wrong while deleting the image",
       ]);
     }

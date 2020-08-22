@@ -2,6 +2,9 @@ import {
   Router,
 } from "express";
 import {
+ HttpStatus,
+} from "../helpers/http";
+import {
  roleNames,
 } from "../helpers/permissions";
 import {
@@ -136,7 +139,7 @@ router.get("/item/:slug", apiRoute(async ({ params }) => {
   const [ rawNews ] = await query(queryNewsGetBySlug(slug));
 
   if (!rawNews) {
-    throw new ApiError("not-found", 404);
+    throw new ApiError("not-found", HttpStatus.Error.NotFound);
   }
 
   const rawImages = await query(queryImageGetById(rawNews.image_id));
@@ -152,7 +155,7 @@ authRouter.patch("/item/:slug", apiRoute(async ({ params, body }) => {
   const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
 
   if (!oldNews) {
-    throw new ApiError("news-not-found", 403, {
+    throw new ApiError("news-not-found", HttpStatus.Error.Forbidden, {
       global: "News not found",
     });
   }
@@ -160,7 +163,7 @@ authRouter.patch("/item/:slug", apiRoute(async ({ params, body }) => {
   const errors = validateNews(body);
 
   if (0 < errors.length) {
-    throw new ApiError("validation-failed", 403, Object.fromEntries(errors));
+    throw new ApiError("validation-failed", HttpStatus.Error.Forbidden, Object.fromEntries(errors));
   }
 
   const [ res ] = await query(queryNewsUpdateBySlug(params.slug, {
@@ -175,7 +178,7 @@ authRouter.patch("/item/:slug", apiRoute(async ({ params, body }) => {
 
 authRouter.put("/item/", apiRoute(async ({ body, authUser }) => {
   if (!body.imageId) {
-    throw new ApiError("image-required", 403, {
+    throw new ApiError("image-required", HttpStatus.Error.Forbidden, {
       global: "Image is required",
     });
   }
@@ -183,7 +186,7 @@ authRouter.put("/item/", apiRoute(async ({ body, authUser }) => {
   const errors = validateNews(body);
 
   if (0 < errors.length) {
-    throw new ApiError("validation-failed", 403, Object.fromEntries(errors));
+    throw new ApiError("validation-failed", HttpStatus.Error.Forbidden, Object.fromEntries(errors));
   }
 
   const sluggedTitle =
@@ -216,7 +219,7 @@ authRouter.delete("/item/:slug", apiRoute(async ({ params }) => {
   const [ news ] = await query(queryNewsGetBySlug(slug));
 
   if (!news) {
-    throw new ApiError("not-found", 404, [
+    throw new ApiError("not-found", HttpStatus.Error.NotFound, [
       "News item not found",
     ]);
   }

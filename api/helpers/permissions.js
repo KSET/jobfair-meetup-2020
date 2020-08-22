@@ -1,3 +1,7 @@
+/**
+ * @readonly
+ * @enum {String}
+ */
 export const roleNames = {
   BASE: "nobody",
   STUDENT: "student",
