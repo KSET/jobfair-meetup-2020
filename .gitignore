@@ -89,6 +89,9 @@ sw.*
 # macOS
 .DS_Store
 
+# Linux
+.directory
+
 # Vim swap files
 *.swp
 
