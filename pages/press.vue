@@ -182,6 +182,7 @@
 </template>
 
 <script>
+  import downloadIconSrc from "@/assets/images/icons/icon-download.svg?inline";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import JfPressKit from "~/components/press/JfPressKit";
   import TranslatedText from "~/components/TranslatedText";
@@ -191,7 +192,6 @@
   import {
     generateMetadata,
   } from "~/helpers/head";
-  import downloadIconSrc from "@/assets/images/icons/icon-download.svg?inline";
 
   export default {
     name: "PagePress",
