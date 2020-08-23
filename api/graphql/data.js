@@ -114,3 +114,73 @@ export const workshopData = {
     "name",
   ),
 };
+
+export const basicResumeData = {
+  ...basicFields(
+    "id",
+    "full_name",
+    "email",
+  ),
+};
+
+export const resumeEducationData = {
+  ...basicFields(
+    "name",
+    "year",
+    "module",
+    "awarded_title",
+  ),
+};
+
+export const resumeLanguageData = {
+  ...basicFields(
+    "name",
+    "skill_level",
+  ),
+};
+
+export const resumeWorkExperiencesData = {
+  ...basicFields(
+    "company",
+    "years",
+    "description",
+    "current_employer",
+  ),
+};
+
+export const resumeComputerSkillData = {
+  ...basicFields(
+    "name",
+  ),
+};
+
+export const resumeSkillData = {
+  ...basicFields(
+    "name",
+  ),
+};
+
+export const resumeAwardData = {
+  ...basicFields(
+    "title",
+    "year",
+  ),
+};
+
+export const resumeData = {
+  ...basicResumeData,
+  ...basicFields(
+    "city",
+    "birthday",
+    "phone",
+    "github_url",
+    "linkedin_url",
+    "resume_file_data",
+  ),
+  educations: resumeEducationData,
+  work_experiences: resumeWorkExperiencesData,
+  computer_skills: resumeComputerSkillData,
+  skills: resumeSkillData,
+  languages: resumeLanguageData,
+  awards: resumeAwardData,
+};

@@ -4,6 +4,8 @@ import {
   basicUserData,
   presentationData,
   workshopData,
+  resumeData,
+  basicResumeData,
 } from "./data";
 import {
   createObject,
@@ -45,4 +47,20 @@ export const participantEventsQuery = () => ({
       },
     },
   }) } }`,
+});
+
+export const resumesQuery = () => ({
+  query: `{ ${ createObject({
+    resumes: basicResumeData,
+  }) } }`,
+});
+
+export const resumeQuery = (id) => ({
+  query: `query Resume($id: ID) { ${ createObject({
+    "resume(id: $id)": resumeData,
+  }) } }`,
+  operationName: "Resume",
+  variables: {
+    id,
+  },
 });

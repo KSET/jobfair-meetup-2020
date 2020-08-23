@@ -12,3 +12,14 @@ export const snakeToCamelCase =
         ,
       )
 ;
+
+/**
+ * @param {*} maybeString
+ * @return {boolean}
+ */
+export const isString =
+  (maybeString) =>
+    null !== maybeString &&
+    undefined !== maybeString &&
+    String === maybeString.constructor
+;

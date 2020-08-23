@@ -1,4 +1,5 @@
 import {
+  isString,
   snakeToCamelCase,
 } from "./string";
 
@@ -8,25 +9,37 @@ export const isObject =
     null !== maybeObject
 ;
 
-export const keysFromSnakeToCamelCase = (object) => {
+export const deepMap = (fn, object) => {
   if (!isObject(object)) {
-    return object;
+    return fn({ value: object }).value;
   }
 
+  const boundMap = deepMap.bind(null, fn);
+
   if (Array.isArray(object)) {
-    return object.map(keysFromSnakeToCamelCase);
+    return object.map(boundMap);
   }
 
   return Object.fromEntries(
     Object
       .entries(object)
-      .map(([ k, v ]) => [
-        snakeToCamelCase(k),
-        keysFromSnakeToCamelCase(v),
+      .map(([ key, value ]) => [
+        fn({ key }).key,
+        boundMap(value),
       ])
     ,
   );
 };
+
+export const keysFromSnakeToCamelCase = (object) =>
+  deepMap(
+    ({ key, value }) => ({
+      key: isString(key) ? snakeToCamelCase(key) : key,
+      value,
+    }),
+    object,
+  )
+;
 
 export const mapArray =
   (array, fn) =>
