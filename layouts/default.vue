@@ -4,11 +4,11 @@
 
     <app-nav-drawer />
 
-    <v-content :class="$style.contentContainer">
+    <v-main :class="$style.contentContainer">
       <v-container :class="$style.container" fluid>
         <nuxt :class="$style.pageContainer" />
       </v-container>
-    </v-content>
+    </v-main>
 
     <app-footer />
   </v-app>
