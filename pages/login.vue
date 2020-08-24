@@ -9,7 +9,7 @@
         Login
       </v-card-title>
       <v-card-subtitle>
-        Use your JobFair credentials
+        Use your JobFair credentials (from <a style="color: inherit;" target="_blank" rel="noopener noreferrer" :href="loginUrlHref">{{ loginUrlName }}</a>)
       </v-card-subtitle>
       <v-card-text>
         <v-form
@@ -119,7 +119,21 @@
       ...mapGetters({
         user: "user/getUser",
         isModerator: "user/isModerator",
+        getSetting: "settings/getSetting",
       }),
+
+      loginUrlHref() {
+        const url = this.getSetting("GraphQL Endpoint") || process.env.JOBFAIR_GRAPHQL_ENDPOINT;
+        const parsedUrl = new URL(url);
+
+        return parsedUrl.origin;
+      },
+
+      loginUrlName() {
+        const parsedUrl = new URL(this.loginUrlHref);
+
+        return parsedUrl.hostname;
+      },
     },
 
     methods: {
