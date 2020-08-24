@@ -2,6 +2,9 @@ import {
   HttpStatus,
 } from "../helpers/http";
 import {
+  cachedFetcher,
+} from "../helpers/fetchCache";
+import {
   resumesQuery,
   resumeQuery,
 } from "../graphql/queries";
@@ -61,14 +64,22 @@ const fixResume = (resume) => {
   return fixResumes(resume);
 };
 
+const listCacheTimeoutMs = 10 * 1000;
+const fetchListCached = cachedFetcher(
+  listCacheTimeoutMs,
+  async (authHeader) => {
+    const { resumes } = await graphQlQuery(resumesQuery(), authHeader);
+
+    if (!resumes) {
+      return [];
+    }
+
+    return resumes.map(fixResume);
+  },
+);
+
 authRouter.get("/list", async ({ authHeader }) => {
-  const { resumes } = await graphQlQuery(resumesQuery(), authHeader);
-
-  if (!resumes) {
-    return [];
-  }
-
-  return resumes.map(fixResume);
+  return await fetchListCached(authHeader);
 });
 
 authRouter.get("/info/:id", async ({ authHeader, params }) => {
