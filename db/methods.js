@@ -30,6 +30,32 @@ export class Client {
     return await (new Client()).connect();
   }
 
+  static async queryOnce(...args) {
+    let client;
+    try {
+      client = await this.connected();
+
+      return await client.query(...args);
+    } finally {
+      if (client) {
+        await client.end();
+      }
+    }
+  }
+
+  static async queryOneOnce(...args) {
+    let client;
+    try {
+      client = await this.connected();
+
+      return await client.queryOne(...args);
+    } finally {
+      if (client) {
+        await client.end();
+      }
+    }
+  }
+
   /**
    * @returns {Promise<Client>}
    */
