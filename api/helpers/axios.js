@@ -1,4 +1,7 @@
 import axios from "axios";
+import {
+  getSetting,
+} from "./settings";
 
 /**
  * @param {AxiosRequestConfig} config
@@ -67,9 +70,14 @@ export async function graphQlQuery({ query, operationName, variables }, token = 
     : {}
   ;
 
+  const endpointUrl = await getSetting(
+    "GraphQL Endpoint",
+    process.env.JOBFAIR_GRAPHQL_ENDPOINT,
+  );
+
   return (
     await post(
-      process.env.JOBFAIR_GRAPHQL_ENDPOINT,
+      endpointUrl,
       { operationName, query, variables },
       config,
     )
