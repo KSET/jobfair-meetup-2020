@@ -6,6 +6,7 @@ import express from "express";
 import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import {
   HttpStatus,
 } from "../api/helpers/http";
@@ -41,6 +42,11 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(fileUploadMiddleware);
+app.use(morgan(
+  "development" === process.env.NODE_ENV
+  ? "dev"
+  : "tiny",
+));
 
 app.use(routes);
 
