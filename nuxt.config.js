@@ -96,6 +96,7 @@ export default {
       path: "/api",
       handler: "~/api/index.js",
     },
+    "~/middleware/logger",
   ],
   /*
    ** Axios module configuration

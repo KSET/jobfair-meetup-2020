@@ -8,6 +8,11 @@ import {
 export default (nuxtConfig) => ({
 
   async routeDone(_url, _result, { nuxt }) {
+    if (!nuxt.state) {
+      console.log("No nuxt state", nuxt);
+      return;
+    }
+
     const { undefinedKeys = [] } = nuxt.state.translations;
 
     await Promise.all(
