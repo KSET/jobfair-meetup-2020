@@ -101,11 +101,11 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-content :class="$style.contentContainer">
+    <v-main :class="$style.contentContainer">
       <v-container :class="$style.container" fluid>
         <nuxt :class="$style.pageContainer" />
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
