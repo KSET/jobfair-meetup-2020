@@ -179,7 +179,7 @@
         }
 
         if (this.isModerator) {
-          await this.fetchAdminPages({ role: this.user.role });
+          await this.fetchAdminPages({ userRole: this.user.role });
         }
 
         return await this.$router.push(redirectTo);
