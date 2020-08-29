@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app :class="$style.globalContainer">
     <v-app-bar app dark elevate-on-scroll>
       <v-toolbar-title>
         <v-btn
@@ -156,11 +156,14 @@
 <style lang="scss" module>
   @import "../assets/styles/include/all";
 
-  :global(.v-toolbar__content) {
-    max-width: $content-max-width;
-    margin: 0 auto;
-    padding-top: 0;
-    padding-bottom: 0;
+  .globalContainer {
+
+    :global(.v-toolbar__content) {
+      max-width: $content-max-width;
+      margin: 0 auto;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
   }
 
   .contentContainer {
@@ -178,8 +181,6 @@
   .pageContainer {
     width: 100%;
   }
-
-  $nav-height: 64px;
 
   .logoLink {
     display: flex;
