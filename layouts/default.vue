@@ -47,6 +47,7 @@
 
     head() {
       return {
+        title: "Welcome",
         meta: [
           ...generateMetadata({
             title: "Welcome",
