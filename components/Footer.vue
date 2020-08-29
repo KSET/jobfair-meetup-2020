@@ -40,7 +40,7 @@
           <img
             :class="$style.jobfairLogo"
             :src="jobfairMonospaceLogo"
-            alt="JobFair MeetUP"
+            alt="JobFair Meetup"
           >
           <div :class="$style.afterJobfairText">
             <translated-text trans-key="footer.legal.kset" /> &copy; {{ (new Date).getFullYear() }}

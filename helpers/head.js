@@ -10,7 +10,7 @@ const renameMap = {
 };
 
 const mappedContent = {
-  "og:title": (title) => `${ title } | JobFair MeetUP`,
+  "og:title": (title) => `${ title } | JobFair Meetup`,
 };
 
 const getMappedContent = (key, content) => mappedContent[key] ? mappedContent[key](content) : content;

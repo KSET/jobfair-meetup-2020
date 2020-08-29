@@ -126,7 +126,7 @@
       meta: [
         ...generateMetadata({
           title: "Blog - Home",
-          description: "JobFair MeetUP Blog",
+          description: "JobFair Meetup Blog",
         }),
       ],
     }),

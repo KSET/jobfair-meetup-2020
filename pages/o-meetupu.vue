@@ -337,10 +337,10 @@
     },
 
     head: () => ({
-      title: "O MeetUPu",
+      title: "O Meetupu",
       meta: [
         ...generateMetadata({
-          title: "O MeetUPu",
+          title: "O Meetupu",
         }),
       ],
     }),
