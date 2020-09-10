@@ -257,9 +257,9 @@
             <div :class="$style.participantContainer">
               <v-img
                 :alt="participant.description"
-                :lazy-src="participant.images.small.url"
+                :lazy-src="participant.images && participant.images.small.url"
                 :src="participant.image"
-                :srcset="getSrcSet(participant.images)"
+                :srcset="participant.images && getSrcSet(participant.images)"
                 aspect-ratio="1.875"
                 contain
               />
@@ -314,6 +314,7 @@
   import {
     getSrcSet,
   } from "~/helpers/image";
+  import NotFoundImg from "~/assets/images/404.svg?inline";
 
   const storeActions = {
     fetchNews: "news/fetchNews",
@@ -330,6 +331,18 @@
     },
 
     async asyncData({ store }) {
+      const ensureHasImage =
+        (participants) =>
+          participants
+            .map((participant) => {
+              if (!participant.image) {
+                participant.image = NotFoundImg;
+              }
+
+              return participant;
+            })
+      ;
+
       const [
         news,
         projectFriends,
@@ -337,7 +350,7 @@
       ] = await Promise.all([
         store.dispatch(storeActions.fetchNews).then(ensureArray).then(limitLength(3)),
         store.dispatch(storeActions.fetchProjectFriends).then(ensureArray),
-        store.dispatch(storeActions.fetchParticipants).then(ensureArray),
+        store.dispatch(storeActions.fetchParticipants).then(ensureArray).then(ensureHasImage),
       ]);
 
       return {
