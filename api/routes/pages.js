@@ -30,10 +30,10 @@ router.get("/list", () => {
       name: "page.name.press",
       to: { name: "PagePress" },
     },
-    {
-      name: "button.joinNow",
-      setting: "Join Now URL",
-    },
+    // {
+    //   name: "button.joinNow",
+    //   setting: "Join Now URL",
+    // },
   ];
 });
 

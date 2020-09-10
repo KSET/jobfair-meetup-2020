@@ -24,18 +24,18 @@
                 <span slot="placeholder" :class="$style.typing">{{ titleTexts[0] }}</span>
               </client-only>
             </h1>
-            <div :class="$style.heroButtonContainer">
-              <v-btn
-                :class="$style.heroButton"
-                :href="getSetting('Join Now URL', '#')"
-                color="primary"
-                large
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <translated-text trans-key="button.joinNow" />
-              </v-btn>
-            </div>
+            <!--            <div :class="$style.heroButtonContainer">-->
+            <!--              <v-btn-->
+            <!--                :class="$style.heroButton"-->
+            <!--                :href="getSetting('Join Now URL', '#')"-->
+            <!--                color="primary"-->
+            <!--                large-->
+            <!--                rel="noopener noreferrer"-->
+            <!--                target="_blank"-->
+            <!--              >-->
+            <!--                <translated-text trans-key="button.joinNow" />-->
+            <!--              </v-btn>-->
+            <!--            </div>-->
           </v-col>
 
           <v-col :class="$style.heroExplanationContainer" cols="12" md="5" offset-md="6">
