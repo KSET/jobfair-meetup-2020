@@ -139,6 +139,23 @@
       },
     },
 
+    middleware({ store, redirect, route }) {
+      const user = store.getters["user/getUser"];
+
+      if (user) {
+        const { r } = route.query;
+        const redirectTo = decodeRedirectParam(
+          r,
+          {
+            name: "Index",
+            params: {},
+          },
+        );
+
+        return redirect(redirectTo);
+      }
+    },
+
     methods: {
       ...mapActions({
         doLogin: "user/doLogin",
