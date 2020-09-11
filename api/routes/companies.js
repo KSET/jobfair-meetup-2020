@@ -7,6 +7,7 @@ import {
 import {
   participantsQuery,
   participantEventsQuery,
+  companyQuery,
 } from "../graphql/queries";
 import {
   ApiError,
@@ -111,6 +112,13 @@ router.get("/project-friends", () => {
         ,
       )
   );
+});
+
+router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params, authHeader }) => {
+  const { id } = params;
+  const { company } = await graphQlQuery(companyQuery(Number(id)), authHeader);
+
+  return fixCompany(company);
 }));
 
 export default router;

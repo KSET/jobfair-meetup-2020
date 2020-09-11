@@ -6,6 +6,7 @@ import {
   workshopData,
   resumeData,
   basicResumeData,
+  companyDataWithMeta,
 } from "./data";
 import {
   createObject,
@@ -28,6 +29,22 @@ export const currentUserQuery = () => ({
 export const participantsQuery = () => ({
   query: `{ ${ createObject({
     companies: companyData,
+  }) } }`,
+});
+
+export const companyQuery = (id) => ({
+  query: `query Company($id: ID) { ${ createObject({
+    "company(id: $id)": companyDataWithMeta,
+  }) } }`,
+  operationName: "Company",
+  variables: {
+    id,
+  },
+});
+
+export const participantsWithEventsQuery = () => ({
+  query: `{ ${ createObject({
+    companies: companyDataWithMeta,
   }) } }`,
 });
 

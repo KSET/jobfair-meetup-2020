@@ -92,6 +92,21 @@ export const loginData = {
   ...tokenData,
 };
 
+export const pointData = {
+  ...basicFields(
+    "latitude",
+    "longitude",
+  ),
+};
+
+export const locationData = {
+  ...basicFields(
+    "id",
+    "name",
+  ),
+  geolocation: pointData,
+};
+
 export const presentationData = {
   ...basicFields(
     "id",
@@ -108,11 +123,41 @@ export const presentationData = {
 export const workshopData = {
   ...basicFields(
     "id",
+    "approved",
+    "name",
     "description",
     "occures_at",
+    "finishes_at",
     "location",
-    "name",
   ),
+  place: locationData,
+};
+
+export const boothData = {
+  ...basicFields(
+    "id",
+    "approved",
+    "notes",
+    "size",
+  ),
+  place: locationData,
+};
+
+export const cocktailData = {
+  ...basicFields(
+    "id",
+    "approved",
+    "name",
+    "description",
+  ),
+};
+
+export const companyDataWithMeta = {
+  ...companyData,
+  booth: boothData,
+  presentation: presentationData,
+  workshop: workshopData,
+  cocktail: cocktailData,
 };
 
 export const basicResumeData = {
