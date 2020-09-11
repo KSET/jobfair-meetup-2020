@@ -55,7 +55,10 @@
                 v-for="company in user.companies"
                 :key="company.id"
               >
-                <v-list-item-avatar :data-srcset="getSrcSet(company.logo)">
+                <v-list-item-avatar
+                  v-if="company.logo"
+                  :data-srcset="getSrcSet(company.logo)"
+                >
                   <v-img
                     :lazy-src="company.logo.small.url"
                     :src="company.logo.original.url"
@@ -220,8 +223,8 @@
     }
 
     .noPadding {
-      padding: 0 !important;
       margin: 0 !important;
+      padding: 0 !important;
       border-bottom: none;
     }
   }
