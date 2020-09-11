@@ -314,7 +314,6 @@
   import {
     getSrcSet,
   } from "~/helpers/image";
-  import NotFoundImg from "~/assets/images/404.png";
 
   const storeActions = {
     fetchNews: "news/fetchNews",
@@ -336,7 +335,7 @@
           participants
             .map((participant) => {
               if (!participant.image) {
-                participant.image = NotFoundImg;
+                participant.image = require("@/assets/images/404.png");
               }
 
               return participant;

@@ -39,7 +39,7 @@
         >
           <img
             :class="$style.jobfairLogo"
-            :src="jobfairMonospaceLogo"
+            src="../assets/images/logo/jobfair-mono.png"
             alt="JobFair Meetup"
           >
           <div :class="$style.afterJobfairText">
@@ -169,10 +169,6 @@
             height: "9em",
           },
         ];
-      },
-
-      jobfairMonospaceLogo() {
-        return require("@/assets/images/logo/jobfair-mono.png");
       },
 
       socialIcons() {
