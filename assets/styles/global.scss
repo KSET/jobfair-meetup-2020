@@ -68,18 +68,25 @@ h5 {
 
 html > body > div {
 
-  .theme--dark.v-btn.v-btn--flat {
-    transition-property: color, background-color;
-    color: fer-active($fer-yellow);
-    border-radius: 2px;
+  .theme--dark.v-btn {
 
-    &:hover {
-      color: fer-hover($fer-yellow);
-      background-color: transparentize($fer-yellow, .85);
+    &.v-btn--flat {
+      transition-property: color, background-color;
+      color: fer-active($fer-yellow);
+      border-radius: 2px;
+
+      &:hover {
+        color: fer-hover($fer-yellow);
+        background-color: transparentize($fer-yellow, .85);
+      }
+
+      &:active {
+        color: fer-active($fer-yellow);
+      }
     }
 
-    &:active {
-      color: fer-active($fer-yellow);
+    &.v-btn--depressed {
+      border-radius: 2px;
     }
   }
 }
