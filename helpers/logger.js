@@ -8,6 +8,11 @@ export const morgan =
   (resourceName, options = {}) =>
     morganLogger(
       `[:date[iso]] ${ resourceName } | :method :url | :status :response-time[3]ms :res[content-length]b | ":referrer" ":user-agent"`,
-      options,
+      {
+        skip() {
+          return "development" === process.env.NODE_ENV;
+        },
+        ...options,
+      },
     )
 ;
