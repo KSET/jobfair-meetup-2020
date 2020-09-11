@@ -2,11 +2,29 @@ import {
   AtomicBool,
 } from "./atomic";
 
-export const cachedFetcher = (timeoutMs, fetchFn) => {
-  const cache = {
+export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") => {
+  const getBaseData = () => ({
     time: 0,
     data: null,
     fetching: new AtomicBool(),
+  });
+
+  const cache = {};
+
+  const cacheSet = (cacheKey, key, value) => {
+    if (!(cacheKey in cache)) {
+      cache[cacheKey] = getBaseData();
+    }
+
+    cache[cacheKey][key] = value;
+  };
+
+  const cacheGet = (cacheKey, key) => {
+    if (!(cacheKey in cache)) {
+      cache[cacheKey] = getBaseData();
+    }
+
+    return cache[cacheKey][key];
   };
 
   const timeMs = () => {
@@ -17,23 +35,23 @@ export const cachedFetcher = (timeoutMs, fetchFn) => {
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const setCached = (data) => {
-    cache.data = data;
-    cache.time = timeMs();
+  const setCached = (key, data) => {
+    cacheSet(key, "data", data);
+    cacheSet(key, "time", timeMs());
   };
 
-  const setFetching = (fetching) => {
-    cache.fetching.value = fetching;
+  const setFetching = (key, fetching) => {
+    cacheGet(key, "fetching").value = fetching;
   };
 
   const isFetching =
-    () =>
-      cache.fetching.value
+    (key) =>
+      cacheGet(key, "fetching").value
   ;
 
-  const testAndSetFetching = (ifItIs, thenSetTo) => {
-    const oldValue = cache.fetching.testAndSet(ifItIs, thenSetTo);
-    const newValue = isFetching();
+  const testAndSetFetching = (key, ifItIs, thenSetTo) => {
+    const oldValue = cacheGet(key, "fetching").testAndSet(ifItIs, thenSetTo);
+    const newValue = isFetching(key);
 
     const changed = oldValue !== newValue;
 
@@ -44,8 +62,8 @@ export const cachedFetcher = (timeoutMs, fetchFn) => {
     }
   };
 
-  const waitForFetchingToBe = async (fetching) => {
-    while (isFetching() !== fetching) {
+  const waitForFetchingToBe = async (key, fetching) => {
+    while (isFetching(key) !== fetching) {
       await sleep(10);
     }
 
@@ -53,60 +71,61 @@ export const cachedFetcher = (timeoutMs, fetchFn) => {
   };
 
   const hasCacheEntry =
-    () =>
-      Boolean(getCacheEntry())
+    (key) =>
+      Boolean(getCacheEntry(key))
   ;
 
   const getCacheEntry =
-    () =>
-      cache.data
+    (key) =>
+      cacheGet(key, "data")
   ;
 
   const hasCached =
-    () =>
-      hasCacheEntry() &&
-      (timeMs() - timeoutMs) <= cache.time
+    (key) =>
+      hasCacheEntry(key) &&
+      (timeMs() - timeoutMs) <= cacheGet(key, "time")
   ;
 
   return async (...args) => {
-    // console.log("CACHE GET");
+    const key = cacheKeyFn(...args);
+    // console.log("CACHE GET", key);
 
-    if (hasCached()) {
-      // console.log("CACHE FRESH");
-      return getCacheEntry();
+    if (hasCached(key)) {
+      // console.log("CACHE FRESH", key);
+      return getCacheEntry(key);
     }
 
     const fetchData = async () => {
-      setFetching(true);
+      setFetching(key, true);
 
-      // console.log("FETCH START");
+      // console.log("FETCH START", key);
       const data = await fetchFn(...args);
-      // console.log("FETCH  DONE");
+      // console.log("FETCH  DONE", key);
 
-      setCached(data);
+      setCached(key, data);
 
-      setFetching(false);
+      setFetching(key, false);
 
       return data;
     };
 
-    if (hasCacheEntry()) {
-      // console.log("CACHE STALE");
-      if (testAndSetFetching(false, true)) {
+    if (hasCacheEntry(key)) {
+      // console.log("CACHE STALE", key);
+      if (testAndSetFetching(key, false, true)) {
         // run in background
         setTimeout(fetchData, 0);
       }
 
-      return getCacheEntry();
+      return getCacheEntry(key);
     }
 
-    if (isFetching()) {
-      await waitForFetchingToBe(false);
+    if (isFetching(key)) {
+      await waitForFetchingToBe(key, false);
 
-      return getCacheEntry();
+      return getCacheEntry(key);
     }
 
-    // console.log("CACHE  MISS");
+    // console.log("CACHE  MISS", key);
     return await fetchData();
   };
 };

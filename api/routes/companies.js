@@ -96,6 +96,10 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
     ...obj,
     company: companies.find(({ id }) => id === obj.company.id),
   };
+}, ({ params }) => {
+  const { type, id } = params;
+
+  return `${ type }::${ id }`;
 }));
 
 router.get("/project-friends", () => {
@@ -119,6 +123,8 @@ router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params, authHeader })
   const { company } = await graphQlQuery(companyQuery(Number(id)), authHeader);
 
   return fixCompany(company);
+}, ({ params }) => {
+  return params.id;
 }));
 
 export default router;
