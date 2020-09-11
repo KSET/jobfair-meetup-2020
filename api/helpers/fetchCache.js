@@ -35,7 +35,7 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const setCached = (key, data) => {
+  const setData = (key, data) => {
     cacheSet(key, "data", data);
     cacheSet(key, "time", timeMs());
   };
@@ -70,19 +70,19 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
     return fetching;
   };
 
-  const hasCacheEntry =
+  const hasData =
     (key) =>
-      Boolean(getCacheEntry(key))
+      Boolean(getData(key))
   ;
 
-  const getCacheEntry =
+  const getData =
     (key) =>
       cacheGet(key, "data")
   ;
 
-  const hasCached =
+  const hasFreshCache =
     (key) =>
-      hasCacheEntry(key) &&
+      hasData(key) &&
       (timeMs() - timeoutMs) <= cacheGet(key, "time")
   ;
 
@@ -90,9 +90,9 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
     const key = cacheKeyFn(...args);
     // console.log("CACHE GET", key);
 
-    if (hasCached(key)) {
+    if (hasFreshCache(key)) {
       // console.log("CACHE FRESH", key);
-      return getCacheEntry(key);
+      return getData(key);
     }
 
     const fetchData = async () => {
@@ -102,27 +102,27 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
       const data = await fetchFn(...args);
       // console.log("FETCH  DONE", key);
 
-      setCached(key, data);
+      setData(key, data);
 
       setFetching(key, false);
 
       return data;
     };
 
-    if (hasCacheEntry(key)) {
+    if (hasData(key)) {
       // console.log("CACHE STALE", key);
       if (testAndSetFetching(key, false, true)) {
         // run in background
         setTimeout(fetchData, 0);
       }
 
-      return getCacheEntry(key);
+      return getData(key);
     }
 
     if (isFetching(key)) {
       await waitForFetchingToBe(key, false);
 
-      return getCacheEntry(key);
+      return getData(key);
     }
 
     // console.log("CACHE  MISS", key);
