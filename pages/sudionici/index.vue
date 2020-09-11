@@ -232,7 +232,7 @@
 
     async asyncData({ store }) {
       return {
-        events: await store.dispatch("companies/fetchParticipantEvents"),
+        events: (await store.dispatch("companies/fetchParticipantEvents")).sort((a, b) => a.date - b.date),
       };
     },
 
