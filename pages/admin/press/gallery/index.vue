@@ -158,7 +158,7 @@
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
-  const image404 = require("@/assets/images/404.svg?inline");
+  const image404 = require("@/assets/images/404.png");
 
   const fixupItems = (items) => {
     return (

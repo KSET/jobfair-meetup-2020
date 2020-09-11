@@ -153,26 +153,26 @@
         return [
           {
             name: "FER",
-            src: require("@/assets/images/logo/fer.svg?inline"),
+            src: require("@/assets/images/logo/fer.png"),
           },
           {
             name: "Centar Karijera",
-            src: require("@/assets/images/logo/ck.svg?inline"),
+            src: require("@/assets/images/logo/ck.png"),
           },
           {
             name: "KSET",
-            src: require("@/assets/images/logo/kset.svg?inline"),
+            src: require("@/assets/images/logo/kset.png"),
           },
           {
             name: "SSFER",
-            src: require("@/assets/images/logo/ssfer.svg?inline"),
+            src: require("@/assets/images/logo/ssfer.png"),
             height: "9em",
           },
         ];
       },
 
       jobfairMonospaceLogo() {
-        return require("@/assets/images/logo/jobfair-mono.svg?inline");
+        return require("@/assets/images/logo/jobfair-mono.png");
       },
 
       socialIcons() {
@@ -180,17 +180,17 @@
           {
             name: "Instagram",
             href: this.getSetting("Instagram URL"),
-            src: require("@/assets/images/icons/instagram.svg?inline"),
+            src: require("@/assets/images/icons/instagram.png"),
           },
           {
             name: "Facebook",
             href: this.getSetting("Facebook URL"),
-            src: require("@/assets/images/icons/facebook.svg?inline"),
+            src: require("@/assets/images/icons/facebook.png"),
           },
           {
             name: "Youtube",
             href: this.getSetting("Youtube URL"),
-            src: require("@/assets/images/icons/youtube.svg?inline"),
+            src: require("@/assets/images/icons/youtube.png"),
           },
         ];
       },

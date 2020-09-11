@@ -5,7 +5,7 @@
         <img
           :class="$style.image"
           :alt="errorMessage"
-          src="../assets/images/404.svg?inline"
+          src="../assets/images/404.png"
         >
         <h1 :class="$style.headline">
           Stranica nije uhvaćena

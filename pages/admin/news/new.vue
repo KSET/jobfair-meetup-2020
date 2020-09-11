@@ -5,7 +5,7 @@
         <v-img
           :class="$style.headerImage"
           :lazy-src="rawNews.images && rawNews.images.thumb ? rawNews.images.thumb.url : null"
-          :src="imagePreview || rawNews.images && rawNews.images.default.url || require('@/assets/images/404.svg?inline')"
+          :src="imagePreview || rawNews.images && rawNews.images.default.url || require('@/assets/images/404.png')"
           aspect-ratio="2.4"
           position="bottom center"
         >

@@ -16,7 +16,7 @@
     <v-row>
       <v-col class="mb-12" cols="12" md="5" offset-md="1">
         <v-img
-          :src="require('@/assets/images/contact-illustration.svg?inline')"
+          :src="require('@/assets/images/contact-illustration.png')"
           aspect-ratio="0.95"
           contain
         />
@@ -32,7 +32,7 @@
             <div :class="$style.linkContainer">
               <v-img
                 :class="$style.icon"
-                :src="require('@/assets/images/icons/contact-icon-mail.svg?inline')"
+                :src="require('@/assets/images/icons/contact-icon-mail.png')"
                 aspect-ratio="1"
                 contain
               />
@@ -47,7 +47,7 @@
             <div :class="$style.linkContainer">
               <v-img
                 :class="$style.icon"
-                :src="require('@/assets/images/icons/contact-icon-location.svg?inline')"
+                :src="require('@/assets/images/icons/contact-icon-location.png')"
                 aspect-ratio="1"
                 contain
               />
@@ -72,7 +72,7 @@
             <div :class="$style.linkContainer">
               <v-img
                 :class="$style.icon"
-                :src="require('@/assets/images/icons/contact-icon-insta.svg?inline')"
+                :src="require('@/assets/images/icons/contact-icon-insta.png')"
                 aspect-ratio="1"
                 contain
               />
@@ -89,7 +89,7 @@
             <div :class="$style.linkContainer">
               <v-img
                 :class="$style.icon"
-                :src="require('@/assets/images/icons/contact-icon-fb.svg?inline')"
+                :src="require('@/assets/images/icons/contact-icon-fb.png')"
                 aspect-ratio="1"
                 contain
               />
@@ -106,7 +106,7 @@
             <div :class="$style.linkContainer">
               <v-img
                 :class="$style.icon"
-                :src="require('@/assets/images/icons/contact-icon-yt.svg?inline')"
+                :src="require('@/assets/images/icons/contact-icon-yt.png')"
                 aspect-ratio="1"
                 contain
               />

@@ -155,9 +155,9 @@
 
       icons() {
         return {
-          talk: require("@/assets/images/icons/talk.svg?inline"),
-          workshop: require("@/assets/images/icons/workshop.svg?inline"),
-          panel: require("@/assets/images/icons/panel.svg?inline"),
+          talk: require("@/assets/images/icons/talk.png"),
+          workshop: require("@/assets/images/icons/workshop.png"),
+          panel: require("@/assets/images/icons/panel.png"),
         };
       },
     },

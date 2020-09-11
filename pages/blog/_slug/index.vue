@@ -160,26 +160,26 @@
 
         return [
           {
-            src: require("@/assets/images/icons/icon-fb.svg?inline"),
+            src: require("@/assets/images/icons/icon-fb.png"),
             href: `https://www.facebook.com/sharer/sharer.php?u=${ url }`,
           },
           {
-            src: require("@/assets/images/icons/icon-wp.svg?inline"),
+            src: require("@/assets/images/icons/icon-wp.png"),
             href: `https://api.whatsapp.com/send?text=${ text }%0A${ url }`,
             attr: {
               "data-action": "share/whatsapp/share",
             },
           },
           {
-            src: require("@/assets/images/icons/icon-tg.svg?inline"),
+            src: require("@/assets/images/icons/icon-tg.png"),
             href: `https://t.me/share/url?url=${ url }&text=${ text }`,
           },
           {
-            src: require("@/assets/images/icons/icon-tw.svg?inline"),
+            src: require("@/assets/images/icons/icon-tw.png"),
             href: `https://twitter.com/intent/tweet?url=${ url }&text=${ text }`,
           },
           {
-            src: require("@/assets/images/icons/icon-ln.svg?inline"),
+            src: require("@/assets/images/icons/icon-ln.png"),
             href: `https://www.linkedin.com/sharing/share-offsite/?url=${ url }`,
           },
         ];

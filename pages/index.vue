@@ -61,7 +61,7 @@
 
           <v-col :class="$style.joinCard" cols="12" md="3">
             <v-img
-              :src="require('@/assets/images/participate-illustration-1.svg?inline')"
+              :src="require('@/assets/images/participate-illustration-1.png')"
               aspect-ratio="1.12"
               contain
             />
@@ -75,7 +75,7 @@
 
           <v-col :class="$style.joinCard" cols="12" md="3">
             <v-img
-              :src="require('@/assets/images/participate-illustration-2.svg?inline')"
+              :src="require('@/assets/images/participate-illustration-2.png')"
               aspect-ratio="1.12"
               contain
             />
@@ -89,7 +89,7 @@
 
           <v-col :class="$style.joinCard" cols="12" md="3">
             <v-img
-              :src="require('@/assets/images/participate-illustration-3.svg?inline')"
+              :src="require('@/assets/images/participate-illustration-3.png')"
               aspect-ratio="1.12"
               contain
             />
@@ -137,7 +137,7 @@
             <v-row :class="$style.signupBullet">
               <v-col cols="4" md="2" offset="4" offset-md="0">
                 <v-img
-                  :src="require('@/assets/images/icons/prijavi-se-icon-1.svg?inline')"
+                  :src="require('@/assets/images/icons/prijavi-se-icon-1.png')"
                   aspect-ratio="1"
                   contain
                 />
@@ -155,7 +155,7 @@
             <v-row :class="$style.signupBullet">
               <v-col cols="4" md="2" offset="4" offset-md="0">
                 <v-img
-                  :src="require('@/assets/images/icons/prijavi-se-icon-2.svg?inline')"
+                  :src="require('@/assets/images/icons/prijavi-se-icon-2.png')"
                   aspect-ratio="1"
                   contain
                 />
@@ -173,7 +173,7 @@
             <v-row :class="$style.signupBullet">
               <v-col cols="4" md="2" offset="4" offset-md="0">
                 <v-img
-                  :src="require('@/assets/images/icons/prijavi-se-icon-3.svg?inline')"
+                  :src="require('@/assets/images/icons/prijavi-se-icon-3.png')"
                   aspect-ratio="1"
                   contain
                 />
@@ -314,7 +314,7 @@
   import {
     getSrcSet,
   } from "~/helpers/image";
-  import NotFoundImg from "~/assets/images/404.svg?inline";
+  import NotFoundImg from "~/assets/images/404.png";
 
   const storeActions = {
     fetchNews: "news/fetchNews",
@@ -382,17 +382,17 @@
           {
             name: "Instagram",
             href: this.getSetting("Instagram URL"),
-            src: require("@/assets/images/icons/ig.svg?inline"),
+            src: require("@/assets/images/icons/ig.png"),
           },
           {
             name: "Facebook",
             href: this.getSetting("Facebook URL"),
-            src: require("@/assets/images/icons/fb.svg?inline"),
+            src: require("@/assets/images/icons/fb.png"),
           },
           {
             name: "YouTube",
             href: this.getSetting("Youtube URL"),
-            src: require("@/assets/images/icons/yt.svg?inline"),
+            src: require("@/assets/images/icons/yt.png"),
           },
         ];
       },
@@ -427,16 +427,15 @@
       min-height: $min-height;
       margin-bottom: 3em;
       background-color: $fer-dark-blue;
-      background-image: url("../assets/images/index-bg.svg?inline");
+      background-image: url("../assets/images/index-bg.png");
       background-repeat: no-repeat;
-      background-position: center #{-$nav-height};
-      background-size: #{$page-max-width} #{$min-height};
+      background-position: center #{$nav-height};
 
-      @include media(md) {
+      @include media(sm) {
         $min-height: 1225px;
 
         min-height: $min-height;
-        background-image: url("../assets/images/index-bg-mobile.svg?inline");
+        background-image: url("../assets/images/index-bg-mobile.png");
         background-size: #{map-get($breakpoints, sm) * .8} #{$min-height};
         background-position: center #{-$nav-height * 1.5};
       }
@@ -450,7 +449,7 @@
           margin-top: 1.5em;
           color: $fer-yellow;
 
-          @include media(md) {
+          @include media(sm) {
             font-size: 100%;
           }
         }
@@ -461,7 +460,7 @@
           height: 4.5em;
           color: $fer-white;
 
-          @include media(md) {
+          @include media(sm) {
             font-size: 225%;
             height: 3.5em;
           }
@@ -493,7 +492,7 @@
       .heroExplanationContainer {
         margin-top: 42em;
 
-        @include media(md) {
+        @include media(sm) {
           margin-top: 45em;
         }
 
@@ -502,7 +501,7 @@
           font-weight: bold;
           color: $fer-yellow;
 
-          @include media(md) {
+          @include media(sm) {
             font-size: 162.5%;
           }
         }
@@ -511,7 +510,7 @@
           font-size: 112.5%;
           color: $fer-white;
 
-          @include media(md) {
+          @include media(sm) {
             font-size: 100%;
           }
         }
@@ -547,7 +546,7 @@
           margin: 0 auto;
         }
 
-        @include media(md) {
+        @include media(sm) {
 
           > h3 {
             font-size: 112.5%;
@@ -605,7 +604,7 @@
             }
           }
 
-          @include media(md) {
+          @include media(sm) {
             margin-top: 2em;
 
             > * {
@@ -627,7 +626,7 @@
           color: $fer-dark-blue;
         }
 
-        @include media(md) {
+        @include media(sm) {
 
           :global(.v-image) {
             max-width: 90px;

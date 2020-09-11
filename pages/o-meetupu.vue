@@ -11,7 +11,7 @@
     <v-row>
       <v-col cols="12" md="6" offset-md="3">
         <v-img
-          :src="require('@/assets/images/meetup-illustration-1.svg?inline')"
+          :src="require('@/assets/images/meetup-illustration-1.png')"
           aspect-ratio="1"
           contain
         />
@@ -60,7 +60,7 @@
             offset-md="0"
           >
             <v-img
-              :src="require('@/assets/images/meet-icon-1-kset.svg?inline')"
+              :src="require('@/assets/images/meet-icon-1-kset.png')"
               aspect-ratio="1"
               class="mx-12"
               contain
@@ -76,7 +76,7 @@
             offset-md="0"
           >
             <v-img
-              :src="require('@/assets/images/meet-icon-2-fer.svg?inline')"
+              :src="require('@/assets/images/meet-icon-2-fer.png')"
               aspect-ratio="1"
               class="mx-12"
               contain
@@ -104,7 +104,7 @@
           <translated-text trans-key="meetup.attractions.text" />
         </p>
         <v-img
-          :src="require('@/assets/images/meetup-illustration-2.svg?inline')"
+          :src="require('@/assets/images/meetup-illustration-2.png')"
           aspect-ratio="1.15"
           contain
         />
@@ -134,7 +134,7 @@
             cols="12"
           >
             <v-img
-              :src="require('@/assets/images/talks.svg?inline')"
+              :src="require('@/assets/images/talks.png')"
               aspect-ratio="1"
               class="ml-md-n3 ml-md-0 ml-auto mb-n8 mb-md-0"
               contain
@@ -186,7 +186,7 @@
             cols="12"
           >
             <v-img
-              :src="require('@/assets/images/workshops.svg?inline')"
+              :src="require('@/assets/images/workshops.png')"
               aspect-ratio="1"
               class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
               contain
@@ -208,7 +208,7 @@
             cols="12"
           >
             <v-img
-              :src="require('@/assets/images/panel.svg?inline')"
+              :src="require('@/assets/images/panel.png')"
               aspect-ratio="1"
               class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
               contain
@@ -230,7 +230,7 @@
             cols="12"
           >
             <v-img
-              :src="require('@/assets/images/networking.svg?inline')"
+              :src="require('@/assets/images/networking.png')"
               aspect-ratio="1"
               class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
               contain
@@ -252,7 +252,7 @@
             cols="12"
           >
             <v-img
-              :src="require('@/assets/images/party.svg?inline')"
+              :src="require('@/assets/images/party.png')"
               aspect-ratio="1"
               class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
               contain
@@ -278,7 +278,7 @@
             offset-md="1"
           >
             <v-img
-              :src="require('@/assets/images/meet-illustration-3.svg?inline')"
+              :src="require('@/assets/images/meet-illustration-3.png')"
               aspect-ratio="1"
               contain
             />
