@@ -5,6 +5,8 @@
     </h1>
 
     <v-data-iterator
+      v-if="events.length > 0"
+
       :custom-filter="filterFunction"
       :items="filteredEventsByType"
       :items-per-page.sync="itemsPerPage"
@@ -164,6 +166,9 @@
         </v-row>
       </template>
     </v-data-iterator>
+    <h2 v-else>
+      <translated-text trans-key="participants.no-participants" />
+    </h2>
   </app-max-width-container>
 </template>
 
