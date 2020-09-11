@@ -2,7 +2,11 @@ import {
   pipe,
   keysFromSnakeToCamelCase,
   mapArray,
+  deepMap,
 } from "../../helpers/object";
+import {
+  isString,
+} from "../../helpers/string";
 import {
   HttpStatus,
 } from "../helpers/http";
@@ -55,7 +59,19 @@ const fixResume = (resume) => {
       })
   ;
 
+  const trimValues =
+    (resume) =>
+      deepMap(
+        ({ key, value }) => ({
+          key,
+          value: isString(value) ? String(value).trim() : value,
+        }),
+        resume,
+      )
+  ;
+
   const fixResumes = pipe(
+    trimValues,
     keysFromSnakeToCamelCase,
     fixResumeProps,
   );
