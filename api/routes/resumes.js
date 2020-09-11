@@ -18,6 +18,7 @@ import {
   resumeQuery,
 } from "../graphql/queries";
 import {
+  get,
   graphQlQuery,
 } from "../helpers/axios";
 import {
@@ -95,6 +96,35 @@ const fetchListCached = cachedFetcher(
 
 authRouter.get("/list", async ({ authHeader }) => {
   return await fetchListCached(authHeader);
+});
+
+authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
+  const { id } = params;
+  let resume;
+
+  try {
+    const { resume: res } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
+
+    if (!res) {
+      throw new ApiError("Resume not found", HttpStatus.Error.Client.NotFound);
+    }
+
+    resume = fixResume(res);
+  } catch {
+    res.status(HttpStatus.Error.Client.NotFound);
+    return res.end();
+  }
+
+  const response = await get(resume.resumeFileData, {
+    responseType: "stream",
+  });
+
+  for (const [ key, value ] of Object.entries(response.headers)) {
+    res.header(key, value);
+  }
+
+  response.pipe(res);
+  response.on("end", () => res.end());
 });
 
 authRouter.get("/info/:id", async ({ authHeader, params }) => {
