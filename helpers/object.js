@@ -48,12 +48,20 @@ export const mapArray =
     : []
 ;
 
-export const compose = (...functions) =>
+export const pipe = (...functions) =>
   (arg) =>
-    functions.reduceRight(
-      (acc, fn) =>
-        fn(acc)
-      ,
-      arg,
-    )
+    functions
+      .flat()
+      .reduce(
+        (acc, fn) =>
+          fn(acc)
+        ,
+        arg,
+      )
+;
+
+export const compose = (...functions) =>
+  pipe(
+    ...functions.reverse(),
+  )
 ;

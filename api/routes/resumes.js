@@ -1,4 +1,9 @@
 import {
+  pipe,
+  keysFromSnakeToCamelCase,
+  mapArray,
+} from "../../helpers/object";
+import {
   HttpStatus,
 } from "../helpers/http";
 import {
@@ -11,11 +16,6 @@ import {
 import {
   graphQlQuery,
 } from "../helpers/axios";
-import {
-  compose,
-  keysFromSnakeToCamelCase,
-  mapArray,
-} from "../helpers/object";
 import {
   RoleNames,
 } from "../helpers/permissions";
@@ -55,8 +55,7 @@ const fixResume = (resume) => {
       })
   ;
 
-
-  const fixResumes = compose(
+  const fixResumes = pipe(
     keysFromSnakeToCamelCase,
     fixResumeProps,
   );
