@@ -26,7 +26,7 @@
       padding: 0 2em;
 
       @include media(sm) {
-        max-width: 98%;
+        max-width: $content-max-width-mobile;
       }
     }
   }
