@@ -21,7 +21,6 @@ const uid = new ShortUniqueId();
 const identNameMap = {};
 
 export default {
-  mode: "universal",
   /*
    ** Headers of the page
    */
