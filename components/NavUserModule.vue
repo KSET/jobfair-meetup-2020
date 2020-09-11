@@ -20,7 +20,10 @@
           }"
           v-on="on"
         >
-          <span :class="$style.navLinkText" v-text="user.name" />
+          <span
+            :class="$style.navLinkText"
+            v-text="labelText"
+          />
           <v-icon
             :class="{
               [$style.navLinkIcon]: true,
@@ -136,6 +139,15 @@
     getSrcSet,
   } from "~/helpers/image";
 
+  /**
+   * @readonly
+   * @enum{string}
+   */
+  const labels = {
+    name: "name",
+    email: "email",
+  };
+
   export default {
     name: "NavUserModule",
 
@@ -148,6 +160,17 @@
         required: false,
         type: Boolean,
         default: true,
+      },
+
+      label: {
+        required: false,
+        type: String,
+        default: labels.name,
+        validator: (value) =>
+          Object
+            .values(labels)
+            .includes(value)
+        ,
       },
     },
 
@@ -169,6 +192,17 @@
 
       canEditText() {
         return this.isAdmin;
+      },
+
+      labelText() {
+        switch (this.label) {
+          case labels.name:
+            return this.user.name;
+          case labels.email:
+            return this.user.email;
+          default:
+            return "Account";
+        }
       },
     },
 
