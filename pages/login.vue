@@ -88,6 +88,9 @@
     mapGetters,
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
+  import {
+    decodeRedirectParam,
+  } from "~/helpers/url";
 
   export default {
     name: "PageLogin",
@@ -165,36 +168,23 @@
         this.showTimeError = false;
         this.isLoading = false;
 
-        const { r } = this.$route.query;
-
         if (!success) {
           this.hasError = true;
           return;
         }
 
-        const redirectTo = {
-          name: "Index",
-          params: {},
-        };
-
-        if (r) {
-          try {
-            const [ name, params ] = JSON.parse(Buffer.from(r, "base64").toString("binary"));
-
-            Object.assign(
-              redirectTo,
-              {
-                name,
-                params,
-              },
-            );
-          } catch (e) {
-          }
-        }
-
         if (this.isModerator) {
           await this.fetchAdminPages({ userRole: this.user.role });
         }
+
+        const { r } = this.$route.query;
+        const redirectTo = decodeRedirectParam(
+          r,
+          {
+            name: "Index",
+            params: {},
+          },
+        );
 
         return await this.$router.push(redirectTo);
       },

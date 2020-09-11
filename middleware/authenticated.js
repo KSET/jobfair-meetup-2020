@@ -1,14 +1,13 @@
+import {
+ encodeRedirectParam,
+} from "~/helpers/url";
+
 export default function({ store, redirect, route }) {
   if (!store.state.user.user) {
-    const routeData = [
-      route.name,
-      route.params,
-    ];
-
     const query = {
-      r: Buffer.from(JSON.stringify(routeData), "binary").toString("base64"),
+      r: encodeRedirectParam(route),
     };
 
-    redirect({ name: "PageLogin", query });
+    return redirect({ name: "PageLogin", query });
   }
 }
