@@ -96,6 +96,12 @@ export default {
     [ "cookie-universal-nuxt", { parseJSON: false } ],
   ],
 
+  server: {
+    timing: {
+      total: true,
+    },
+  },
+
   serverMiddleware: [
     {
       path: "/api",
