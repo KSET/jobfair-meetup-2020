@@ -90,7 +90,16 @@ export default {
     "@nuxtjs/axios",
     "@nuxtjs/pwa",
     // Doc: https://github.com/nuxt-community/dotenv-module
-    "@nuxtjs/dotenv",
+    [
+      "@nuxtjs/dotenv", {
+      only: [
+        "BASE_URL",
+        "JOBFAIR_COOKIE_NAME",
+        "JOBFAIR_GRAPHQL_ENDPOINT",
+        "GOOGLE_ANALYTICS_KEY",
+      ],
+    },
+    ],
     [ "@nuxtjs/router", { keepDefaultRouter: true } ],
     "nuxt-svg-loader",
     [ "cookie-universal-nuxt", { parseJSON: false } ],
