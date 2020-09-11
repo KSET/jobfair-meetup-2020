@@ -110,21 +110,21 @@ authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
     }
 
     resume = fixResume(res);
+
+    const response = await get(resume.resumeFileData, {
+      responseType: "stream",
+    });
+
+    for (const [ key, value ] of Object.entries(response.headers)) {
+      res.header(key, value);
+    }
+
+    response.pipe(res);
+    response.on("end", () => res.end());
   } catch {
     res.status(HttpStatus.Error.Client.NotFound);
     return res.end();
   }
-
-  const response = await get(resume.resumeFileData, {
-    responseType: "stream",
-  });
-
-  for (const [ key, value ] of Object.entries(response.headers)) {
-    res.header(key, value);
-  }
-
-  response.pipe(res);
-  response.on("end", () => res.end());
 });
 
 authRouter.get("/info/:id", async ({ authHeader, params }) => {
