@@ -433,11 +433,12 @@
       background-size: #{$page-max-width} #{$min-height};
 
       @include media(md) {
-        $min-height: 1565px;
+        $min-height: 1225px;
 
         min-height: $min-height;
         background-image: url("../assets/images/index-bg-mobile.svg?inline");
-        background-size: #{map-get($breakpoints, md) * .9} #{$min-height};
+        background-size: #{map-get($breakpoints, sm) * .8} #{$min-height};
+        background-position: center #{-$nav-height * 1.5};
       }
 
       .heroMainContainer {
@@ -493,7 +494,7 @@
         margin-top: 42em;
 
         @include media(md) {
-          margin-top: 62em;
+          margin-top: 45em;
         }
 
         .heroExplanationTitle {
