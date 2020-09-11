@@ -5,7 +5,7 @@
   "author": "Josip Igrec",
   "private": true,
   "scripts": {
-    "dev": "node --inspect node_modules/.bin/nuxt dev",
+    "dev": "nuxt dev",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
