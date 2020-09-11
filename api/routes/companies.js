@@ -1,6 +1,6 @@
 import {
-  Router,
-} from "express";
+  cachedFetcher,
+} from "../helpers/fetchCache";
 import {
   HttpStatus,
 } from "../helpers/http";
@@ -9,47 +9,50 @@ import {
   participantEventsQuery,
 } from "../graphql/queries";
 import {
-  apiRoute,
   ApiError,
+  Router,
 } from "../helpers/route";
 import {
   graphQlQuery,
 } from "../helpers/axios";
 
-const router = Router();
+const router = new Router();
 
-router.get("/participants", apiRoute(async () => {
+const fixCompany =
+  ({
+     id,
+     short_description: description,
+     homepage_url: homepageUrl,
+     logo,
+     ...rest
+   }) =>
+    ({
+      id,
+      description,
+      image: logo && logo.original.url,
+      images: logo,
+      homepageUrl,
+      ...rest,
+    })
+;
+
+const cacheForMs = 10 * 1000;
+
+router.get("/participants", cachedFetcher(cacheForMs, async () => {
   const { companies } = await graphQlQuery(participantsQuery());
 
   if (!companies) {
     return [];
   }
 
-  return companies.map(
-    ({
-       id,
-       short_description: description,
-       homepage_url: homepageUrl,
-       logo,
-       ...rest
-     }) =>
-      ({
-        id,
-        description,
-        image: logo.original.url,
-        images: logo,
-        homepageUrl,
-        ...rest,
-      })
-    ,
-  );
+  return companies.map(fixCompany);
 }));
 
-router.get("/events", apiRoute(async () => {
+router.get("/events", cachedFetcher(cacheForMs, async () => {
   return await graphQlQuery(participantEventsQuery());
 }));
 
-router.get("/events/:type/:id", apiRoute(async ({ params }) => {
+router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => {
   const { type, id } = params;
 
   if (!type || !id) {
@@ -94,7 +97,7 @@ router.get("/events/:type/:id", apiRoute(async ({ params }) => {
   };
 }));
 
-router.get("/project-friends", apiRoute(() => {
+router.get("/project-friends", () => {
   return (
     Array(5 * 2)
       .fill(0)
