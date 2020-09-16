@@ -247,28 +247,6 @@
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-col
-            cols="12"
-          >
-            <v-img
-              :src="require('@/assets/images/party.png')"
-              aspect-ratio="1"
-              class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
-              contain
-              width="100"
-            />
-            <h2
-              :class="$style.header"
-            >
-              <translated-text trans-key="meetup.party.header" />
-            </h2>
-            <p>
-              <translated-text trans-key="meetup.party.text" />
-            </p>
-          </v-col>
-        </v-row>
-
         <v-row
           class="mb-n12"
         >
