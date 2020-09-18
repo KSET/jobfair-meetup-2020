@@ -116,27 +116,26 @@ authRouter.get("/for-user/:uid", cachedFetcher(listCacheTimeoutMs, async ({ auth
 
 authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
   const { id } = params;
-  let resume;
 
   try {
-    const { resume: res } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
+    const { resume } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
 
-    if (!res) {
+    if (!resume) {
       throw new ApiError("Resume not found", HttpStatus.Error.Client.NotFound);
     }
 
-    resume = fixResume(res);
+    const { resumeFileData } = fixResume(resume);
 
-    const response = await get(resume.resumeFileData, {
+    const response = await get(resumeFileData, {
       responseType: "stream",
     });
 
     for (const [ key, value ] of Object.entries(response.headers)) {
-      res.header(key, value);
+      resume.header(key, value);
     }
 
-    response.pipe(res);
-    response.on("end", () => res.end());
+    response.pipe(resume);
+    response.on("end", () => resume.end());
   } catch {
     res.status(HttpStatus.Error.Client.NotFound);
     return res.end();

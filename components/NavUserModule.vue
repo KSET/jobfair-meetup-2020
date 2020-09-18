@@ -76,7 +76,7 @@
 
                 <v-list-item-action>
                   <v-list-item-action-text>
-                    <v-btn color="primary">
+                    <v-btn :to="{ name: 'PageCompanyResumes' }" color="primary">
                       <translated-text trans-key="nav.user.actions.company.enter" />
                     </v-btn>
                   </v-list-item-action-text>
