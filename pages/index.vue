@@ -369,7 +369,7 @@
           "talk",
           "workshop",
           "panel",
-          "party",
+          // "party",
           "hot talk",
           "Meetup",
           "networking",
