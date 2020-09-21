@@ -156,6 +156,24 @@ create table if not exists press_kit
             on update cascade on delete cascade
 );
 
+create table if not exists event_reservations
+(
+    id         serial                                             not null
+        constraint event_reservations_pk
+            primary key,
+    event_id   integer                                            not null,
+    user_id    integer,
+    status     integer                                            not null,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP not null
+);
+
+create unique index if not exists event_reservations_event_id_user_id_uindex
+    on event_reservations (event_id, user_id);
+
+create index if not exists event_reservations_user_id_index
+    on event_reservations (user_id);
+
 `;
 
 
