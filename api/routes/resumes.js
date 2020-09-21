@@ -22,18 +22,13 @@ import {
   graphQlQuery,
 } from "../helpers/axios";
 import {
-  RoleNames,
-} from "../helpers/permissions";
-import {
   ApiError,
   AuthRouter,
   Router,
 } from "../helpers/route";
 
 const router = new Router();
-const authRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.ADMIN,
-});
+const authRouter = AuthRouter.boundToRouter(router, {});
 
 const fixResume = (resume) => {
   const fixComputerSkills =
@@ -71,10 +66,17 @@ const fixResume = (resume) => {
       )
   ;
 
+  const addFullName =
+    (resume) =>
+      Object.assign(resume, {
+        fullName: `${ resume.firstName } ${ resume.lastName }`,
+      });
+
   const fixResumes = pipe(
     trimValues,
     keysFromSnakeToCamelCase,
     fixResumeProps,
+    addFullName,
   );
 
   return fixResumes(resume);
@@ -96,6 +98,18 @@ const fetchListCached = cachedFetcher(
 
 authRouter.get("/list", async ({ authHeader }) => {
   return await fetchListCached(authHeader);
+});
+
+authRouter.get("/for-user/:uid", async ({ authHeader, params }) => {
+  const resumes = await fetchListCached(authHeader);
+
+  const [ resume ] = resumes.filter(({ uid }) => uid === params.uid);
+
+  if (!resume) {
+    throw new ApiError("Resume not found", HttpStatus.Error.Client.NotFound);
+  }
+
+  return resume;
 });
 
 authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {

@@ -40,12 +40,19 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
   ;
 
   try {
-    const data = await graphQlQuery(
+    const { current_user: rawUser } = await graphQlQuery(
       fullUser ? currentUserQuery() : basicUserQuery(),
       auth,
     );
 
-    return data.current_user;
+    const user = {
+      uid: rawUser.resume && rawUser.resume.uid,
+      ...rawUser,
+    };
+
+    delete user.resume;
+
+    return user;
   } catch (e) {
     return null;
   }

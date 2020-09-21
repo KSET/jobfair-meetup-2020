@@ -19,6 +19,8 @@
  * @typedef {Object.<StatusCode, StatusName>} StatusCodeToName
  */
 
+import axios from "axios";
+
 /**
  * @type {Readonly<StatusNameToCode>}
  */
@@ -416,3 +418,17 @@ export class HttpStatus {
     return StatusCodeToInfo[code];
   }
 }
+
+
+export const internalRequest = async (method, url, ...rest) => {
+  const baseUrl = `http://localhost:${ "development" === process.env.NODE_ENV ? "3000" : process.env.PORT }/api`;
+  const fetchUrl = `${ baseUrl }${ url }`;
+
+  try {
+    const { data } = await axios[method](fetchUrl, ...rest);
+
+    return data;
+  } catch (e) {
+    return null;
+  }
+};

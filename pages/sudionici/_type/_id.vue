@@ -14,7 +14,7 @@
         <div class="ml-md-2">
           <h1
             :class="$style.company"
-            v-text="eventObj.company.brand_name || eventObj.company.name"
+            v-text="eventObj.company.brandName || eventObj.company.name"
           />
           <h3
             :class="$style.type"
@@ -77,7 +77,7 @@
           <translated-text trans-key="participants.event.aboutCompany" />
         </h2>
         <p
-          v-text="eventObj.company.short_description"
+          v-text="eventObj.company.shortDescription"
         />
       </v-col>
     </v-row>
@@ -174,7 +174,7 @@
       const { title: eventTitle, name, company } = this.eventObj;
       const { type } = this.$route.params;
 
-      const c = company.brand_name || company.name;
+      const c = company.brandName || company.name;
 
       const capitalize = (str) => str.slice(0, 1).toUpperCase() + str.slice(1);
 

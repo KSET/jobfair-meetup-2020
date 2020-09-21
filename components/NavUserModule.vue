@@ -71,8 +71,8 @@
                 </v-list-item-avatar>
 
                 <v-list-item-content>
-                  <v-list-item-title v-text="company.brand_name || company.name" />
-                  <v-list-item-subtitle v-text="company.short_description.substr(0, 50) + '...'" />
+                  <v-list-item-title v-text="company.brandName || company.name" />
+                  <v-list-item-subtitle v-text="company.shortDescription.substr(0, 50) + '...'" />
                 </v-list-item-content>
 
                 <v-list-item-action>
@@ -84,6 +84,23 @@
                 </v-list-item-action>
               </v-list-item>
             </v-list>
+          </v-list-item>
+        </v-list>
+
+        <v-divider v-if="canViewStudentPanel" />
+
+        <v-list v-if="canViewAdminPanel" subheader>
+          <v-subheader>
+            <translated-text trans-key="nav.user.student.header" />
+          </v-subheader>
+
+          <v-list-item>
+            <v-btn
+              :to="{ name: 'PageStudentIndex' }"
+              color="primary"
+            >
+              <translated-text trans-key="button.studentPanel" />
+            </v-btn>
           </v-list-item>
         </v-list>
 
@@ -182,9 +199,14 @@
       ...mapGetters({
         user: "user/getUser",
         isEditing: "translations/isEditable",
+        isStudent: "user/isStudent",
         isModerator: "user/isModerator",
         isAdmin: "user/isAdmin",
       }),
+
+      canViewStudentPanel() {
+        return this.isStudent;
+      },
 
       canViewAdminPanel() {
         return this.isModerator;

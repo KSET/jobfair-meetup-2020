@@ -9,6 +9,16 @@ export const isObject =
     null !== maybeObject
 ;
 
+export const pickKeys = (keyList, object) => {
+  const newObject = {};
+
+  for (const key of keyList) {
+    newObject[key] = object[key];
+  }
+
+  return newObject;
+};
+
 export const deepMap = (fn, object) => {
   if (!isObject(object)) {
     return fn({ value: object }).value;

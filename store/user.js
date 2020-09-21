@@ -2,6 +2,7 @@ import Vue from "vue";
 import {
   isAdmin,
   isModerator,
+  isStudent,
 } from "~/api/helpers/permissions";
 
 export const state = () => (
@@ -31,6 +32,10 @@ export const getters = {
 
   isAdmin({ user }) {
     return isAdmin(user.role);
+  },
+
+  isStudent({ user }) {
+    return isStudent(user.role);
   },
 };
 

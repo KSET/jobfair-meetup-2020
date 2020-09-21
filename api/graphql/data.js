@@ -76,6 +76,11 @@ export const userData = {
     "role",
   ),
   companies: companyData,
+  resume: {
+    ...basicFields(
+      "uid",
+    ),
+  },
 };
 
 export const tokenData = {
@@ -163,7 +168,9 @@ export const companyDataWithMeta = {
 export const basicResumeData = {
   ...basicFields(
     "id",
-    "full_name",
+    "uid",
+    "first_name",
+    "last_name",
     "email",
   ),
 };
