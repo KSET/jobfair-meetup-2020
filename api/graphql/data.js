@@ -47,7 +47,6 @@ export const companyData = {
     "id",
     "name",
     "brand_name",
-    "vat_number",
     "short_description",
     "homepage_url",
     "address",
