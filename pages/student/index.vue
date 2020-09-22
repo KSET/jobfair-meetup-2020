@@ -97,7 +97,7 @@
             <v-divider />
           </v-col>
 
-          <v-col cols="12">
+          <v-col v-if="hasCv" cols="12">
             <v-row v-if="rawEvents.length > 0">
               <v-col cols="12">
                 <v-text-field
@@ -179,7 +179,9 @@
                             <translated-text :trans-key="`studentPanel.event.status.${eventType}`" />
                             <v-expand-x-transition>
                               <span v-if="!event.userStatus.includes(eventType)" class="ml-1">
-                                ({{ maxParticipants - event.participants[eventType] }} <translated-text :trans-key="`studentPanel.event.slots.free`" />)
+                                ({{ maxParticipants - event.participants[eventType] }}
+                                <translated-text :trans-key="`studentPanel.event.slots.free`" />
+                                )
                               </span>
                             </v-expand-x-transition>
                           </v-chip>
@@ -197,8 +199,13 @@
               </v-col>
             </v-row>
 
-            <h2 v-else>
+            <h2 v-else :class="$style.noEntries">
               <translated-text trans-key="participants.no-participants" />
+            </h2>
+          </v-col>
+          <v-col v-else>
+            <h2 :class="$style.noEntries">
+              <translated-text trans-key="studentPanel.noCv" />
             </h2>
           </v-col>
         </v-row>
