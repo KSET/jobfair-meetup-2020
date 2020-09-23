@@ -35,7 +35,7 @@ import {
 
 
 const router = new AuthRouter({
-  role: RoleNames.STUDENT,
+  role: RoleNames.BASE,
 });
 
 router.post("/status", async ({ body, authUser }) => {

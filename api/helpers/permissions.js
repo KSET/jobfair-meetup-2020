@@ -29,4 +29,4 @@ export const hasPermission =
 
 export const isAdmin = (roleName) => hasPermission(RoleNames.ADMIN, roleName);
 export const isModerator = (roleName) => hasPermission(RoleNames.MODERATOR, roleName);
-export const isStudent = (roleName) => hasPermission(RoleNames.STUDENT, roleName);
+export const isStudent = (roleName) => hasPermission(RoleNames.BASE, roleName);

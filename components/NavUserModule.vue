@@ -89,7 +89,7 @@
 
         <v-divider v-if="canViewStudentPanel" />
 
-        <v-list v-if="canViewAdminPanel" subheader>
+        <v-list v-if="canViewStudentPanel" subheader>
           <v-subheader>
             <translated-text trans-key="nav.user.student.header" />
           </v-subheader>
