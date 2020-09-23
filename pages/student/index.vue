@@ -170,7 +170,7 @@
                             v-for="eventType in getEventStatus(event)"
                             :key="eventType"
 
-                            :disabled="event.loading || event.participants[eventType] >= maxParticipants && !event.userStatus.includes(eventType)"
+                            :disabled="event.loading || event.participants[eventType] >= event.maxParticipants && !event.userStatus.includes(eventType)"
 
                             :ripple="false"
                             :value="eventType"
@@ -180,7 +180,7 @@
                             <v-expand-x-transition>
                               <span v-if="!event.userStatus.includes(eventType)" class="ml-1">
                                 <span :class="$style.parentheses">
-                                  <span>{{ maxParticipants - event.participants[eventType] }}</span>
+                                  <span>{{ event.maxParticipants - event.participants[eventType] }}</span>
                                   <translated-text :trans-key="`studentPanel.event.slots.free`" />
                                 </span>
                               </span>
@@ -229,7 +229,7 @@
     eventListFromStatus,
     EventStatus,
     eventStatusForEvent,
-    MAX_PARTICIPANTS,
+    getParticipantCapacityFor,
   } from "~/components/student/event-status";
   import TranslatedText from "~/components/TranslatedText";
   import {
@@ -306,6 +306,7 @@
             userStatus: getUserStatus(event),
             participants: getEventParticipants(event),
             loading: false,
+            maxParticipants: getParticipantCapacityFor(event.type),
           }))
       ;
 
@@ -341,7 +342,6 @@
       return {
         basicInfo,
         rawEvents: events,
-        maxParticipants: MAX_PARTICIPANTS,
 
         hasCv: user.uid,
 

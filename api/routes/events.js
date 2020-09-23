@@ -1,7 +1,7 @@
 import {
-  MAX_PARTICIPANTS,
   eventListFromStatus,
   EventStatus,
+  hasParticipantCapacityFor,
 } from "../../components/student/event-status";
 import {
   queryReservationsCountVisitorsForEvent,
@@ -43,12 +43,14 @@ router.post("/status", async ({ body, authUser }) => {
   const id = String(rawId);
   const status = Number(rawStatus);
 
+  const addType = (type) => (item) => Object.assign(item, { type });
+
   const { data } = await internalRequest(
     "get",
     "/companies/events",
   );
   const { workshops, presentations } = data;
-  const events = [ ...workshops, ...presentations ];
+  const events = [ ...workshops.map(addType("workshop")), ...presentations.map(addType("talk")) ];
   const event = events.find((event) => String(event.id) === String(id));
 
   if (!event) {
@@ -62,7 +64,7 @@ router.post("/status", async ({ body, authUser }) => {
     await client.startTransaction();
     const key = { userId: authUser.id, eventId: id };
 
-    const event = await client.queryOne(queryReservationsGetByEventAndUserId(key));
+    const eventReservation = await client.queryOne(queryReservationsGetByEventAndUserId(key));
     const rawParticipants = await client.query(queryReservationsCountVisitorsForEvent(key));
     const participants = {};
 
@@ -76,13 +78,13 @@ router.post("/status", async ({ body, authUser }) => {
       }
     }
 
-    if (event) {
+    if (eventReservation) {
       // eslint-disable-next-line no-bitwise
-      const statusAdded = (event.status ^ status) & status;
+      const statusAdded = (eventReservation.status ^ status) & status;
       const newProps = eventListFromStatus(statusAdded);
 
       for (const prop of newProps) {
-        if (participants[prop] + 1 >= MAX_PARTICIPANTS) {
+        if (!hasParticipantCapacityFor(event.type, participants[prop])) {
           throw new ApiError("Too many participants");
         }
       }

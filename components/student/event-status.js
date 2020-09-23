@@ -59,4 +59,25 @@ export const eventListFromStatus =
       .map(([ key ]) => key)
 ;
 
-export const MAX_PARTICIPANTS = 80;
+export const getParticipantCapacityFor = (eventType) => {
+  switch (eventType) {
+    case "workshop":
+      return 15;
+    case "talk":
+    case "panel":
+      return 80;
+    default:
+      return 0;
+  }
+};
+
+/**
+ * @param {string} eventType
+ * @param {number} currentParticipants
+ * @return {boolean}
+ */
+export const hasParticipantCapacityFor = (eventType, currentParticipants = 0) => {
+  const maxParticipants = getParticipantCapacityFor(eventType);
+
+  return currentParticipants + 1 < maxParticipants;
+};
