@@ -1,5 +1,5 @@
 import {
- HttpStatus,
+  HttpStatus,
 } from "./http";
 import {
   extractAuthorizationToken,
@@ -60,6 +60,10 @@ export const requireAuth =
         return res.json(error({
           reason: "authorization-required",
           status: HttpStatus.Error.Client.Unauthorized,
+          data: {
+            required: "auth",
+            given: "none",
+          },
         }));
       }
 
@@ -69,6 +73,10 @@ export const requireAuth =
         return res.json(error({
           reason: "authorization-required",
           status: HttpStatus.Error.Client.Unauthorized,
+          data: {
+            required: `auth|role=${ role }`,
+            given: `auth|role=${ req.authUser.role }`,
+          },
         }));
       }
 
