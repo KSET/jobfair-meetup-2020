@@ -179,9 +179,10 @@
                             <translated-text :trans-key="`studentPanel.event.status.${eventType}`" />
                             <v-expand-x-transition>
                               <span v-if="!event.userStatus.includes(eventType)" class="ml-1">
-                                ({{ maxParticipants - event.participants[eventType] }}
-                                <translated-text :trans-key="`studentPanel.event.slots.free`" />
-                                )
+                                <span :class="$style.parentheses">
+                                  <span>{{ maxParticipants - event.participants[eventType] }}</span>
+                                  <translated-text :trans-key="`studentPanel.event.slots.free`" />
+                                </span>
                               </span>
                             </v-expand-x-transition>
                           </v-chip>
@@ -525,6 +526,19 @@
         display: inline-block;
         width: 1.2em;
         height: 1.2em;
+      }
+
+      .parentheses {
+
+        &::before {
+          display: inline-block;
+          content: "(";
+        }
+
+        &::after {
+          display: inline-block;
+          content: ")";
+        }
       }
     }
 
