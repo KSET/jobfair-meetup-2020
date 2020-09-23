@@ -34,13 +34,11 @@
         <v-col
           cols="6"
           md="6"
-          order="3"
-          order-md="1"
         >
           <img
             :class="$style.jobfairLogo"
-            src="../assets/images/logo/jobfair-mono.png"
             alt="JobFair Meetup"
+            src="../assets/images/logo/jobfair-mono.png"
           >
           <div :class="$style.afterJobfairText">
             <translated-text trans-key="footer.legal.kset" /> &copy; {{ (new Date).getFullYear() }}
@@ -52,30 +50,7 @@
         <v-col
           cols="6"
           md="2"
-          order="1"
-          order-md="2"
-        >
-          <div>
-            <strong>
-              <translated-text trans-key="footer.apps.header" />
-            </strong>
-          </div>
-          <div>
-            <a :href="getSetting('Play Store URL')" rel="noopener noreferrer" target="_blank">
-              <translated-text trans-key="footer.apps.android" />
-            </a>
-          </div>
-          <div>
-            <a :href="getSetting('App Store URL')" rel="noopener noreferrer" target="_blank">
-              <translated-text trans-key="footer.apps.iphone" />
-            </a>
-          </div>
-        </v-col>
-        <v-col
-          cols="6"
-          md="2"
-          order="2"
-          order-md="3"
+          offset-md="2"
         >
           <div>
             <strong>
@@ -95,8 +70,10 @@
         <v-col
           cols="6"
           md="2"
-          order="4"
-          order-md="4"
+          offset="6"
+          offset-md="0"
+          order="3"
+          order-md="3"
         >
           <div>
             <strong>
@@ -197,95 +174,95 @@
 </script>
 
 <style lang="scss" module>
-@import "../assets/styles/include/all";
+  @import "../assets/styles/include/all";
 
-.container {
-  width: 95%;
-  max-width: $content-max-width;
+  .container {
+    width: 95%;
+    max-width: $content-max-width;
 
-  @include media(sm) {
-    max-width: 100%;
-  }
+    @include media(sm) {
+      max-width: 100%;
+    }
 
-  a {
-    text-decoration: none;
-    color: $fer-white;
+    a {
+      text-decoration: none;
+      color: $fer-white;
 
-    &:hover {
-      text-decoration: underline;
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
-}
 
-.organizatori {
-  font-size: 2.5em;
-  margin-bottom: 1em;
-  text-align: center;
-  color: $fer-yellow;
+  .organizatori {
+    font-size: 2.5em;
+    margin-bottom: 1em;
+    text-align: center;
+    color: $fer-yellow;
 
-  @include media(sm) {
-    font-size: 2em;
-  }
-}
-
-.logoRow {
-  width: 60%;
-  margin: 0 auto;
-
-  @include media(sm) {
-    width: 100%;
-  }
-
-  .logoCol {
-    align-self: center;
-
-    .logo {
-      height: 3em;
+    @include media(sm) {
+      font-size: 2em;
     }
   }
-}
 
-.spacer {
-  border-color: rgba(255, 255, 255, .42) !important;
-}
+  .logoRow {
+    width: 60%;
+    margin: 0 auto;
 
-.bottomPart {
-  font-size: 87.5%;
-  margin-top: 1.5em;
+    @include media(sm) {
+      width: 100%;
+    }
 
-  strong {
-    display: block;
-    margin-bottom: .3em;
-  }
-}
+    .logoCol {
+      align-self: center;
 
-.jobfairLogo {
-  $height: 3em;
-  $aspect-ratio: 110 / 40;
-
-  width: $height * $aspect-ratio;
-  height: $height;
-  margin-bottom: 1em;
-}
-
-.afterJobfairText {
-  font-size: 90%;
-  opacity: .7;
-}
-
-.socialIcon {
-  margin-right: 1.5em;
-
-  &:last-child {
-    margin-right: initial;
-  }
-}
-
-@include media(md) {
-
-  .hideOnSmall {
-    display: none;
+      .logo {
+        height: 3em;
+      }
+    }
   }
 
-}
+  .spacer {
+    border-color: rgba(255, 255, 255, .42) !important;
+  }
+
+  .bottomPart {
+    font-size: 87.5%;
+    margin-top: 1.5em;
+
+    strong {
+      display: block;
+      margin-bottom: .3em;
+    }
+  }
+
+  .jobfairLogo {
+    $height: 3em;
+    $aspect-ratio: 110 / 40;
+
+    width: $height * $aspect-ratio;
+    height: $height;
+    margin-bottom: 1em;
+  }
+
+  .afterJobfairText {
+    font-size: 90%;
+    opacity: .7;
+  }
+
+  .socialIcon {
+    margin-right: 1.5em;
+
+    &:last-child {
+      margin-right: initial;
+    }
+  }
+
+  @include media(md) {
+
+    .hideOnSmall {
+      display: none;
+    }
+
+  }
 </style>
