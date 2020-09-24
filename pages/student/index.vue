@@ -175,7 +175,16 @@
                             :value="eventType"
                             filter
                           >
-                            <translated-text :trans-key="`studentPanel.event.status.${eventType}`" />
+                            <span
+                              v-if="'event' === eventType"
+                              class="text-capitalize"
+                              v-text="event.type"
+                            />
+                            <translated-text
+                              v-else
+                              :trans-key="`studentPanel.event.status.${eventType}`"
+                            />
+
                             <v-expand-x-transition>
                               <span v-if="!event.userStatus.includes(eventType)" class="ml-1">
                                 <span :class="$style.parentheses">
