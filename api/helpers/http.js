@@ -425,7 +425,7 @@ export const internalRequest = async (method, url, ...rest) => {
   const fetchUrl = `${ baseUrl }${ url }`;
 
   try {
-    const { data } = await axios[method](fetchUrl, ...rest);
+    const { data } = await axios[method.toLowerCase()](fetchUrl, ...rest);
 
     return data;
   } catch (e) {
