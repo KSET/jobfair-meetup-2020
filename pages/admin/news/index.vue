@@ -10,13 +10,21 @@
       <v-col cols="12">
         <v-btn
           :to="{ name: 'PageAdminIndex' }"
+          exact
         >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
           Back
         </v-btn>
         <v-btn
           :to="{ name: 'PageAdminNewsCreate' }"
           color="success"
+          exact
         >
+          <v-icon left>
+            mdi-newspaper-plus
+          </v-icon>
           Create
         </v-btn>
       </v-col>
@@ -50,6 +58,9 @@
                         color="error"
                         @click.prevent="deleteNews(item.slug)"
                       >
+                        <v-icon left>
+                          mdi-delete
+                        </v-icon>
                         Delete
                       </v-btn>
 
@@ -60,6 +71,9 @@
                         :to="{ name: 'PageAdminNewsEdit', params: { slug: item.slug } }"
                         color="warning"
                       >
+                        <v-icon left>
+                          mdi-pencil
+                        </v-icon>
                         Edit
                       </v-btn>
                     </v-card-actions>

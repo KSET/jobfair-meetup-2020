@@ -9,7 +9,11 @@
       <v-col>
         <v-btn
           :to="{ name: 'PageAdminIndex' }"
+          exact
         >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
           Back
         </v-btn>
       </v-col>
