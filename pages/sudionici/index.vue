@@ -371,7 +371,7 @@
   .filterContainer {
 
     & + & {
-      padding-top: 0;
+      padding-left: 0;
     }
   }
 

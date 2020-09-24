@@ -97,6 +97,13 @@ html > body > div {
   pointer-events: none;
 }
 
+.v-card {
+
+  .v-card__title {
+    word-break: break-word;
+  }
+}
+
 a,
 button {
 
