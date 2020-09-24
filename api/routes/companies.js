@@ -25,11 +25,16 @@ const router = new Router();
 
 const fixCompanyKeys =
   ({
+     name,
+     brandName,
      shortDescription: description,
      logo,
      ...rest
    }) =>
     ({
+      name: brandName || name,
+      legalName: name,
+      brandName,
       description,
       image: logo && logo.original.url,
       thumbnail: logo && logo.small && logo.small.url,
