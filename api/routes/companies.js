@@ -1,4 +1,8 @@
 import {
+  keysFromSnakeToCamelCase,
+  pipe,
+} from "../../helpers/object";
+import {
   cachedFetcher,
 } from "../helpers/fetchCache";
 import {
@@ -19,22 +23,26 @@ import {
 
 const router = new Router();
 
-const fixCompany =
+const fixCompanyKeys =
   ({
-     id,
-     short_description: description,
-     homepage_url: homepageUrl,
+     shortDescription: description,
      logo,
      ...rest
    }) =>
     ({
-      id,
       description,
       image: logo && logo.original.url,
+      thumbnail: logo && logo.small && logo.small.url,
       images: logo,
-      homepageUrl,
       ...rest,
     })
+;
+
+const fixCompany =
+  pipe(
+    keysFromSnakeToCamelCase,
+    fixCompanyKeys,
+  )
 ;
 
 const cacheForMs = 10 * 1000;
@@ -50,7 +58,12 @@ router.get("/participants", cachedFetcher(cacheForMs, async () => {
 }));
 
 router.get("/events", cachedFetcher(cacheForMs, async () => {
-  return await graphQlQuery(participantEventsQuery());
+  const { companies, ...events } = await graphQlQuery(participantEventsQuery());
+
+  return {
+    companies: companies.map(fixCompany),
+    ...events,
+  };
 }));
 
 router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => {
@@ -94,7 +107,7 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
 
   return {
     ...obj,
-    company: companies.find(({ id }) => id === obj.company.id),
+    company: fixCompany(companies.find(({ id }) => id === obj.company.id)),
   };
 }, ({ params }) => {
   const { type, id } = params;

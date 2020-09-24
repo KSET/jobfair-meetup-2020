@@ -47,9 +47,8 @@
         order-md="1"
       >
         <v-img
-          :lazy-src="eventObj.company.logo.small.url"
-          :src="eventObj.company.logo.original.url"
-          :srcset="eventObj.company.logo | srcSet"
+          :lazy-src="eventObj.company.thumbnail"
+          :src="eventObj.company.image"
           contain
           aspect-ratio="1.78"
         />
@@ -77,7 +76,7 @@
           <translated-text trans-key="participants.event.aboutCompany" />
         </h2>
         <p
-          v-text="eventObj.company.shortDescription"
+          v-text="eventObj.company.description"
         />
       </v-col>
     </v-row>
@@ -103,19 +102,6 @@
     },
 
     filters: {
-      srcSet(image) {
-        return (
-          Object
-            .values(image)
-            .map(
-              ({ width, url }) =>
-                `${ url } ${ width }w`
-              ,
-            )
-            .join(",")
-        );
-      },
-
       weekday(date) {
         const days = [
           "nedjelja",
