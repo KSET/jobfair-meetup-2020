@@ -108,7 +108,7 @@ export const locationData = {
     "id",
     "name",
   ),
-  geolocation: pointData,
+  // geolocation: pointData,
 };
 
 export const presentationData = {
@@ -131,10 +131,10 @@ export const workshopData = {
     "name",
     "description",
     "occures_at",
-    "finishes_at",
+    // "finishes_at",
     "location",
   ),
-  place: locationData,
+  // place: locationData,
 };
 
 export const boothData = {
@@ -144,7 +144,7 @@ export const boothData = {
     "notes",
     "size",
   ),
-  place: locationData,
+  // place: locationData,
 };
 
 export const cocktailData = {
