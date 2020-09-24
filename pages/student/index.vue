@@ -113,6 +113,31 @@
                 />
               </v-col>
 
+              <v-col cols="12">
+                <v-row>
+                  <v-col
+                    v-for="filter in filterValues"
+                    :key="filter.name"
+
+                    :class="$style.filterContainer"
+                    class="d-flex px-2"
+                    :cols="Math.round(12 / filterValues.length)"
+                  >
+                    <v-btn
+                      :class="{
+                        [$style.filter]: true,
+                        [$style.filterSelected]: filter.value === filterType
+                      }"
+                      text
+                      tile
+                      @click="filterType = filter.value"
+                    >
+                      <translated-text :trans-key="filter.name" />
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+
               <v-col v-if="events.length !== 0" cols="12">
                 <v-row :class="$style.eventsContainer">
                   <v-col
@@ -340,6 +365,7 @@
 
         hasCv: user.uid,
 
+        filterType: null,
         filterValue: "",
         searchFields: [
           "title",
@@ -360,8 +386,39 @@
         };
       },
 
+      filteredEvents() {
+        const { filterType, rawEvents } = this;
+
+        if (!filterType) {
+          return rawEvents;
+        }
+
+        return rawEvents.filter(({ type }) => type === filterType);
+      },
+
       events() {
-        return this.filterFunction(this.rawEvents, this.filterValue.toLowerCase());
+        return this.filterFunction(this.filteredEvents, this.filterValue);
+      },
+
+      filterValues() {
+        return [
+          {
+            name: "participants.filter.all",
+            value: null,
+          },
+          {
+            name: "participants.filter.workshops",
+            value: "workshop",
+          },
+          {
+            name: "participants.filter.panels",
+            value: "panel",
+          },
+          {
+            name: "participants.filter.talks",
+            value: "talk",
+          },
+        ];
       },
     },
 
@@ -415,7 +472,7 @@
         const search =
           (object, key) =>
             fuzzySearch(
-              query,
+              query.toLowerCase(),
               String(dotGet(object, key) || "").toLowerCase(),
             )
         ;
@@ -533,6 +590,46 @@
         &::after {
           display: inline-block;
           content: ")";
+        }
+      }
+    }
+
+    .filterContainer {
+      justify-content: center;
+
+      & + & {
+        padding-left: 0;
+      }
+
+      .filter {
+        $border-bottom-height: 2px;
+
+        align-self: center;
+        margin: 0 .8em;
+        cursor: pointer;
+        transition-timing-function: $transition-timing-function;
+        transition-duration: 200ms;
+        transition-property: opacity, border-bottom-color;
+        opacity: .6;
+        color: $fer-black;
+        border-bottom: 2px solid transparent;
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.filterSelected {
+          font-weight: bold;
+          margin-bottom: 0;
+          opacity: 1;
+          color: $fer-dark-blue;
+          border-bottom-color: $fer-black;
+        }
+
+        @include media(sm) {
+          padding-right: .3em !important;
+          padding-left: .3em !important;
+          margin: 0 .3em;
         }
       }
     }
