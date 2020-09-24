@@ -127,9 +127,8 @@
                       flat
                     >
                       <v-img
-                        :lazy-src="event.company.logo.small.url"
-                        :src="event.company.logo.original.url"
-                        :srcset="event.company.logo | srcSet"
+                        :lazy-src="event.company.thumbnail"
+                        :src="event.company.image"
                         aspect-ratio="1.78"
                         class="mx-6"
                         contain
@@ -248,19 +247,6 @@
     },
 
     filters: {
-      srcSet(image) {
-        return (
-          Object
-            .values(image)
-            .map(
-              ({ width, url }) =>
-                `${ url } ${ width }w`
-              ,
-            )
-            .join(",")
-        );
-      },
-
       weekday(date) {
         const days = [
           "nedjelja",

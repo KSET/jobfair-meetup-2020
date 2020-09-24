@@ -60,12 +60,11 @@
               >
                 <v-list-item-avatar
                   v-if="company.logo"
-                  :data-srcset="getSrcSet(company.logo)"
+                  :data-srcset="getSrcSet(company.images)"
                 >
                   <v-img
-                    :lazy-src="company.logo.small.url"
-                    :src="company.logo.original.url"
-                    :srcset="getSrcSet(company.logo)"
+                    :lazy-src="company.thumbnail"
+                    :src="company.image"
                     fill
                   />
                 </v-list-item-avatar>
