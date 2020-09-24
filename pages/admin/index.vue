@@ -15,6 +15,7 @@
           :to="page.to"
           class="ml-3"
         >
+          <v-icon left v-text="page.icon" />
           {{ page.name }}
         </v-btn>
       </v-col>
@@ -37,8 +38,12 @@
 
     computed: {
       ...mapGetters({
-        pages: "adminPages/getPages",
+        rawPages: "adminPages/getPages",
       }),
+
+      pages() {
+        return this.rawPages.filter(({ name }) => "Home" !== name);
+      },
     },
   };
 </script>
