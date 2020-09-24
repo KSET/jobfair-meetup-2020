@@ -136,7 +136,7 @@
           <v-btn text @click="userOpen = false">
             <translated-text trans-key="actions.cancel" />
           </v-btn>
-          <v-btn color="error" text @click="userOpen = logout()">
+          <v-btn color="error" text @click="logout()">
             <translated-text trans-key="actions.auth.logout" />
           </v-btn>
         </v-card-actions>
@@ -238,6 +238,8 @@
       }),
 
       async logout() {
+        this.userOpen = false;
+
         await this.doLogout();
 
         await this.$router.push({ name: "Index" });

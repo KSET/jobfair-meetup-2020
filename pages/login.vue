@@ -203,7 +203,9 @@
           },
         );
 
-        return await this.$router.push(redirectTo);
+        const redirectUrl = this.$router.resolve(redirectTo).href;
+
+        return await window.location.assign(redirectUrl);
       },
     },
   };
