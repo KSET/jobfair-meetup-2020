@@ -446,6 +446,9 @@
         }
 
         .heroButtonContainer {
+          @include media(sm) {
+            margin-top: 3em;
+          }
 
           .heroButton {
             color: $fer-black;
