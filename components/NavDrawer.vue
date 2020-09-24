@@ -54,7 +54,6 @@
           <v-list-item-content>
             <v-list-item-title>
               <v-btn
-                :to="{ name: 'PageLogin' }"
                 :class="$style.navItemButton"
 
                 large
