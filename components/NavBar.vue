@@ -31,6 +31,22 @@
         <translated-text :class="$style.navLinkText" :trans-key="page.name" />
       </nuxt-link>
 
+      <v-btn
+        v-if="!isLoggedIn"
+
+        v-ripple
+
+        :class="$style.navLinkButton"
+
+        :to="{ name: 'PageLogin' }"
+
+        large
+        nuxt
+        outlined
+      >
+        <translated-text :class="$style.navLinkText" trans-key="button.joinNow" />
+      </v-btn>
+
       <nav-user-module />
     </div>
 
@@ -63,6 +79,7 @@
     computed: {
       ...mapGetters({
         rawPages: "pages/getPages",
+        isLoggedIn: "user/isLoggedIn",
       }),
 
       HeaderLinkVariants() {

@@ -46,6 +46,28 @@
           </v-list-item-content>
         </v-list-item>
 
+        <v-list-item
+          v-if="!isLoggedIn"
+          ripple
+          :to="{ name: 'PageLogin' }"
+        >
+          <v-list-item-content>
+            <v-list-item-title>
+              <v-btn
+                :to="{ name: 'PageLogin' }"
+                :class="$style.navItemButton"
+
+                large
+                nuxt
+                outlined
+                ripple
+              >
+                <translated-text trans-key="button.joinNow" />
+              </v-btn>
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
         <v-list-item>
           <v-list-item-content>
             <nav-user-module />
@@ -79,6 +101,7 @@
       ...mapGetters({
         pages: "pages/getPages",
         isOpen: "nav-drawer/isOpen",
+        isLoggedIn: "user/isLoggedIn",
       }),
     },
 

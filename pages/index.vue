@@ -24,18 +24,16 @@
                 <span slot="placeholder" :class="$style.typing">{{ titleTexts[0] }}</span>
               </client-only>
             </h1>
-            <!--            <div :class="$style.heroButtonContainer">-->
-            <!--              <v-btn-->
-            <!--                :class="$style.heroButton"-->
-            <!--                :href="getSetting('Join Now URL', '#')"-->
-            <!--                color="primary"-->
-            <!--                large-->
-            <!--                rel="noopener noreferrer"-->
-            <!--                target="_blank"-->
-            <!--              >-->
-            <!--                <translated-text trans-key="button.joinNow" />-->
-            <!--              </v-btn>-->
-            <!--            </div>-->
+            <div v-if="!isLoggedIn" :class="$style.heroButtonContainer">
+              <v-btn
+                :class="$style.heroButton"
+                color="primary"
+                large
+                :to="{ name: 'PageLogin' }"
+              >
+                <translated-text trans-key="button.joinNow" />
+              </v-btn>
+            </div>
           </v-col>
 
           <v-col :class="$style.heroExplanationContainer" cols="12" md="5" offset-md="6">
@@ -362,6 +360,7 @@
     computed: {
       ...mapGetters({
         getSetting: "settings/getSetting",
+        isLoggedIn: "user/isLoggedIn",
       }),
 
       titleTexts() {
@@ -480,7 +479,6 @@
         }
 
         .heroButtonContainer {
-          margin-top: 4em;
 
           .heroButton {
             color: $fer-black;

@@ -37,6 +37,10 @@ export const getters = {
   isStudent({ user }) {
     return isStudent(user.role);
   },
+
+  isLoggedIn({ user }) {
+    return Boolean(user);
+  },
 };
 
 export const mutations = {
