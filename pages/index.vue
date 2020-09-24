@@ -264,35 +264,6 @@
             </div>
           </v-col>
         </v-row>
-
-        <!--<v-row>
-          <v-col cols="12">
-            <h1 :class="$style.participantsHeader">
-              <translated-text trans-key="index.participants.projectFriends.header" />
-            </h1>
-            <p :class="$style.participantsDescription">
-              <translated-text trans-key="index.participants.projectFriends.text" />
-            </p>
-          </v-col>
-        </v-row>
-
-        <v-row>
-          <v-col
-            v-for="friend in projectFriends"
-            :key="friend.id"
-            :class="$style.participantCol"
-            cols="6"
-          >
-            <div :class="$style.participantContainer">
-              <v-img
-                :alt="friend.description"
-                :src="friend.image"
-                aspect-ratio="1.875"
-                contain
-              />
-            </div>
-          </v-col>
-        </v-row>-->
       </v-col>
     </v-row>
   </div>
@@ -316,7 +287,6 @@
   const storeActions = {
     fetchNews: "news/fetchNews",
     fetchParticipants: "companies/fetchParticipants",
-    fetchProjectFriends: "companies/fetchProjectFriends",
   };
 
   export default {
@@ -342,17 +312,14 @@
 
       const [
         news,
-        projectFriends,
         participants,
       ] = await Promise.all([
         store.dispatch(storeActions.fetchNews).then(ensureArray).then(limitLength(3)),
-        store.dispatch(storeActions.fetchProjectFriends).then(ensureArray),
         store.dispatch(storeActions.fetchParticipants).then(ensureArray).then(ensureHasImage),
       ]);
 
       return {
         news,
-        projectFriends,
         participants,
       };
     },

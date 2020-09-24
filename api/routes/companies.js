@@ -102,22 +102,6 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
   return `${ type }::${ id }`;
 }));
 
-router.get("/project-friends", () => {
-  return (
-    Array(5 * 2)
-      .fill(0)
-      .map(
-        (_, i) =>
-          ({
-            id: i + 1,
-            image: "/404.svg",
-            description: `Prijatelj projekta ${ i + 1 }`,
-          })
-        ,
-      )
-  );
-});
-
 router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params, authHeader }) => {
   const { id } = params;
   const { company } = await graphQlQuery(companyQuery(Number(id)), authHeader);

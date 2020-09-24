@@ -25,12 +25,6 @@ export const actions = {
     return data;
   },
 
-  async fetchProjectFriends() {
-    const { data } = await this.$api.$get("/companies/project-friends");
-
-    return data;
-  },
-
   async fetchEvent({ commit }, { type, id }) {
     const { data } = await this.$api.$get(`/companies/events/${ encodeURIComponent(type) }/${ encodeURIComponent(id) }`).catch((e) => e);
 
