@@ -7,11 +7,11 @@ import {
 } from "../helpers/fetchCache";
 import {
   HttpStatus,
+  internalRequest,
 } from "../helpers/http";
 import {
   participantsQuery,
   participantEventsQuery,
-  companyQuery,
 } from "../graphql/queries";
 import {
   ApiError,
@@ -120,11 +120,16 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
   return `${ type }::${ id }`;
 }));
 
-router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params, authHeader }) => {
-  const { id } = params;
-  const { company } = await graphQlQuery(companyQuery(Number(id)), authHeader);
+router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+  const { data: companies = [] } = await internalRequest("GET", "/companies/participants") || {};
 
-  return fixCompany(company);
+  const company = companies.find(({ id }) => String(id) === String(params.id));
+
+  if (!company) {
+    throw new ApiError("Company not found", HttpStatus.Error.Client.NotFound);
+  }
+
+  return company;
 }, ({ params }) => {
   return params.id;
 }));
