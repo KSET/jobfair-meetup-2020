@@ -271,6 +271,15 @@
 
   const noParticipants = () => Object.fromEntries(Object.keys(EventStatus).map((k) => [ k, 0 ]));
 
+  const getEventParticipants =
+    (participants, { id, type }) =>
+      dotGet(
+        participants,
+        `${ type }.${ id }`,
+        noParticipants(),
+      )
+  ;
+
   export default {
     name: "PageStudentIndex",
 
@@ -309,14 +318,17 @@
       const eventParticipants = await store.dispatch("events/fetchEventsParticipants");
 
       const getUserStatus =
-        ({ id }) =>
-          eventListFromStatus(eventStatuses[id])
+        ({ id, type }) =>
+          eventListFromStatus(
+            dotGet(
+              eventStatuses,
+              `${ type }.${ id }`,
+              0,
+            ),
+          )
       ;
 
-      const getEventParticipants =
-        ({ id }) =>
-          eventParticipants[id] || noParticipants()
-      ;
+      const eventParticipantsFor = getEventParticipants.bind(null, eventParticipants);
 
       const events =
         (await store.dispatch("companies/fetchParticipantEvents"))
@@ -324,7 +336,7 @@
           .map((event) => ({
             ...event,
             userStatus: getUserStatus(event),
-            participants: getEventParticipants(event),
+            participants: eventParticipantsFor(event),
             loading: false,
             maxParticipants: getParticipantCapacityFor(event.type),
           }))
@@ -427,7 +439,7 @@
         const participants = await this.fetchEventsParticipants();
 
         for (const event of this.events) {
-          this.$set(event, "participants", participants[event.id] || noParticipants());
+          this.$set(event, "participants", getEventParticipants(participants, event) || noParticipants());
         }
       }, 8000 + 4000 * Math.random());
     },
@@ -448,12 +460,12 @@
         const oldSelected = [ ...event.userStatus ];
 
         try {
-          const { status } = await this.doMarkEventStatus({ eventId: event.id, selected });
+          const { status } = await this.doMarkEventStatus({ eventId: event.id, eventType: event.type, selected });
           this.$set(event, "userStatus", eventListFromStatus(status));
         } catch {
           this.$set(event, "userStatus", oldSelected);
         } finally {
-          const participants = await this.fetchEventParticipants({ eventId: event.id });
+          const participants = await this.fetchEventParticipants({ eventId: event.id, eventType: event.type });
           this.$set(event, "participants", participants);
 
           event.loading = false;

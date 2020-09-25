@@ -39,18 +39,26 @@ const router = new AuthRouter({
 });
 
 router.post("/status", async ({ body, authUser }) => {
-  const { id: rawId, status: rawStatus } = body;
+  const { id: rawId, type: rawEventType, status: rawStatus } = body;
   const id = String(rawId);
   const status = Number(rawStatus);
-
-  const addType = (type) => (item) => Object.assign(item, { type });
+  const eventType = String(rawEventType);
 
   const { data } = await internalRequest(
     "get",
     "/companies/events",
   );
-  const { workshops, presentations } = data;
-  const events = [ ...workshops.map(addType("workshop")), ...presentations.map(addType("talk")) ];
+
+  let events = [];
+  switch (eventType) {
+    case "workshop":
+      events = data.workshops;
+      break;
+    case "talk":
+      events = data.presentations;
+      break;
+  }
+
   const event = events.find((event) => String(event.id) === String(id));
 
   if (!event) {
@@ -62,7 +70,7 @@ router.post("/status", async ({ body, authUser }) => {
   try {
     await client.connect();
     await client.startTransaction();
-    const key = { userId: authUser.id, eventId: id };
+    const key = { userId: authUser.id, eventId: id, eventType };
 
     const eventReservation = await client.queryOne(queryReservationsGetByEventAndUserId(key));
     const rawParticipants = await client.query(queryReservationsCountVisitorsForEvent(key));
@@ -84,7 +92,7 @@ router.post("/status", async ({ body, authUser }) => {
       const newProps = eventListFromStatus(statusAdded);
 
       for (const prop of newProps) {
-        if (!hasParticipantCapacityFor(event.type, participants[prop])) {
+        if (!hasParticipantCapacityFor(eventType, participants[prop])) {
           throw new ApiError("Too many participants");
         }
       }
@@ -96,7 +104,7 @@ router.post("/status", async ({ body, authUser }) => {
 
     await client.commit();
 
-    return { eventId: id, status };
+    return { ...key, status };
   } catch (e) {
     await client.rollback();
 
@@ -118,36 +126,48 @@ router.get("/mine", async ({ authUser }) => {
   const fixEvent =
     pipe(
       keysFromSnakeToCamelCase,
-      pickKeys.bind(null, [ "eventId", "status" ]),
+      pickKeys.bind(null, [ "eventId", "eventType", "status" ]),
     )
   ;
 
-  return rawEvents.map(fixEvent);
+  return rawEvents.map(fixEvent).reduce((acc, { eventType, ...el }) => {
+    if (!(eventType in acc)) {
+      acc[eventType] = [];
+    }
+
+    acc[eventType].push(el);
+
+    return acc;
+  }, {});
 });
 
 router.get("/participants", async () => {
   const rawEvents = await Client.queryOnce(queryReservationsCountVisitorsByEvent());
   const events = {};
 
-  for (const { event_id: id, status, count } of rawEvents) {
-    if (!(id in events)) {
-      events[id] =
+  for (const { event_id: id, event_type: type, status, count } of rawEvents) {
+    if (!(type in events)) {
+      events[type] = {};
+    }
+
+    if (!(id in events[type])) {
+      events[type][id] =
         Object.fromEntries(Object.keys(EventStatus).map((k) => [ k, 0 ]))
       ;
     }
 
     for (const selected of eventListFromStatus(status)) {
-      events[id][selected] += Number(count);
+      events[type][id][selected] += Number(count);
     }
   }
 
   return events;
 });
 
-router.get("/participants/:eventId", async ({ params }) => {
-  const { eventId } = params;
+router.get("/participants/:eventType/:eventId", async ({ params }) => {
+  const { eventType, eventId } = params;
 
-  const rawEvents = await Client.queryOnce(queryReservationsGetByEventId({ eventId }));
+  const rawEvents = await Client.queryOnce(queryReservationsGetByEventId({ eventType, eventId }));
   const events = Object.fromEntries(Object.keys(EventStatus).map((k) => [ k, 0 ]));
 
   for (const { status } of rawEvents) {

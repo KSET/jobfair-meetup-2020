@@ -1,5 +1,6 @@
 export const queryReservationsGetByEventId =
   ({
+     eventType,
      eventId,
    }) => ({
     text: `
@@ -9,10 +10,12 @@ export const queryReservationsGetByEventId =
         event_reservations
       where
             event_id = $1
-        and  status <> 0
+        and event_type = $2
+        and status <> 0
     `,
     values: [
       eventId,
+      eventType,
     ],
   })
 ;
@@ -21,33 +24,38 @@ export const queryReservationsCountVisitorsByEvent =
   () => ({
     text: `
       select
-        event_id, status, count(status)
+        event_id, event_type, status, count(status)
       from
         event_reservations
       where
         status <> 0
       group by
-        event_id, status
+        event_id, event_type, status
     `,
     values: [],
   })
 ;
 
 export const queryReservationsCountVisitorsForEvent =
-  ({ eventId }) => ({
+  ({
+     eventType,
+     eventId,
+   }) => ({
     text: `
       select
-        event_id, status, count(status)
+        event_id, event_type, status, count(status)
       from
         event_reservations
       where
              status <> 0
         and event_id = $1
+        and event_type = $2
       group by
-        event_id, status
+        event_id, event_type, status
     `,
     values: [
       eventId,
+      eventType,
     ],
   })
 ;
@@ -74,6 +82,7 @@ export const queryReservationsGetByUserId =
 export const queryReservationsGetByEventAndUserId =
   ({
      eventId,
+     eventType,
      userId,
    }) => ({
     text: `
@@ -84,10 +93,12 @@ export const queryReservationsGetByEventAndUserId =
       where
             event_id = $1
         and  user_id = $2
+        and event_type = $3
     `,
     values: [
       eventId,
       userId,
+      eventType,
     ],
   })
 ;
@@ -95,6 +106,7 @@ export const queryReservationsGetByEventAndUserId =
 export const queryReservationsCreate =
   ({
      eventId,
+     eventType,
      userId,
      status,
    }) => {
@@ -102,6 +114,8 @@ export const queryReservationsCreate =
       status,
       // eslint-disable-next-line camelcase
       event_id: eventId,
+      // eslint-disable-next-line camelcase
+      event_type: eventType,
       // eslint-disable-next-line camelcase
       user_id: userId,
     };
@@ -136,6 +150,7 @@ export const queryReservationsUpdateStatusByEventIdAndUserId =
   (
     {
       eventId,
+      eventType,
       userId,
     },
     {
@@ -147,16 +162,18 @@ export const queryReservationsUpdateStatusByEventIdAndUserId =
         event_reservations
       set
           "updated_at" = CURRENT_TIMESTAMP
-        , "status" = $3
+        , "status" = $4
       where
             event_id = $1
         and  user_id = $2
+        and event_type = $3
       returning
         *
     `,
     values: [
       eventId,
       userId,
+      eventType,
 
       status,
     ],

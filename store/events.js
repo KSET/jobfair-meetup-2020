@@ -11,7 +11,30 @@ export const actions = {
       return [];
     }
 
-    return Object.fromEntries(data.map(({ eventId, status }) => [ eventId, status ]));
+    const eventListToObject =
+      (eventList) =>
+        Object
+          .fromEntries(
+            eventList
+              .map(({ eventId, status }) => [ eventId, status ])
+            ,
+          )
+    ;
+
+    return (
+      Object
+        .entries(data)
+        .reduce(
+          (acc, [ type, eventList ]) =>
+            Object.assign(
+              acc,
+              {
+                [type]: eventListToObject(eventList),
+              },
+            ),
+          {},
+        )
+    );
   },
 
   async fetchEventsParticipants() {
@@ -20,19 +43,20 @@ export const actions = {
     return data || [];
   },
 
-  async fetchEventParticipants(_context, { eventId }) {
-    const { data } = await this.$api.$get(`/events/participants/${ eventId }`, { progress: false });
+  async fetchEventParticipants(_context, { eventId, eventType }) {
+    const { data } = await this.$api.$get(`/events/participants/${ eventType }/${ eventId }`, { progress: false });
     const noParticipants = Object.fromEntries(Object.keys(EventStatus).map((k) => [ k, 0 ]));
 
     return { ...noParticipants, ...data };
   },
 
-  async markEventStatus(_context, { eventId, selected }) {
+  async markEventStatus(_context, { eventId, eventType, selected }) {
     // eslint-disable-next-line no-bitwise
     const status = statusFromEventList(selected);
     const id = Number(eventId);
+    const type = String(eventType);
 
-    const { data } = await this.$api.$post("/events/status", { id, status }, { progress: false });
+    const { data } = await this.$api.$post("/events/status", { id, type, status }, { progress: false });
 
     return data;
   },
