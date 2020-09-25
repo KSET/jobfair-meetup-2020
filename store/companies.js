@@ -3,6 +3,7 @@ import Vue from "vue";
 export const state = () => (
   {
     event: null,
+    company: null,
   }
 );
 
@@ -10,17 +11,33 @@ export const getters = {
   getEvent(state) {
     return state.event;
   },
+
+  getCompany(state) {
+    return state.company;
+  },
 };
 
 export const mutations = {
   SET_EVENT(state, event) {
     Vue.set(state, "event", event);
   },
+
+  SET_COMPANY(state, company) {
+    Vue.set(state, "company", company);
+  },
 };
 
 export const actions = {
   async fetchParticipants() {
     const { data } = await this.$api.$get("/companies/participants");
+
+    return data;
+  },
+
+  async fetchInfo({ commit }, { id }) {
+    const { data } = await this.$api.$get(`/companies/info/${ encodeURIComponent(id) }`).catch((e) => e);
+
+    commit("SET_COMPANY", data);
 
     return data;
   },

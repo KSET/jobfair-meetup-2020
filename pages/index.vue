@@ -252,16 +252,21 @@
             :class="$style.participantCol"
             cols="6"
           >
-            <div :class="$style.participantContainer">
-              <v-img
-                :alt="participant.description"
-                :lazy-src="participant.images && participant.images.small.url"
-                :src="participant.image"
-                :srcset="participant.images && getSrcSet(participant.images)"
-                aspect-ratio="1.875"
-                contain
-              />
-            </div>
+            <nuxt-link
+              :to="{ name: 'PageSudioniciCompanyInfo', params: { id: participant.id } }"
+            >
+              <div :class="$style.participantContainer">
+                <v-img
+                  :alt="participant.name"
+                  :title="getParticipantTitleText(participant)"
+                  :lazy-src="participant.images && participant.images.small.url"
+                  :src="participant.image"
+                  :srcset="participant.images && getSrcSet(participant.images)"
+                  aspect-ratio="1.875"
+                  contain
+                />
+              </div>
+            </nuxt-link>
           </v-col>
         </v-row>
       </v-col>
@@ -367,6 +372,12 @@
       ...mapActions(storeActions),
 
       getSrcSet,
+
+      getParticipantTitleText({ name, description }) {
+        const separator = "----------";
+
+        return `${ name }\n${ separator }\n${ description }`;
+      },
     },
   };
 </script>

@@ -23,3 +23,13 @@ export const isString =
     undefined !== maybeString &&
     String === maybeString.constructor
 ;
+
+export const capitalize =
+  (str) => {
+    if ("string" !== typeof str) {
+      return "";
+    }
+
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+;

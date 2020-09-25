@@ -121,7 +121,8 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
 }));
 
 router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
-  const { data: companies = [] } = await internalRequest("GET", "/companies/participants") || {};
+  const { data } = await internalRequest("GET", "/companies/events") || {};
+  const { companies, ...rawEvents } = data;
 
   const company = companies.find(({ id }) => String(id) === String(params.id));
 
@@ -129,7 +130,38 @@ router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
     throw new ApiError("Company not found", HttpStatus.Error.Client.NotFound);
   }
 
-  return company;
+  const newType = (key) => {
+    switch (key) {
+      case "presentations":
+        return "talk";
+      case "workshops":
+        return "workshop";
+      default:
+        return key.replace(/s$/, "");
+    }
+  };
+
+  const events =
+    Object
+      .entries(rawEvents)
+      .flatMap(
+        ([ type, events ]) =>
+          events.map(
+            (event) =>
+              Object.assign(
+                event,
+                {
+                  type: newType(type),
+                  title: event.title || event.name,
+                  topic: event.topic || "Workshop",
+                },
+              ),
+          ),
+      )
+      .filter(({ company }) => String(company.id) === String(params.id))
+  ;
+
+  return { ...company, events };
 }, ({ params }) => {
   return params.id;
 }));
