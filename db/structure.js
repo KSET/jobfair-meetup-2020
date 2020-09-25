@@ -204,4 +204,34 @@ export const versions = [
     ;
   `,
   },
+  {
+    name: "event-reservation-add-event-type",
+    up: `
+    alter table
+      event_reservations
+    add
+      "event_type"
+      varchar(255)
+      default 'talk'
+      not null
+    ;
+
+    drop index if exists event_reservations_event_id_user_id_uindex;
+
+    create unique index if not exists event_reservations_event_id_user_id_event_type_uindex
+      on event_reservations (event_id, event_type, user_id);
+  `,
+    down: `
+    alter table
+      event_reservations
+    drop column
+      "event_type"
+    ;
+
+    create unique index if not exists event_reservations_event_id_user_id_uindex
+      on event_reservations (event_id, user_id);
+
+    drop index if exists event_reservations_event_id_user_id_event_type_uindex;
+  `,
+  },
 ];
