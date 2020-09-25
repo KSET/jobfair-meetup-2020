@@ -84,8 +84,8 @@ export const actions = {
         ...workshops,
       ]
         .map(
-          ({ occures_at, ...rest }) =>
-            ({ ...rest, date: new Date(occures_at) })
+          ({ occuresAt, ...rest }) =>
+            ({ ...rest, date: new Date(occuresAt) })
           ,
         )
         .sort(

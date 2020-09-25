@@ -65,10 +65,10 @@ router.get("/participants", cachedFetcher(cacheForMs, async () => {
 router.get("/events", cachedFetcher(cacheForMs, async () => {
   const { companies, ...events } = await graphQlQuery(participantEventsQuery());
 
-  return {
+  return keysFromSnakeToCamelCase({
     companies: companies.map(fixCompany),
     ...events,
-  };
+  });
 }));
 
 router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => {
@@ -110,10 +110,10 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
     ]);
   }
 
-  return {
+  return keysFromSnakeToCamelCase({
     ...obj,
     company: fixCompany(companies.find(({ id }) => id === obj.company.id)),
-  };
+  });
 }, ({ params }) => {
   const { type, id } = params;
 

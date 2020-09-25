@@ -41,16 +41,16 @@
         class="my-4 my-md-0"
         cols="10"
         md="6"
-        offset-md="0"
         offset="1"
+        offset-md="0"
         order="2"
         order-md="1"
       >
         <v-img
           :lazy-src="eventObj.company.thumbnail"
           :src="eventObj.company.image"
-          contain
           aspect-ratio="1.78"
+          contain
         />
       </v-col>
 
@@ -130,11 +130,11 @@
       }),
 
       eventObj() {
-        const { occures_at, ...event } = this.rawEvent;
+        const { occuresAt, ...event } = this.rawEvent;
 
         return {
           ...event,
-          date: new Date(occures_at),
+          date: new Date(occuresAt),
           type: this.$route.params.type,
         };
       },
