@@ -60,13 +60,44 @@
         order="1"
         order-md="2"
       >
-        <h1
-          :class="$style.title"
-          v-text="eventObj.title || eventObj.name"
-        />
-        <p
-          v-text="eventObj.description"
-        />
+        <v-row>
+          <v-col cols="12">
+            <h1
+              :class="$style.title"
+              v-text="eventObj.title || eventObj.name"
+            />
+            <p
+              v-text="eventObj.description"
+            />
+          </v-col>
+
+          <v-col
+            v-if="eventObj.presenterBio"
+            :class="$style.presenterBio"
+            cols="12"
+          >
+            <h2 :class="$style.about">
+              <translated-text trans-key="participants.event.aboutPresenter" />
+            </h2>
+
+            <div>
+              <v-avatar
+                :class="$style.presenterAvatar"
+                color="secondary"
+                size="100"
+                left
+              >
+                <v-img
+                  v-if="eventObj.presenterPhoto"
+                  :lazy-src="eventObj.presenterPhoto.small.url"
+                  :src="eventObj.presenterPhoto.large.url"
+                  alt="Presenter photo"
+                />
+              </v-avatar>
+              {{ eventObj.presenterBio }}
+            </div>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
 
@@ -253,6 +284,16 @@
       margin-bottom: .5em;
       text-transform: uppercase;
       color: $fer-dark-blue;
+    }
+
+    .presenterBio {
+
+      .presenterAvatar {
+        float: left;
+        margin-right: 2em;
+        clip-path: circle();
+        shape-outside: circle();
+      }
     }
   }
 </style>
