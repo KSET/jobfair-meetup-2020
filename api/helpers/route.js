@@ -123,6 +123,7 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
     });
 
     if ("development" === process.env.NODE_ENV && !(e instanceof ApiError)) {
+      console.log(e);
       errorData._errorObject = e;
     }
 
