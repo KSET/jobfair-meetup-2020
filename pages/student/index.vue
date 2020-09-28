@@ -146,36 +146,11 @@
                     cols="12"
                     md="6"
                   >
-                    <v-card
+                    <company-participant
                       :class="$style.cardContainer"
-                      :loading="event.loading"
-                      flat
+                      :event="event"
+                      no-link
                     >
-                      <v-img
-                        :lazy-src="event.company.thumbnail"
-                        :src="event.company.image"
-                        aspect-ratio="1.78"
-                        class="mx-6"
-                        contain
-                      />
-                      <v-card-subtitle :class="$style.company">
-                        {{ event.company.name }}
-                      </v-card-subtitle>
-
-                      <v-card-title :class="$style.title">
-                        {{ event.title }}
-                      </v-card-title>
-
-                      <v-card-text>
-                        <v-img
-                          :class="$style.icon"
-                          :src="icons[event.type]"
-                          aspect-ratio="1"
-                          contain
-                        />
-                        {{ event.date | weekday }} | {{ event.date | time }} | {{ event.location || "TBA" }}
-                      </v-card-text>
-
                       <v-divider class="mx4" />
 
                       <v-card-subtitle class="pb-0 pt-3">
@@ -221,7 +196,7 @@
                           </v-chip>
                         </v-chip-group>
                       </v-card-text>
-                    </v-card>
+                    </company-participant>
                   </v-col>
                 </v-row>
               </v-col>
@@ -254,6 +229,7 @@
     mapActions,
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
+  import CompanyParticipant from "~/components/companies/CompanyParticipant";
   import BasicInfoValue from "~/components/student/basic-info-value";
   import {
     EntryType,
@@ -284,32 +260,10 @@
     name: "PageStudentIndex",
 
     components: {
+      CompanyParticipant,
       TranslatedText,
       BasicInfoValue,
       AppMaxWidthContainer,
-    },
-
-    filters: {
-      weekday(date) {
-        const days = [
-          "nedjelja",
-          "ponedjeljak",
-          "utorak",
-          "srijeda",
-          "četvrtak",
-          "petak",
-          "subota",
-        ];
-        const dateObj = new Date(date);
-
-        return days[dateObj.getDay()];
-      },
-
-      time(date) {
-        const dateObj = new Date(date);
-        const zeroPad = (n) => String(n).padStart(2, "0");
-        return `${ zeroPad(dateObj.getHours()) }:${ zeroPad(dateObj.getMinutes()) }`;
-      },
     },
 
     async asyncData({ store }) {
@@ -390,14 +344,6 @@
     },
 
     computed: {
-      icons() {
-        return {
-          talk: require("@/assets/images/icons/talk.png"),
-          workshop: require("@/assets/images/icons/workshop.png"),
-          panel: require("@/assets/images/icons/panel.png"),
-        };
-      },
-
       filteredEvents() {
         const { filterType, rawEvents } = this;
 
@@ -565,32 +511,6 @@
 
     .cardContainer {
       height: 100%;
-
-      .company {
-        font-size: 100%;
-        font-weight: normal;
-        padding-top: .5em;
-        padding-bottom: 0;
-        text-transform: uppercase;
-        opacity: .7;
-        color: $fer-black;
-      }
-
-      .title {
-        font-size: 112.5%;
-        font-weight: bold;
-        padding-top: 0;
-        padding-bottom: 0;
-        color: $fer-dark-blue;
-      }
-
-      .icon {
-        position: relative;
-        top: .25em;
-        display: inline-block;
-        width: 1.2em;
-        height: 1.2em;
-      }
 
       .parentheses {
 
