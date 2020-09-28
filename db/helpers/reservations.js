@@ -179,3 +179,23 @@ export const queryReservationsUpdateStatusByEventIdAndUserId =
     ],
   })
 ;
+
+export const queryReservationsDeleteByEventId =
+  ({
+     eventType,
+     eventId,
+   }) => ({
+    text: `
+      delete from
+        event_reservations
+      where
+            event_id = $1
+        and event_type = $2
+      returning id
+    `,
+    values: [
+      eventId,
+      eventType,
+    ],
+  })
+;

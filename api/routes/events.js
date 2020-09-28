@@ -57,6 +57,9 @@ router.post("/status", async ({ body, authUser }) => {
     case "talk":
       events = data.presentations;
       break;
+    case "panel":
+      events = data.panels;
+      break;
   }
 
   const event = events.find((event) => String(event.id) === String(id));

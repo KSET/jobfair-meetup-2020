@@ -5,15 +5,40 @@
     flat
   >
     <v-img
+      v-if="!isPanel"
+
       :lazy-src="company.thumbnail"
       :src="company.image"
       aspect-ratio="1.78"
       class="mx-6"
       contain
     />
+    <v-carousel
+      v-else
+
+      :show-arrows="false"
+      continuous
+      cycle
+      height="auto"
+      hide-delimiters
+      :interval="transitionTime"
+      touchless
+    >
+      <v-carousel-item
+        v-for="image in companyImageList"
+        :key="`${ company.id }-${ image.src }`"
+      >
+        <v-img
+          v-bind="image"
+          aspect-ratio="1.78"
+          class="mx-6"
+          contain
+        />
+      </v-carousel-item>
+    </v-carousel>
 
     <v-card-subtitle :class="$style.company">
-      {{ company.name }}
+      {{ companyNameList }}
     </v-card-subtitle>
 
     <v-card-title :class="$style.title">
@@ -52,6 +77,10 @@
       },
     },
 
+    data: () => ({
+      transitionTime: 7000,
+    }),
+
     computed: {
       icons() {
         return {
@@ -81,6 +110,29 @@
 
       eventTime() {
         return this.time(this.event.date);
+      },
+
+      isPanel() {
+        return "panel" === this.event.type;
+      },
+
+      companyNameList() {
+        const { company, companies } = this.event;
+
+        if (!this.isPanel) {
+          return company.name;
+        }
+
+        return companies.map(({ info }) => info.name).join(", ");
+      },
+
+      companyImageList() {
+        const { companies = [] } = this.event;
+
+        return companies.map(({ info }) => ({
+          src: info.image,
+          "lazy-src": info.thumbnail,
+        }));
       },
     },
 

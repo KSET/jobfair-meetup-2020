@@ -65,8 +65,11 @@ router.get("/participants", cachedFetcher(cacheForMs, async () => {
 router.get("/events", cachedFetcher(cacheForMs, async () => {
   const { companies, ...events } = await graphQlQuery(participantEventsQuery());
 
+  const { data: panels } = await internalRequest("get", "/panels/list");
+
   return keysFromSnakeToCamelCase({
     companies: companies.map(fixCompany),
+    panels: panels.map((id) => id),
     ...events,
   });
 }));

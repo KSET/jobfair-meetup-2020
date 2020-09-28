@@ -174,6 +174,18 @@ create unique index if not exists event_reservations_event_id_user_id_uindex
 create index if not exists event_reservations_user_id_index
     on event_reservations (user_id);
 
+create table if not exists panels
+(
+    id         serial                                             not null
+        constraint talks_pk
+            primary key,
+    description text                                              not null,
+    title      text                                               not null,
+    occures_at timestamp with time zone                           not null,
+    companies  json                                               not null,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP not null
+);
 `;
 
 

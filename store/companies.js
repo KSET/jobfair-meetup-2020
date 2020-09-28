@@ -1,4 +1,7 @@
 import Vue from "vue";
+import {
+ pipe,
+} from "~/helpers/object";
 
 export const state = () => (
   {
@@ -55,8 +58,9 @@ export const actions = {
 
     const {
       companies: rawCompanies,
-      presentations: rawPresentations,
-      workshops: rawWorkshops,
+      presentations: rawPresentations = [],
+      workshops: rawWorkshops = [],
+      panels: rawPanels = [],
     } = data;
 
     if (!rawCompanies || !rawPresentations || !rawWorkshops) {
@@ -95,10 +99,31 @@ export const actions = {
         )
     ;
 
+    const fixPanel =
+      pipe(
+        ({ companies: rawCompanies, date, ...panel }) => ({
+          ...panel,
+          companies: rawCompanies.map(({ companyId, ...rest }) => ({
+            info: companies[companyId],
+            ...rest,
+          })),
+          type: "panel",
+          location: "KSET",
+          occuresAt: date,
+        }),
+        (panel) => ({
+          ...panel,
+          company: panel.companies[0].info,
+        }),
+      )
+    ;
+    const panels = rawPanels.map(fixPanel);
+
     return (
       [
         ...presentations,
         ...workshops,
+        ...panels,
       ]
         .map(
           ({ occuresAt, ...rest }) =>

@@ -58,6 +58,12 @@ authRouter.get("/admin", () => {
       icon: "mdi-newspaper",
     },
     {
+      name: "Panel",
+      to: { name: "PageAdminPanelsIndex" },
+      requiredRole: RoleNames.ADMIN,
+      icon: "mdi-human-queue",
+    },
+    {
       name: "Translations",
       to: { name: "PageAdminTranslationsList" },
       requiredRole: RoleNames.ADMIN,
