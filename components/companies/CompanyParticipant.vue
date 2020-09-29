@@ -21,7 +21,7 @@
       cycle
       height="auto"
       hide-delimiters
-      :interval="transitionTime"
+      interval="3000"
       touchless
     >
       <v-carousel-item
@@ -76,10 +76,6 @@
         },
       },
     },
-
-    data: () => ({
-      transitionTime: 7000,
-    }),
 
     computed: {
       icons() {

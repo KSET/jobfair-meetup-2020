@@ -11,8 +11,15 @@
       </v-col>
 
       <v-col class="d-flex flex-column" cols="12" md="6">
-        <div class="ml-md-2">
+        <div
+          :class="{
+            'ml-md-2': !isPanel,
+            'ml-md-n1': isPanel,
+            'mb-md-n12': isPanel,
+          }"
+        >
           <h1
+            v-if="!isPanel"
             :class="$style.company"
             v-text="eventObj.company.name"
           />
@@ -47,11 +54,37 @@
         order-md="1"
       >
         <v-img
+          v-if="!isPanel"
+
           :lazy-src="eventObj.company.thumbnail"
           :src="eventObj.company.image"
           aspect-ratio="1.78"
           contain
         />
+
+        <v-carousel
+          v-else
+
+          :show-arrows="false"
+          continuous
+          cycle
+          height="auto"
+          hide-delimiters
+          interval="3000"
+          touchless
+        >
+          <v-carousel-item
+            v-for="image in companyImageList"
+            :key="image.src"
+          >
+            <v-img
+              v-bind="image"
+              aspect-ratio="1.78"
+              class="mx-6"
+              contain
+            />
+          </v-carousel-item>
+        </v-carousel>
       </v-col>
 
       <v-col
@@ -158,7 +191,7 @@
                       />
 
                       <v-card-subtitle
-                        class="text-center"
+                        class="text-center pt-1"
                         v-text="company.name"
                       />
                     </v-card>
@@ -180,7 +213,7 @@
       </v-col>
     </v-row>
 
-    <v-row>
+    <v-row v-if="!isPanel">
       <v-col cols="12" md="6" offset-md="6">
         <h2 :class="$style.about">
           <translated-text trans-key="participants.event.aboutCompany" />
@@ -259,6 +292,15 @@
           workshop: require("@/assets/images/icons/workshop.png"),
           panel: require("@/assets/images/icons/panel.png"),
         };
+      },
+
+      companyImageList() {
+        const { companies = [] } = this.eventObj;
+
+        return companies.map(({ info }) => ({
+          src: info.image,
+          "lazy-src": info.thumbnail,
+        }));
       },
     },
 
