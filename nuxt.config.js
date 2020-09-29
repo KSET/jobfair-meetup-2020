@@ -97,13 +97,19 @@ export default {
         "JOBFAIR_COOKIE_NAME",
         "JOBFAIR_GRAPHQL_ENDPOINT",
         "GOOGLE_ANALYTICS_KEY",
+        "SENTRY_DSN",
       ],
     },
     ],
     [ "@nuxtjs/router", { keepDefaultRouter: true } ],
     "nuxt-svg-loader",
     [ "cookie-universal-nuxt", { parseJSON: false } ],
+    "@nuxtjs/sentry",
   ],
+
+  sentry: {
+    dsn: process.env.SENTRY_DSN,
+  },
 
   server: {
     timing: {

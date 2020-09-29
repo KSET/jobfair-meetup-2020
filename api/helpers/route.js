@@ -5,6 +5,7 @@ import {
   join as joinPath,
 } from "path";
 import express from "express";
+import * as Sentry from "@sentry/node";
 import {
   HttpStatus,
 } from "./http";
@@ -122,9 +123,13 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
       data: e.data,
     });
 
-    if ("development" === process.env.NODE_ENV && !(e instanceof ApiError)) {
-      console.log(e);
-      errorData._errorObject = e;
+    if (!(e instanceof ApiError)) {
+      Sentry.captureException(e);
+
+      if ("development" === process.env.NODE_ENV) {
+        console.log(e);
+        errorData._errorObject = e;
+      }
     }
 
     return res.json(errorData);

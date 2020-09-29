@@ -3,11 +3,12 @@ import {
 } from "path";
 
 import express from "express";
+import * as Sentry from "@sentry/node";
 import fileUpload from "express-fileupload";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import {
- morgan,
+  morgan,
 } from "../helpers/logger";
 import {
   HttpStatus,
@@ -36,6 +37,13 @@ const fileUploadMiddleware = fileUpload({
 });
 
 const app = express();
+
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler());
+
 const routes = registerRoutesInFolder(joinPath(__dirname, "routes"));
 
 app.set("x-powered-by", false);
@@ -47,6 +55,9 @@ app.use(fileUploadMiddleware);
 app.use(morgan("API"));
 
 app.use(routes);
+
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 
 // Fallback route (404)
 app.use("*", apiRoute(() => {

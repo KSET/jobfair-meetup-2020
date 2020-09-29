@@ -1,4 +1,4 @@
-export default function({ $axios, isDev }, inject) {
+export default function({ $axios, isDev, $sentry, store, req }, inject) {
   const api = $axios.create({});
 
   const baseUrl =
@@ -12,7 +12,22 @@ export default function({ $axios, isDev }, inject) {
 
   api.interceptors.response.use(
     (response) => response,
-    ({ response }) => response,
+    ({ response, config }) => {
+      $sentry.captureMessage(
+        config.url,
+        {
+          req,
+          extra: {
+            responseData: response.data,
+            postData: config.data,
+          },
+          level: "error",
+          user: store.getters["user/getUser"],
+        },
+      );
+
+      return response;
+    },
   );
 
   inject("api", api);

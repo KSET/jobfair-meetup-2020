@@ -408,7 +408,8 @@
         try {
           const { status } = await this.doMarkEventStatus({ eventId: event.id, eventType: event.type, selected });
           this.$set(event, "userStatus", eventListFromStatus(status));
-        } catch {
+        } catch (e) {
+          this.$sentry.captureException(e);
           this.$set(event, "userStatus", oldSelected);
         } finally {
           const participants = await this.fetchEventParticipants({ eventId: event.id, eventType: event.type });
