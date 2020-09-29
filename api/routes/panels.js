@@ -37,22 +37,13 @@ const fixEntry = pipe(
   withoutKeys.bind(null, [ "createdAt", "updatedAt" ]),
   ({ occuresAt, ...panel }) => ({
     ...panel,
+    occuresAt,
     date: occuresAt,
   }),
 );
 
-router.get("/list", async () => {
-  const entries = await Client.queryOnce(queryPanelsGetAll());
-
-  return entries.map(fixEntry);
-});
-
-router.get("/list/with-info", async () => {
-  const rawPanels = await Client.queryOnce(queryPanelsGetAll());
-  const { data: rawCompanies } = await internalRequest("get", "/companies/participants");
-  const companyList = Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
-
-  const addInfo =
+const addInfo =
+  (companyList) =>
     pipe(
       fixEntry,
       ({ companies, ...panel }) => ({
@@ -69,9 +60,33 @@ router.get("/list/with-info", async () => {
         company: panel.companies[0].info,
       }),
     )
-  ;
+;
 
-  return rawPanels.map(addInfo);
+router.get("/list", async () => {
+  const entries = await Client.queryOnce(queryPanelsGetAll());
+
+  return entries.map(fixEntry);
+});
+
+router.get("/list/with-info", async () => {
+  const rawPanels = await Client.queryOnce(queryPanelsGetAll());
+  const { data: rawCompanies } = await internalRequest("get", "/companies/participants");
+  const companyList = Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
+
+  return rawPanels.map(addInfo(companyList));
+});
+
+router.get("/full-info/:id", async ({ params }) => {
+  const { id } = params;
+  const entry = await Client.queryOneOnce(queryPanelsGetById({ id }));
+  const { data: rawCompanies } = await internalRequest("get", "/companies/participants");
+  const companyList = Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
+
+  if (!entry) {
+    throw new ApiError("Panel not found", HttpStatus.Error.Client.NotFound);
+  }
+
+  return addInfo(companyList)(entry);
 });
 
 router.get("/info/:id", async ({ params }) => {

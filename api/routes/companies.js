@@ -50,7 +50,7 @@ const fixCompany =
   )
 ;
 
-const cacheForMs = 10 * 1000;
+const cacheForMs = 0.10 * 1000;
 
 router.get("/participants", cachedFetcher(cacheForMs, async () => {
   const { companies } = await graphQlQuery(participantsQuery());
@@ -65,13 +65,25 @@ router.get("/participants", cachedFetcher(cacheForMs, async () => {
 router.get("/events", cachedFetcher(cacheForMs, async () => {
   const { companies, ...events } = await graphQlQuery(participantEventsQuery());
 
-  const { data: panels } = await internalRequest("get", "/panels/list");
+  const { data: panels } = await internalRequest("get", "/panels/list/with-info");
 
   return keysFromSnakeToCamelCase({
     companies: companies.map(fixCompany),
     panels: panels.map((id) => id),
     ...events,
   });
+}));
+
+router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+  const { id } = params;
+  const { data: panel } = await internalRequest("get", `/panels/full-info/${ id }`);
+
+  return {
+    ...panel,
+    occuresAt: panel.date,
+  };
+}, ({ params }) => {
+  return params.id;
 }));
 
 router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => {
@@ -161,7 +173,17 @@ router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
               ),
           ),
       )
-      .filter(({ company }) => String(company.id) === String(params.id))
+      .filter(({ company, companies }) => {
+        if (String(company.id) === String(params.id)) {
+          return true;
+        }
+
+        if (!companies) {
+          return false;
+        }
+
+        return companies.find(({ info }) => String(info.id) === String(params.id));
+      })
   ;
 
   return { ...company, events };

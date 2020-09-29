@@ -61,10 +61,17 @@
             three-line
           >
             <v-list-item-avatar tile>
-              <v-img :src="icons[event.type]" />
+              <v-img
+                contain
+                :src="icons[event.type]"
+              />
             </v-list-item-avatar>
             <v-list-item-content>
               <v-list-item-title v-text="event.title" />
+              <v-list-item-subtitle>
+                <span v-text="formatDate(event.occuresAt)" />
+                <span v-if="event.location" v-text="'| ' + event.location" />
+              </v-list-item-subtitle>
               <v-list-item-subtitle v-text="event.description" />
             </v-list-item-content>
           </v-list-item>
@@ -99,9 +106,9 @@
 
       icons() {
         return {
-          talk: require("@/assets/images/icons/talk.png"),
-          workshop: require("@/assets/images/icons/workshop.png"),
-          panel: require("@/assets/images/icons/panel.png"),
+          talk: require("@/assets/images/icons/talk.svg?inline"),
+          workshop: require("@/assets/images/icons/workshop.svg?inline"),
+          panel: require("@/assets/images/icons/panel.svg?inline"),
         };
       },
     },
@@ -109,6 +116,17 @@
     methods: {
       capitalize(str) {
         return capitalize(str);
+      },
+
+      formatDate(date) {
+        return capitalize(new Date(date).toLocaleDateString("hr-HR", {
+          weekday: "long",
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+        }));
       },
     },
 

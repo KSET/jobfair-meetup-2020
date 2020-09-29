@@ -66,6 +66,35 @@
               :class="$style.title"
               v-text="eventObj.title || eventObj.name"
             />
+            <v-row v-if="isPanel" class="mb-6">
+              <v-col class="pb-0" cols="12">
+                <h3 class="secondary--text text-uppercase">
+                  <translated-text trans-key="participants.event.otherParticipants" />
+                </h3>
+              </v-col>
+              <v-col class="pt-0" cols="12">
+                <v-chip
+                  v-for="{ info: company } in eventObj.companies"
+                  :key="company.id"
+                  :to="{ name: 'PageSudioniciCompanyInfo', params: { id: company.id } }"
+                  class="mr-6"
+                  label
+                  large
+                  outlined
+                  pill
+                >
+                  <v-avatar class="ml-1" left tile>
+                    <v-img
+                      :lazy-src="company.thumbnail"
+                      :src="company.image"
+                      aspect-ratio="1"
+                      contain
+                    />
+                  </v-avatar>
+                  {{ company.name }}
+                </v-chip>
+              </v-col>
+            </v-row>
             <p
               v-text="eventObj.description"
             />
@@ -84,8 +113,8 @@
               <v-avatar
                 :class="$style.presenterAvatar"
                 color="secondary"
-                size="100"
                 left
+                size="100"
               >
                 <v-img
                   v-if="eventObj.presenterPhoto"
@@ -96,6 +125,56 @@
               </v-avatar>
               {{ eventObj.presenterBio }}
             </div>
+          </v-col>
+
+          <v-col v-if="isPanel" cols="12">
+            <h2 :class="$style.about">
+              <translated-text trans-key="participants.event.aboutPanelists" />
+            </h2>
+
+            <v-row
+              v-for="{ info: company, aboutPanelist } in eventObj.companies"
+              :key="company.id"
+            >
+              <v-col cols="12">
+                <v-row>
+                  <v-col
+                    class="d-flex align-center"
+                    cols="6"
+                    md="3"
+                    offset="3"
+                    offset-md="0"
+                    offset-sm="4"
+                    sm="4"
+                  >
+                    <v-card
+                      flat
+                    >
+                      <v-img
+                        :lazy-src="company.thumbnail"
+                        :src="company.image"
+                        contain
+                        width="100%"
+                      />
+
+                      <v-card-subtitle
+                        class="text-center"
+                        v-text="company.name"
+                      />
+                    </v-card>
+                  </v-col>
+
+                  <v-col
+                    class="d-flex align-center justify-center justify-md-start"
+
+                    cols="12"
+                    md="9"
+                  >
+                    <div class="text-center text-md-left" v-text="aboutPanelist" />
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </v-col>
@@ -159,6 +238,10 @@
       ...mapGetters({
         rawEvent: "companies/getEvent",
       }),
+
+      isPanel() {
+        return "panel" === this.eventObj.type;
+      },
 
       eventObj() {
         const { occuresAt, ...event } = this.rawEvent;
