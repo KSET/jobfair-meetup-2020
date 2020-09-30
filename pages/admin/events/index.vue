@@ -374,7 +374,10 @@
     }
 
     .eventUser {
-      margin-right: 8px;
+      $margin: 8px;
+
+      margin-right: $margin;
+      margin-bottom: $margin;
 
       &:last-child {
         margin-right: initial;
