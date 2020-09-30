@@ -1,3 +1,7 @@
+import {
+  isFunction,
+} from "./object";
+
 export const ensureArray =
   (val) =>
     Array.isArray(val)
@@ -22,10 +26,14 @@ export const dotGet =
       v = v[k];
     }
 
-    return (
-      v === undefined
-      ? defaultValue
-      : v
-    );
+    if (v !== undefined) {
+      return v;
+    } else {
+      if (!isFunction(defaultValue)) {
+        defaultValue = () => defaultValue;
+      }
+
+      return defaultValue();
+    }
   }
 ;

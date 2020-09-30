@@ -252,7 +252,7 @@
       dotGet(
         participants,
         `${ type }.${ id }`,
-        noParticipants(),
+        noParticipants,
       )
   ;
 
@@ -432,7 +432,7 @@
           (object, key) =>
             fuzzySearch(
               query.toLowerCase(),
-              String(dotGet(object, key) || "").toLowerCase(),
+              String(dotGet(object, key, "")).toLowerCase(),
             )
         ;
 
