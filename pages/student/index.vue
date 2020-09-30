@@ -74,12 +74,18 @@
 
           <v-row style="width: 100%;">
             <v-col cols="12">
-              <v-img
-                alt="QR kod za studenta"
-                aspect-ratio="1"
-                contain
-                src="/api/image/qr-code/for-user/qr.png"
-              />
+              <a
+                :href="qrImageSrc"
+                target="_blank"
+                title="QR kod za životopis"
+              >
+                <v-img
+                  :src="qrImageSrc"
+                  alt="QR kod za studenta"
+                  aspect-ratio="1"
+                  contain
+                />
+              </a>
             </v-col>
           </v-row>
         </v-row>
@@ -120,8 +126,8 @@
                     :key="filter.name"
 
                     :class="$style.filterContainer"
-                    class="d-flex px-2"
                     :cols="Math.round(12 / filterValues.length)"
+                    class="d-flex px-2"
                   >
                     <v-btn
                       :class="{
@@ -227,6 +233,7 @@
   import fuzzySearch from "fuzzysearch";
   import {
     mapActions,
+    mapGetters,
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import CompanyParticipant from "~/components/companies/CompanyParticipant";
@@ -344,6 +351,14 @@
     },
 
     computed: {
+      ...mapGetters({
+        user: "user/getUser",
+      }),
+
+      qrImageSrc() {
+        return `/api/image/qr-code/for-uid/${ encodeURIComponent(this.user.uid) }.png`;
+      },
+
       filteredEvents() {
         const { filterType, rawEvents } = this;
 
@@ -560,9 +575,9 @@
         }
 
         @include media(sm) {
+          margin: 0 .3em;
           padding-right: .3em !important;
           padding-left: .3em !important;
-          margin: 0 .3em;
         }
       }
     }
