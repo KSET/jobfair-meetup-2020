@@ -50,7 +50,7 @@ const fixCompany =
   )
 ;
 
-const cacheForMs = 0.10 * 1000;
+const cacheForMs = 15 * 1000;
 
 router.get("/participants", cachedFetcher(cacheForMs, async () => {
   const { companies } = await graphQlQuery(participantsQuery());
