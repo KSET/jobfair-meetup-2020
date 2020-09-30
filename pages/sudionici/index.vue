@@ -21,9 +21,8 @@
             :key="filter.name"
 
             :class="$style.filterContainer"
-            class="d-flex"
-            cols="12"
-            md="auto"
+            :cols="Math.round(12 / filterValues.length)"
+            class="d-flex px-2"
           >
             <v-btn
               :class="{
@@ -83,38 +82,50 @@
       </template>
 
       <template v-slot:footer>
-        <v-row align="center" class="mt-2" justify="center">
-          <span class="grey--text">Items per page</span>
-          <v-menu offset-y>
-            <template v-slot:activator="{ on }">
-              <v-btn
-                class="ml-2"
-                color="secondary"
-                dark
-                text
-                v-on="on"
-              >
-                {{ itemsPerPage }}
-                <v-icon>mdi-chevron-down</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <v-list-item
-                v-for="(number, index) in itemsPerPageArray"
-                :key="index"
-                @click="updateItemsPerPage(number)"
-              >
-                <v-list-item-title>{{ number }}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
+        <v-row class="mt-2">
+          <v-col
+            class="text-center text-md-left"
+            cols="12"
+            md="6"
+            order="2"
+            order-md="1"
+          >
+            <span class="grey--text">Items per page</span>
+            <v-menu offset-y>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  class="ml-2"
+                  color="secondary"
+                  dark
+                  text
+                  v-on="on"
+                >
+                  {{ itemsPerPage }}
+                  <v-icon>mdi-chevron-down</v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <v-list-item
+                  v-for="(number, index) in itemsPerPageArray"
+                  :key="index"
+                  @click="updateItemsPerPage(number)"
+                >
+                  <v-list-item-title>{{ number }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </v-col>
 
-          <v-spacer />
-
-          <template v-if="numberOfPages > 1">
+          <v-col
+            v-if="numberOfPages > 1"
+            class="text-center text-md-right"
+            cols="12"
+            md="6"
+            order="1"
+            order-md="2"
+          >
             <span
-              class="mr-4
-            grey--text"
+              class="mr-4 grey--text"
             >
               Page {{ page }} of {{ numberOfPages }}
             </span>
@@ -136,7 +147,7 @@
             >
               <v-icon>mdi-chevron-right</v-icon>
             </v-btn>
-          </template>
+          </v-col>
         </v-row>
       </template>
     </v-data-iterator>
@@ -296,37 +307,42 @@
   }
 
   .filterContainer {
+    justify-content: center;
 
     & + & {
       padding-left: 0;
     }
-  }
 
-  .filter {
-    align-self: center;
-    margin: 0 .8em;
-    cursor: pointer;
-    transition-timing-function: $transition-timing-function;
-    transition-duration: 200ms;
-    transition-property: opacity, border-bottom-color;
-    opacity: .6;
-    color: $fer-black;
-    border-bottom: 2px solid transparent;
+    .filter {
+      $border-bottom-height: 2px;
 
-    &:hover {
-      opacity: 1;
-    }
+      align-self: center;
+      margin: 0 .8em;
+      cursor: pointer;
+      transition-timing-function: $transition-timing-function;
+      transition-duration: 200ms;
+      transition-property: opacity, border-bottom-color;
+      opacity: .6;
+      color: $fer-black;
+      border-bottom: 2px solid transparent;
 
-    &.filterSelected {
-      font-weight: bold;
-      opacity: 1;
-      color: $fer-dark-blue;
-      border-bottom-color: $fer-black;
-    }
+      &:hover {
+        opacity: 1;
+      }
 
-    @include media(sm) {
-      padding-left: .1em !important;
-      padding-right: .1em !important;
+      &.filterSelected {
+        font-weight: bold;
+        margin-bottom: 0;
+        opacity: 1;
+        color: $fer-dark-blue;
+        border-bottom-color: $fer-black;
+      }
+
+      @include media(sm) {
+        margin: 0 .3em;
+        padding-right: .3em !important;
+        padding-left: .3em !important;
+      }
     }
   }
 
