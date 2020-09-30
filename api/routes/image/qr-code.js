@@ -11,9 +11,6 @@ import {
 } from "../../helpers/route";
 
 const qrResponse = (res, { uid, firstName, lastName }) => {
-  res.set("cache-control", "no-store, private");
-  res.set("expires", "Sat, 26 Jul 1997 05:00:00 GMT");
-  res.set("pragma", "no-cache");
   res.set("content-type", "image/png");
 
   QRCode.toFileStream(
@@ -48,6 +45,10 @@ router.getRaw("/for-user/qr.png", addUserData(), (req, res) => {
     return res.end();
   }
 
+  res.set("cache-control", "no-store, private");
+  res.set("expires", "Sat, 26 Jul 1997 05:00:00 GMT");
+  res.set("pragma", "no-cache");
+
   return qrResponse(res, {
     uid,
     // eslint-disable-next-line camelcase
@@ -75,6 +76,9 @@ router.getRaw("/for-uid/:uid.png", async ({ params, authHeader }, res) => {
 
     return res.end();
   }
+
+  const cacheFor = 7 * 24 * 60 * 60;
+  res.set("Cache-Control", `public, max-age=${ cacheFor }, s-max-age=${ cacheFor }, immutable`);
 
   return qrResponse(res, data);
 });
