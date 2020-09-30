@@ -167,6 +167,7 @@ export const companyDataWithMeta = {
 export const basicResumeData = {
   ...basicFields(
     "id",
+    "user_id",
     "uid",
     "first_name",
     "last_name",
