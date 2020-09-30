@@ -100,7 +100,7 @@ authRouter.get("/list", async ({ authHeader }) => {
   return await fetchListCached(authHeader);
 });
 
-authRouter.get("/for-user/:uid", async ({ authHeader, params }) => {
+authRouter.get("/for-user/:uid", cachedFetcher(listCacheTimeoutMs, async ({ authHeader, params }) => {
   const resumes = await fetchListCached(authHeader);
 
   const [ resume ] = resumes.filter(({ uid }) => uid === params.uid);
@@ -110,7 +110,9 @@ authRouter.get("/for-user/:uid", async ({ authHeader, params }) => {
   }
 
   return resume;
-});
+}, ({ params }) => {
+  return params.uid;
+}));
 
 authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
   const { id } = params;
