@@ -12,6 +12,12 @@ export const isObject =
     null !== maybeObject
 ;
 
+export const isFunction =
+  (functionToCheck) =>
+    functionToCheck &&
+    "[object Function]" === {}.toString.call(functionToCheck)
+;
+
 export const pickKeys = (keyList, object) => {
   const newObject = {};
   const get = dotGet.bind(null, object);
