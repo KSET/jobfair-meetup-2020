@@ -58,6 +58,11 @@ authRouter.get("/admin", () => {
       icon: "mdi-newspaper",
     },
     {
+      name: "Events",
+      to: { name: "PageAdminEventsIndex" },
+      icon: "mdi-clipboard-account",
+    },
+    {
       name: "Panel",
       to: { name: "PageAdminPanelsIndex" },
       requiredRole: RoleNames.ADMIN,

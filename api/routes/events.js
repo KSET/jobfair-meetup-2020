@@ -11,6 +11,7 @@ import {
   queryReservationsGetByEventId,
   queryReservationsGetByUserId,
   queryReservationsUpdateStatusByEventIdAndUserId,
+  queryReservationsListUserIdsByEvent,
 } from "../../db/helpers/reservations";
 
 import {
@@ -32,6 +33,9 @@ import {
   ApiError,
   AuthRouter,
 } from "../helpers/route";
+import {
+  cachedFetcher,
+} from "../helpers/fetchCache";
 
 
 const router = new AuthRouter({
@@ -182,4 +186,64 @@ router.get("/participants/:eventType/:eventId", async ({ params }) => {
   return events;
 });
 
-export default router;
+const moderatorRouter = AuthRouter.boundToRouter(router, {
+  role: RoleNames.MODERATOR,
+});
+
+const timeoutMs = 1.5 * 1000;
+
+router.get("/users", cachedFetcher(timeoutMs, async ({ authHeader }) => {
+  const auth = {
+    headers: {
+      Authorization: authHeader,
+    },
+  };
+
+  const resumes = await internalRequest("get", "/resumes/list", auth).then(({ data: resumes }) => Object.fromEntries(resumes.map((resume) => [ resume.userId, resume ])));
+  const rawEvents = await Client.queryOnce(queryReservationsListUserIdsByEvent());
+  const userList = new Set();
+
+  const events = rawEvents.map(keysFromSnakeToCamelCase).reduce((acc, event) => {
+    const { eventType, eventId, status, userIds } = event;
+
+    if (!(eventType in acc)) {
+      acc[eventType] = {};
+    }
+
+    if (!(eventId in acc[eventType])) {
+      acc[eventType][eventId] = Object.fromEntries(eventListFromStatus(-1).map((type) => [ type, [] ]));
+    }
+
+    for (const type of eventListFromStatus(status)) {
+      for (const id of userIds.split(",")) {
+        userList.add(id);
+        acc[eventType][eventId][type].push(id);
+      }
+    }
+
+    return acc;
+  }, {});
+
+  const users =
+    Array
+      .from(userList)
+      .reduce(
+        (acc, id) =>
+          Object.assign(
+            acc,
+            {
+              [id]: resumes[id],
+            },
+          )
+        ,
+        {},
+      )
+  ;
+
+  return {
+    events,
+    users,
+  };
+}));
+
+export default moderatorRouter;

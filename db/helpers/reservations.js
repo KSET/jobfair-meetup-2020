@@ -36,6 +36,27 @@ export const queryReservationsCountVisitorsByEvent =
   })
 ;
 
+export const queryReservationsListUserIdsByEvent =
+  () => ({
+    text: `
+      select
+          event_id
+        , event_type
+        , status
+        , array_to_string(array_agg(distinct user_id), ',') as user_ids
+      from
+        event_reservations
+      where
+        status <> 0
+      group by
+          event_id
+        , event_type
+        , status
+    `,
+    values: [],
+  })
+;
+
 export const queryReservationsCountVisitorsForEvent =
   ({
      eventType,

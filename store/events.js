@@ -43,6 +43,12 @@ export const actions = {
     return data || [];
   },
 
+  async fetchEventsUserParticipants() {
+    const { data } = await this.$api.$get("/events/users", { progress: false });
+
+    return data || [];
+  },
+
   async fetchEventParticipants(_context, { eventId, eventType }) {
     const { data } = await this.$api.$get(`/events/participants/${ eventType }/${ eventId }`, { progress: false });
     const noParticipants = Object.fromEntries(Object.keys(EventStatus).map((k) => [ k, 0 ]));
