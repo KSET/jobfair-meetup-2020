@@ -31,7 +31,7 @@
               }"
               text
               tile
-              @click="filterType = filter.value"
+              @click="changeFilterType(filter.value)"
             >
               <translated-text :trans-key="filter.name" />
             </v-btn>
@@ -253,6 +253,11 @@
 
       updateItemsPerPage(number) {
         this.itemsPerPage = number;
+      },
+
+      changeFilterType(filterType) {
+        this.page = 1;
+        this.filterType = filterType;
       },
 
       filterFunction(elements, query) {
