@@ -238,6 +238,12 @@
       },
     },
 
+    watch: {
+      filterValue() {
+        this.page = 1;
+      },
+    },
+
     methods: {
       nextPage() {
         if (this.page + 1 <= this.numberOfPages) {
