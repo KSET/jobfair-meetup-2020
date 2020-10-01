@@ -74,25 +74,25 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
     return null;
   }
 
-  if (false === fullUser) {
-    try {
-      // Should be a string of format `jwt $AUTH_TOKEN`
-      const token = auth.substr("jwt ".length);
-      const secret = await getSetting("JWT Secret", process.env.JWT_SECRET);
+  try {
+    // Should be a string of format `jwt $AUTH_TOKEN`
+    const token = auth.substr("jwt ".length);
+    const secret = await getSetting("JWT Secret", process.env.JWT_SECRET);
 
-      const data = await verifiedJwt({
-        token,
-        secret,
-      });
+    const data = await verifiedJwt({
+      token,
+      secret,
+    });
 
-      if (!("role" in data)) {
-        throw new Error("Role not present");
-      }
-
-      return data;
-    } catch (e) {
-      console.log("Failed local JWT verification:", e.message);
+    if (!("role" in data)) {
+      return null;
     }
+
+    if (false === fullUser) {
+      return data;
+    }
+  } catch (e) {
+    console.log("Failed local JWT verification:", e.message);
   }
 
   try {
