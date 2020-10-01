@@ -10,7 +10,7 @@
       :custom-filter="filterFunction"
       :items="filteredEventsByType"
       :items-per-page.sync="itemsPerPage"
-      :page="page"
+      :page.sync="page"
       :search="filterValue"
       hide-default-footer
     >
@@ -238,12 +238,6 @@
       },
     },
 
-    watch: {
-      filterValue() {
-        this.page = 1;
-      },
-    },
-
     methods: {
       nextPage() {
         if (this.page + 1 <= this.numberOfPages) {
@@ -262,7 +256,6 @@
       },
 
       changeFilterType(filterType) {
-        this.page = 1;
         this.filterType = filterType;
       },
 
