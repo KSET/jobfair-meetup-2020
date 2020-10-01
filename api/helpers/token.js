@@ -80,10 +80,16 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
       const token = auth.substr("jwt ".length);
       const secret = await getSetting("JWT Secret", process.env.JWT_SECRET);
 
-      return await verifiedJwt({
+      const data = await verifiedJwt({
         token,
         secret,
       });
+
+      if (!("role" in data)) {
+        throw new Error("Role not present");
+      }
+
+      return data;
     } catch (e) {
       console.log("Failed local JWT verification:", e.message);
     }
