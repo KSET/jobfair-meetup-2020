@@ -4,9 +4,6 @@ import {
   internalRequest,
 } from "../../helpers/http";
 import {
-  injectAuthData,
-} from "../../helpers/middleware";
-import {
   AuthRouter,
 } from "../../helpers/route";
 
@@ -30,33 +27,7 @@ const qrResponse = (res, { uid, firstName, lastName }) => {
   );
 };
 
-const addUserData = () => injectAuthData({
-  fullUserData: true,
-});
-
 const router = new AuthRouter({});
-
-router.getRaw("/for-user/qr.png", addUserData(), (req, res) => {
-  const { uid, first_name, last_name } = req.authUser;
-
-  if (!uid) {
-    res.status(HttpStatus.Error.Client.NotFound);
-
-    return res.end();
-  }
-
-  res.set("cache-control", "no-store, private");
-  res.set("expires", "Sat, 26 Jul 1997 05:00:00 GMT");
-  res.set("pragma", "no-cache");
-
-  return qrResponse(res, {
-    uid,
-    // eslint-disable-next-line camelcase
-    firstName: first_name,
-    // eslint-disable-next-line camelcase
-    lastName: last_name,
-  });
-});
 
 router.getRaw("/for-uid/:uid.png", async ({ params, authHeader }, res) => {
   const { uid } = params;
