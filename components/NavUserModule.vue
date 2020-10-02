@@ -71,7 +71,6 @@
 
                 <v-list-item-content>
                   <v-list-item-title v-text="company.name" />
-                  <v-list-item-subtitle v-text="company.shortDescription.substr(0, 50) + '...'" />
                 </v-list-item-content>
 
                 <v-list-item-action>
