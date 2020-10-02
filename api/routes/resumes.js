@@ -3,6 +3,7 @@ import {
   keysFromSnakeToCamelCase,
   mapArray,
   deepMap,
+  withoutKeys,
 } from "../../helpers/object";
 import {
   isString,
@@ -114,7 +115,7 @@ authRouter.get("/for-user/:uid", cachedFetcher(listCacheTimeoutMs, async ({ auth
   return params.uid;
 }));
 
-authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
+authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params, headers: reqHeaders }, res) => {
   const { id } = params;
 
   try {
@@ -126,17 +127,17 @@ authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
 
     const { resumeFileData } = fixResume(resume);
 
+    const headers = withoutKeys([ "cookie", "host", "referer", "connection" ], reqHeaders);
     const response = await get(resumeFileData, {
       responseType: "stream",
+      headers,
     });
 
-    for (const [ key, value ] of Object.entries(response.headers)) {
-      resume.header(key, value);
-    }
+    res.header(response.headers);
 
-    response.pipe(resume);
+    response.pipe(res);
     response.on("end", () => resume.end());
-  } catch {
+  } catch (e) {
     res.status(HttpStatus.Error.Client.NotFound);
     return res.end();
   }
