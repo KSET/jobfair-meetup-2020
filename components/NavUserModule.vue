@@ -44,43 +44,38 @@
               <v-list-item-subtitle v-text="user.email" />
             </v-list-item-content>
           </v-list-item>
+        </v-list>
 
-          <v-divider v-if="user.companies.length" />
+        <v-divider v-if="company" />
 
-          <v-list-item v-if="user.companies.length">
-            <v-list subheader>
-              <v-subheader>
-                <translated-text trans-key="nav.user.company.memberOf" />
-              </v-subheader>
+        <v-list v-if="company" subheader>
+          <v-subheader>
+            <translated-text trans-key="nav.user.company.memberOf" />
+          </v-subheader>
 
-              <v-list-item
-                v-for="company in user.companies"
-                :key="company.id"
-              >
-                <v-list-item-avatar
-                  v-if="company.image"
-                  tile
-                >
-                  <v-img
-                    :lazy-src="company.thumbnail"
-                    :src="company.image"
-                    contain
-                  />
-                </v-list-item-avatar>
+          <v-list-item>
+            <v-list-item-avatar
+              v-if="company.image"
+              tile
+            >
+              <v-img
+                :lazy-src="company.thumbnail"
+                :src="company.image"
+                contain
+              />
+            </v-list-item-avatar>
 
-                <v-list-item-content>
-                  <v-list-item-title v-text="company.name" />
-                </v-list-item-content>
+            <v-list-item-content>
+              <v-list-item-title class="text-center" v-text="company.name" />
+            </v-list-item-content>
 
-                <v-list-item-action>
-                  <v-list-item-action-text>
-                    <v-btn :to="{ name: 'PageCompanyResumes' }" color="primary">
-                      <translated-text trans-key="nav.user.actions.company.enter" />
-                    </v-btn>
-                  </v-list-item-action-text>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+            <v-list-item-action>
+              <v-list-item-action-text>
+                <v-btn :to="{ name: 'PageCompanyResumes' }" color="primary">
+                  <translated-text trans-key="nav.user.actions.company.enter" />
+                </v-btn>
+              </v-list-item-action-text>
+            </v-list-item-action>
           </v-list-item>
         </v-list>
 
@@ -196,6 +191,7 @@
     computed: {
       ...mapGetters({
         user: "user/getUser",
+        company: "user/getCompany",
         isEditing: "translations/isEditable",
         isStudent: "user/isStudent",
         isModerator: "user/isModerator",

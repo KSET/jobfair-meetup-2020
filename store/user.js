@@ -18,6 +18,17 @@ export const getters = {
     return user;
   },
 
+  getCompany(store) {
+    const { user } = store;
+    const { companies = [] } = user;
+
+    if (0 < companies.length) {
+      return companies[0];
+    }
+
+    return null;
+  },
+
   getToken({ token }) {
     return token;
   },
