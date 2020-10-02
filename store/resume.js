@@ -31,7 +31,8 @@ export const actions = {
     const { data } = await this.$api.$get(`/resumes/info/${ resumeId }`);
 
     if (data) {
-      data.pdfUrl = `/api/resumes/info/${ resumeId }.pdf`;
+      // data.pdfUrl = `/api/resumes/info/${ resumeId }.pdf`;
+      data.pdfUrl = data.resumeFileData;
     }
 
     await commit("SET_RESUME", data);
