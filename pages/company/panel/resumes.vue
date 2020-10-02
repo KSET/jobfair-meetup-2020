@@ -126,9 +126,9 @@
       CompanyMaxWidthContainer,
     },
 
-    async asyncData({ store }) {
+    async asyncData({ store, route }) {
       return {
-        search: "",
+        search: route.query.q,
         page: 1,
         pageCount: 0,
         itemsPerPage: 10,
@@ -147,6 +147,23 @@
           },
         ],
       };
+    },
+
+    watch: {
+      search(val) {
+        const getUrl = (query) => {
+          if (!query) {
+            return location.pathname;
+          }
+
+          const params = new URLSearchParams(location.search);
+          params.set("q", query);
+
+          return `${ location.pathname }?${ params.toString() }`;
+        };
+
+        window.history.replaceState({}, "", getUrl(val));
+      },
     },
 
     methods: {
