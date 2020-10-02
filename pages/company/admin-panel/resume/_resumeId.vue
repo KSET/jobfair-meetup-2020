@@ -530,7 +530,7 @@
       .resume {
         overflow: auto;
         width: 100%;
-        height: 475px;
+        height: calc(100vh - #{$nav-height} - 50px);
         border-radius: 4px;
       }
     }
