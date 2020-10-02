@@ -55,7 +55,7 @@
           <translated-text :class="$style.navLinkText" :trans-key="page.name" />
         </nuxt-link>
 
-        <nav-user-module label="email" />
+        <nav-user-module class="ml-6" label="email" />
       </div>
 
       <v-btn :class="$style.navBurgerButton" icon @click.stop="setOpen(true)">

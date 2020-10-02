@@ -47,7 +47,7 @@
         <translated-text :class="$style.navLinkText" trans-key="button.joinNow" />
       </v-btn>
 
-      <nav-user-module />
+      <nav-user-module class="ml-6" />
     </div>
 
     <v-btn :class="$style.navBurgerButton" icon @click.stop="toggleOpen">

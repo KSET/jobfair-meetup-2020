@@ -48,7 +48,7 @@
           <span :class="$style.navLinkText" v-text="page.name" />
         </nuxt-link>
 
-        <nav-user-module />
+        <nav-user-module class="ml-6" />
       </div>
 
       <v-btn :class="$style.navBurgerButton" icon @click.stop="setOpen(true)">
