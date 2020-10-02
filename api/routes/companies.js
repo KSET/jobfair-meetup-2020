@@ -43,7 +43,7 @@ const fixCompanyKeys =
     })
 ;
 
-const fixCompany =
+export const fixCompany =
   pipe(
     keysFromSnakeToCamelCase,
     fixCompanyKeys,

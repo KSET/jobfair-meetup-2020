@@ -1,9 +1,8 @@
 <template>
   <div
-    :class="{
-      [$style.userContainer]: true,
-      [$style.hidden]: !user,
-    }"
+    v-if="user"
+
+    :class="$style.userContainer"
   >
     <v-menu
       v-if="user"
@@ -59,13 +58,13 @@
                 :key="company.id"
               >
                 <v-list-item-avatar
-                  v-if="company.logo"
-                  :data-srcset="getSrcSet(company.images)"
+                  v-if="company.image"
+                  tile
                 >
                   <v-img
                     :lazy-src="company.thumbnail"
                     :src="company.image"
-                    fill
+                    contain
                   />
                 </v-list-item-avatar>
 
@@ -141,6 +140,7 @@
       </v-card>
     </v-menu>
   </div>
+  <div v-else :class="$style.hidden" />
 </template>
 
 <script>
@@ -256,10 +256,8 @@
   }
 
   .userContainer {
-    //noinspection CssOverwrittenProperties
     display: inline-flex;
-    //noinspection CssOverwrittenProperties
-    display: contents;
+    margin-bottom: 4px;
 
     .navLink {
       @extend %nav-link;
