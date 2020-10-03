@@ -1,21 +1,26 @@
 import {
- fixCompany,
+  internalRequest,
+} from "../../helpers/http";
+import {
+  fixCompany,
 } from "../companies";
 import {
- keysFromSnakeToCamelCase,
+  keysFromSnakeToCamelCase,
 } from "../../../helpers/object";
 import {
- AuthRouter,
+  AuthRouter,
 } from "../../helpers/route";
 
 const router = new AuthRouter({ fullUserData: true });
 
-router.get("/", (req) => {
-  const user = keysFromSnakeToCamelCase(req.authUser);
+router.get("/", async ({ authUser }) => {
+  const user = keysFromSnakeToCamelCase(authUser);
+  const { data: rawParticipants } = await internalRequest("get", "/companies/participants");
   const { companies = [] } = user;
+  const participantIds = new Set(rawParticipants.map(({ id }) => id));
 
   if (companies) {
-    user.companies = companies.map(fixCompany);
+    user.companies = companies.filter(({ id }) => participantIds.has(id)).map(fixCompany);
   }
 
   return user;
