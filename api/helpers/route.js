@@ -93,6 +93,12 @@ export class ApiError extends Error {
   }
 }
 
+export class ApiNotFoundError extends ApiError {
+  constructor(message = "not-found", data = null) {
+    super(message, HttpStatus.Error.Client.NotFound, data);
+  }
+}
+
 
 export const asyncWrapper = (fn) => (...args) => {
   return (

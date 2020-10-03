@@ -1,8 +1,12 @@
 import {
+  join as joinPath,
+} from "path";
+import {
   pipe,
   keysFromSnakeToCamelCase,
   mapArray,
   deepMap,
+  withoutKeys,
 } from "../../helpers/object";
 import {
   isString,
@@ -24,6 +28,7 @@ import {
 import {
   ApiError,
   AuthRouter,
+  registerRoutesInFolder,
   Router,
 } from "../helpers/route";
 
@@ -114,30 +119,29 @@ authRouter.get("/for-user/:uid", cachedFetcher(listCacheTimeoutMs, async ({ auth
   return params.uid;
 }));
 
-authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params }, res) => {
+authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params, headers: reqHeaders }, res) => {
   const { id } = params;
-  let resume;
 
   try {
-    const { resume: res } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
+    const { resume } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
 
-    if (!res) {
+    if (!resume) {
       throw new ApiError("Resume not found", HttpStatus.Error.Client.NotFound);
     }
 
-    resume = fixResume(res);
+    const { resumeFileData } = fixResume(resume);
 
-    const response = await get(resume.resumeFileData, {
+    const headers = withoutKeys([ "cookie", "host", "referer", "connection" ], reqHeaders);
+    const response = await get(resumeFileData, {
       responseType: "stream",
+      headers,
     });
 
-    for (const [ key, value ] of Object.entries(response.headers)) {
-      res.header(key, value);
-    }
+    res.header(response.headers);
 
     response.pipe(res);
-    response.on("end", () => res.end());
-  } catch {
+    response.on("end", () => resume.end());
+  } catch (e) {
     res.status(HttpStatus.Error.Client.NotFound);
     return res.end();
   }
@@ -154,5 +158,7 @@ authRouter.get("/info/:id", async ({ authHeader, params }) => {
 
   return fixResume(resume);
 });
+
+authRouter.use(registerRoutesInFolder(joinPath(__dirname, "resumes")));
 
 export default authRouter;

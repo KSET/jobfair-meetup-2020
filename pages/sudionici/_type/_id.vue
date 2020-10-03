@@ -119,7 +119,7 @@
                   <v-avatar class="ml-1" left tile>
                     <v-img
                       :lazy-src="company.thumbnail"
-                      :src="company.image"
+                      :src="company.thumbnail"
                       aspect-ratio="1"
                       contain
                     />
@@ -144,15 +144,15 @@
 
             <div>
               <v-avatar
+                v-if="eventObj.presenterPhoto"
                 :class="$style.presenterAvatar"
                 color="secondary"
                 left
                 size="100"
               >
                 <v-img
-                  v-if="eventObj.presenterPhoto"
-                  :lazy-src="eventObj.presenterPhoto.small.url"
-                  :src="eventObj.presenterPhoto.large.url"
+                  :lazy-src="dotGet(eventObj, 'presenterPhoto.small.url')"
+                  :src="dotGet(eventObj, 'presenterPhoto.small.url')"
                   alt="Presenter photo"
                 />
               </v-avatar>
@@ -185,7 +185,7 @@
                     >
                       <v-img
                         :lazy-src="company.thumbnail"
-                        :src="company.image"
+                        :src="getSrcWithWidth(company.images, 300)"
                         contain
                         width="100%"
                       />
@@ -233,8 +233,14 @@
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
   import {
+    dotGet,
+  } from "~/helpers/data";
+  import {
     generateMetadata,
   } from "~/helpers/head";
+  import {
+    getSrcWithWidth,
+  } from "~/helpers/image";
 
   export default {
     name: "PageSudioniciInfo",
@@ -297,11 +303,16 @@
       companyImageList() {
         const { companies = [] } = this.eventObj;
 
-        return companies.map(({ info }) => ({
-          src: info.image,
-          "lazy-src": info.thumbnail,
+        return companies.map(({ info: company }) => ({
+          src: dotGet(company, "images.large.url"),
+          "lazy-src": dotGet(company, "images.small.url"),
         }));
       },
+    },
+
+    methods: {
+      dotGet,
+      getSrcWithWidth,
     },
 
     validate({ store, params }) {

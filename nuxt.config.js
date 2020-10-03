@@ -67,6 +67,8 @@ export default {
     { src: "~/plugins/axios" },
     { src: "~/plugins/rich-editor", ssr: false },
     { src: "~/plugins/translation-directive" },
+    { src: "~/plugins/vue-pdf", ssr: false },
+    { src: "~/plugins/vue-qr-code", ssr: false },
   ],
   /*
    ** Nuxt.js dev-modules

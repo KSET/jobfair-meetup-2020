@@ -1,9 +1,8 @@
 <template>
   <div
-    :class="{
-      [$style.userContainer]: true,
-      [$style.hidden]: !user,
-    }"
+    v-if="user"
+
+    :class="$style.userContainer"
   >
     <v-menu
       v-if="user"
@@ -45,44 +44,37 @@
               <v-list-item-subtitle v-text="user.email" />
             </v-list-item-content>
           </v-list-item>
+        </v-list>
 
-          <v-divider v-if="user.companies.length" />
+        <v-divider v-if="company" />
 
-          <v-list-item v-if="user.companies.length">
-            <v-list subheader>
-              <v-subheader>
-                <translated-text trans-key="nav.user.company.memberOf" />
-              </v-subheader>
+        <v-list v-if="company" subheader>
+          <v-subheader>
+            <translated-text trans-key="nav.user.company.memberOf" />
+          </v-subheader>
 
-              <v-list-item
-                v-for="company in user.companies"
-                :key="company.id"
-              >
-                <v-list-item-avatar
-                  v-if="company.logo"
-                  :data-srcset="getSrcSet(company.images)"
-                >
-                  <v-img
-                    :lazy-src="company.thumbnail"
-                    :src="company.image"
-                    fill
-                  />
-                </v-list-item-avatar>
+          <v-list-item>
+            <v-list-item-avatar
+              v-if="company.thumbnail"
+              tile
+            >
+              <v-img
+                :src="company.thumbnail"
+                contain
+              />
+            </v-list-item-avatar>
 
-                <v-list-item-content>
-                  <v-list-item-title v-text="company.name" />
-                  <v-list-item-subtitle v-text="company.shortDescription.substr(0, 50) + '...'" />
-                </v-list-item-content>
+            <v-list-item-content>
+              <v-list-item-title class="text-center" v-text="company.name" />
+            </v-list-item-content>
 
-                <v-list-item-action>
-                  <v-list-item-action-text>
-                    <v-btn color="primary">
-                      <translated-text trans-key="nav.user.actions.company.enter" />
-                    </v-btn>
-                  </v-list-item-action-text>
-                </v-list-item-action>
-              </v-list-item>
-            </v-list>
+            <v-list-item-action>
+              <v-list-item-action-text>
+                <v-btn :to="{ name: 'PageCompanyResumes' }" color="primary">
+                  <translated-text trans-key="nav.user.actions.company.enter" />
+                </v-btn>
+              </v-list-item-action-text>
+            </v-list-item-action>
           </v-list-item>
         </v-list>
 
@@ -142,6 +134,7 @@
       </v-card>
     </v-menu>
   </div>
+  <div v-else :class="$style.hidden" />
 </template>
 
 <script>
@@ -197,6 +190,7 @@
     computed: {
       ...mapGetters({
         user: "user/getUser",
+        company: "user/getCompany",
         isEditing: "translations/isEditable",
         isStudent: "user/isStudent",
         isModerator: "user/isModerator",
@@ -257,10 +251,8 @@
   }
 
   .userContainer {
-    //noinspection CssOverwrittenProperties
     display: inline-flex;
-    //noinspection CssOverwrittenProperties
-    display: contents;
+    margin-bottom: 4px;
 
     .navLink {
       @extend %nav-link;

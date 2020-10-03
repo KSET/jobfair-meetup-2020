@@ -1,14 +1,11 @@
 import {
- keysFromSnakeToCamelCase,
-} from "../../../helpers/object";
-import {
- AuthRouter,
+  AuthRouter,
 } from "../../helpers/route";
 
 const router = new AuthRouter({ fullUserData: true });
 
-router.get("/", (req) => {
-  return keysFromSnakeToCamelCase(req.authUser);
+router.get("/", ({ authUser }) => {
+  return authUser;
 });
 
 export default router;

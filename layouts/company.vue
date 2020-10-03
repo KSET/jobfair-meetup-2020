@@ -4,33 +4,40 @@
       <v-toolbar-title>
         <v-btn
           v-ripple
-          :class="$style.logoLink"
+          :class="$style.backButton"
           :to="{ name: 'Index' }"
-          class="black--text"
-          color="primary"
-          light
+          outlined
+          text
+          x-large
         >
-          &larr; Back to site
+          <v-icon
+            :class="$style.backButtonIcon"
+            large
+            left
+            v-text="'mdi-chevron-left'"
+          />
+          <translated-text trans-key="company.layout.backToSite" />
         </v-btn>
       </v-toolbar-title>
 
       <v-spacer />
 
       <div
-        class="d-initial d-md-none"
         :class="$style.pageDisplay"
+        class="d-initial d-md-none"
       >
         <nuxt-link
           v-for="page in pages"
           :key="JSON.stringify(page.to)"
 
           :active-class="$style.pageActive"
-          tag="h2"
-
           :to="page.to"
+
           class="no-select"
-          v-text="page.name"
-        />
+          tag="h2"
+        >
+          <translated-text :class="$style.navLinkText" :trans-key="page.name" />
+        </nuxt-link>
       </div>
 
       <v-spacer />
@@ -45,10 +52,10 @@
           :class="$style.navLink"
           :to="page.to"
         >
-          <span :class="$style.navLinkText" v-text="page.name" />
+          <translated-text :class="$style.navLinkText" :trans-key="page.name" />
         </nuxt-link>
 
-        <nav-user-module class="ml-6" />
+        <nav-user-module class="ml-6" label="email" />
       </div>
 
       <v-btn :class="$style.navBurgerButton" icon @click.stop="setOpen(true)">
@@ -84,8 +91,9 @@
             </v-list-item-icon>
             <v-list-item-title
               class="font-weight-bold"
-              v-text="page.name"
-            />
+            >
+              <translated-text :trans-key="page.name" />
+            </v-list-item-title>
           </v-list-item>
 
           <v-list-item>
@@ -94,7 +102,7 @@
             </v-list-item-icon>
 
             <v-list-item-content>
-              <nav-user-module no-padding />
+              <nav-user-module label="email" no-padding />
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -110,30 +118,40 @@
 </template>
 
 <script>
-  import {
-    mapGetters,
-  } from "vuex";
   import NavUserModule from "~/components/NavUserModule";
+  import TranslatedText from "~/components/TranslatedText";
   import {
     generateMetadata,
   } from "~/helpers/head";
   import MenuIcon from "~/assets/images/icons/menu.svg";
 
   export default {
-    name: "LayoutAdmin",
+    name: "LayoutCompany",
+
     components: {
+      TranslatedText,
       NavUserModule,
       MenuIcon,
     },
 
-    data: () => ({
-      isOpen: false,
-    }),
-
-    computed: {
-      ...mapGetters({
-        pages: "adminPages/getPages",
-      }),
+    data() {
+      return {
+        isOpen: false,
+        pages: [
+          {
+            to: {
+              name: "PageCompanyResumes",
+            },
+            name: "page.company.adminPanel.resumes",
+          },
+          {
+            to: {
+              name: "PageCompanyViewInfo",
+            },
+            name: "page.company.adminPanel.info",
+          },
+        ],
+      };
     },
 
     methods: {
@@ -144,10 +162,10 @@
 
     head() {
       return {
-        title: "Admin panel",
+        title: "Company panel",
         meta: [
           ...generateMetadata({
-            title: "Admin panel",
+            title: "Company panel",
             locale: "hr",
           }),
         ],
@@ -162,10 +180,14 @@
   .globalContainer {
 
     :global(.v-toolbar__content) {
-      max-width: $content-max-width;
+      max-width: $company-max-width;
       margin: 0 auto;
       padding-top: 0;
       padding-bottom: 0;
+
+      @include media(sm) {
+        max-width: $company-max-width-mobile;
+      }
     }
   }
 
@@ -185,10 +207,33 @@
     width: 100%;
   }
 
-  .logoLink {
-    display: flex;
-    padding: .3em;
-    border-radius: 4px;
+  .backButton {
+    font-weight: 600;
+    color: $fer-white !important;
+    border: none !important;
+    background: none !important;
+
+    &::before {
+      opacity: 0 !important;
+    }
+
+    .backButtonIcon {
+      font-weight: 300;
+      transition-timing-function: $transition-bounce-function;
+      transition-duration: 350ms;
+      transition-property: transform;
+      transform: translateX(0);
+      will-change: transform;
+    }
+
+    &:hover {
+
+      .backButtonIcon {
+        $offset: -6px;
+
+        transform: translateX($offset);
+      }
+    }
   }
 
   .navBurgerButton {

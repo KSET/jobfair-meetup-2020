@@ -27,9 +27,9 @@
             <div v-if="!isLoggedIn" :class="$style.heroButtonContainer">
               <v-btn
                 :class="$style.heroButton"
+                :to="{ name: 'PageLogin' }"
                 color="primary"
                 large
-                :to="{ name: 'PageLogin' }"
               >
                 <translated-text trans-key="button.joinNow" />
               </v-btn>
@@ -258,10 +258,8 @@
               <div :class="$style.participantContainer">
                 <v-img
                   :alt="participant.name"
+                  :src="dotGet(participant, 'images.small.url')"
                   :title="getParticipantTitleText(participant)"
-                  :lazy-src="participant.images && participant.images.small.url"
-                  :src="participant.image"
-                  :srcset="participant.images && getSrcSet(participant.images)"
                   aspect-ratio="1.875"
                   contain
                 />
@@ -282,6 +280,7 @@
   import AppNewsCard from "~/components/news/NewsCard";
   import TranslatedText from "~/components/TranslatedText";
   import {
+    dotGet,
     ensureArray,
     limitLength,
   } from "~/helpers/data";
@@ -373,6 +372,8 @@
 
       getSrcSet,
 
+      dotGet,
+
       getParticipantTitleText({ name, description }) {
         const separator = "----------";
 
@@ -412,8 +413,8 @@
 
         min-height: $min-height;
         background-image: url("../assets/images/index-bg-mobile.png");
-        background-size: #{map-get($breakpoints, sm) * .8} #{$min-height};
         background-position: center #{-$nav-height * 1.5};
+        background-size: #{map-get($breakpoints, sm) * .8} #{$min-height};
       }
 
       .heroMainContainer {
@@ -515,8 +516,8 @@
 
         > h3 {
           font-size: 125%;
-          color: $fer-dark-blue;
           padding-bottom: 4px;
+          color: $fer-dark-blue;
         }
 
         > p {
@@ -563,11 +564,11 @@
 
           .socialIcon {
             margin-right: 1em;
+            transition-timing-function: $transition-timing-function;
+            transition-duration: 250ms;
+            transition-property: opacity;
             color: #ffffff;
             background-color: transparent;
-            transition-property: opacity;
-            transition-duration: 250ms;
-            transition-timing-function: $transition-timing-function;
 
             &:last-child {
               margin-right: 0;

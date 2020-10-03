@@ -1,6 +1,8 @@
 import {
+ fixCompany,
+} from "../../helpers/company";
+import {
   keysFromSnakeToCamelCase,
-  pipe,
 } from "../../helpers/object";
 import {
   cachedFetcher,
@@ -22,33 +24,6 @@ import {
 } from "../helpers/axios";
 
 const router = new Router();
-
-const fixCompanyKeys =
-  ({
-     name,
-     brandName,
-     shortDescription: description,
-     logo,
-     ...rest
-   }) =>
-    ({
-      name: brandName || name,
-      legalName: name,
-      brandName,
-      description,
-      image: logo && logo.original.url,
-      thumbnail: logo && logo.small && logo.small.url,
-      images: logo,
-      ...rest,
-    })
-;
-
-const fixCompany =
-  pipe(
-    keysFromSnakeToCamelCase,
-    fixCompanyKeys,
-  )
-;
 
 const cacheForMs = 15 * 1000;
 

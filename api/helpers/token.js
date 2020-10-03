@@ -2,6 +2,12 @@ import {
   verify,
 } from "jsonwebtoken";
 import {
+ fixCompany,
+} from "../../helpers/company";
+import {
+ keysFromSnakeToCamelCase,
+} from "../../helpers/object";
+import {
   basicUserQuery,
   currentUserQuery,
 } from "../graphql/queries";
@@ -11,6 +17,9 @@ import {
 import {
   graphQlQuery,
 } from "./axios";
+import {
+ internalRequest,
+} from "./http";
 
 export const extractAuthorizationToken = (req) => {
   const header = req.get("Authorization");
@@ -101,12 +110,21 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
       auth,
     );
 
-    const user = {
+    const user = keysFromSnakeToCamelCase({
       uid: rawUser.resume && rawUser.resume.uid,
       ...rawUser,
-    };
+    });
 
     delete user.resume;
+
+    const { companies = [] } = user;
+
+    if (companies) {
+      const { data: rawParticipants = [] } = await internalRequest("get", "/companies/participants");
+      const participantIds = new Set(rawParticipants.map(({ id }) => id));
+
+      user.companies = companies.filter(({ id }) => participantIds.has(id)).map(fixCompany);
+    }
 
     return user;
   } catch (e) {
