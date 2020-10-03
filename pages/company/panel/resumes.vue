@@ -14,7 +14,9 @@
               <v-text-field
                 v-model="search"
 
+                :class="$style.searchInput"
                 class="mr-3 mb-n12"
+                clearable
                 dense
                 flat
                 label="Search"
@@ -197,6 +199,10 @@
 
   .scanQrBtn {
     font-weight: 600;
+  }
+
+  .searchInput {
+    min-width: 269px;
   }
 
   .table {
