@@ -91,7 +91,7 @@
 
         capabilities: {},
 
-        camera: "auto",
+        camera: "rear",
         torchActive: false,
 
         noFrontCamera: false,
@@ -227,13 +227,24 @@
           const triedFrontCamera = "front" === this.camera;
           const triedRearCamera = "rear" === this.camera;
           const cameraMissingError = "OverconstrainedError" === error.name;
+          const { noFrontCamera, noRearCamera } = this;
 
           if (triedRearCamera && cameraMissingError) {
             this.noRearCamera = true;
+
+            if (noFrontCamera) {
+              this.camera = "auto";
+              return;
+            }
           }
 
           if (triedFrontCamera && cameraMissingError) {
             this.noFrontCamera = true;
+
+            if (noRearCamera) {
+              this.camera = "auto";
+              return;
+            }
           }
 
           switch (error.name) {
