@@ -39,4 +39,23 @@ export const actions = {
 
     return data;
   },
+
+  addToFavourites(_context, { resumeId }) {
+    return this.$api.$post(
+      "/resumes/favourites/add",
+      {
+        resumeId,
+      },
+    );
+  },
+
+  removeFromFavourites(_context, { resumeId }) {
+    return this.$api.$delete(`/resumes/favourites/remove/${ resumeId }`);
+  },
+
+  async listFavourites() {
+    const { data = [] } = await this.$api.$get("/resumes/favourites/list");
+
+    return Object.fromEntries(data.map((id) => [ id, id ]));
+  },
 };

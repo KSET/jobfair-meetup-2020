@@ -1,4 +1,7 @@
 import {
+  join as joinPath,
+} from "path";
+import {
   pipe,
   keysFromSnakeToCamelCase,
   mapArray,
@@ -25,6 +28,7 @@ import {
 import {
   ApiError,
   AuthRouter,
+  registerRoutesInFolder,
   Router,
 } from "../helpers/route";
 
@@ -154,5 +158,7 @@ authRouter.get("/info/:id", async ({ authHeader, params }) => {
 
   return fixResume(resume);
 });
+
+authRouter.use(registerRoutesInFolder(joinPath(__dirname, "resumes")));
 
 export default authRouter;

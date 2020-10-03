@@ -2,7 +2,7 @@
   <company-max-width-container :class="$style.container">
     <v-row>
       <v-col cols="12" md="6">
-        <v-breadcrumbs :items="breadcrumbItems">
+        <v-breadcrumbs :class="$style.breadcrumbs" :items="breadcrumbItems" class="pl-0">
           <template v-slot:item="{ item }">
             <v-breadcrumbs-item
               :disabled="item.disabled"
@@ -16,8 +16,41 @@
         </v-breadcrumbs>
       </v-col>
 
-      <v-col cols="12" md="6">
-        <span>Dodaj u favorite</span>
+      <v-col class="text-center text-md-right pt-6" cols="12" md="6">
+        <v-btn
+          :loading="favouriteLoading"
+          :ripple="{ class: 'primary--text' }"
+          color="secondary"
+          large
+          outlined
+          style="border: none;"
+          @click.prevent="toggleFavourite"
+        >
+          <v-slide-y-transition
+            leave-absolute
+          >
+            <v-icon
+              v-if="!isFavourite"
+              key="mdi-heart-outline"
+              class="mr-4"
+              large
+              left
+              v-text="'mdi-heart-outline'"
+            />
+            <v-icon
+              v-else
+              key="mdi-heart-broken-outline"
+              class="mr-4"
+              large
+              left
+              v-text="'mdi-heart-broken-outline'"
+            />
+          </v-slide-y-transition>
+
+          <translated-text
+            :trans-key="isFavourite ? 'company.adminPanel.resumes.favourites.remove' : 'company.adminPanel.resumes.favourites.add'"
+          />
+        </v-btn>
       </v-col>
     </v-row>
 
@@ -235,11 +268,30 @@
         </v-row>
       </v-col>
     </v-row>
+
+    <v-snackbar
+      v-model="snackbar.open"
+      :timeout="snackbar.timeout"
+    >
+      {{ snackbar.text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          v-bind="attrs"
+          :color="snackbar.type"
+          text
+          @click="snackbar.open = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </company-max-width-container>
 </template>
 
 <script>
   import {
+    mapActions,
     mapGetters,
   } from "vuex";
   import BasicInfoTable from "~/components/student/resume/basic-info-table";
@@ -265,9 +317,10 @@
       CompanyMaxWidthContainer,
     },
 
-    data() {
-      const resume = this.$store.getters["resume/getResume"];
-      const resumeUrl = this.$store.getters["resume/getResumeUrl"];
+    async asyncData({ store }) {
+      const resume = store.getters["resume/getResume"];
+      const resumeUrl = store.getters["resume/getResumeUrl"];
+      const favourites = await store.dispatch("resume/listFavourites");
 
       const breadcrumbItems =
         [
@@ -324,6 +377,15 @@
       return {
         breadcrumbItems,
 
+        isFavourite: favourites[resume.id],
+        favouriteLoading: false,
+        snackbar: {
+          open: false,
+          text: "",
+          type: "error",
+          timeout: 2000,
+        },
+
         sections: {
           basicInfo,
           education: {
@@ -360,6 +422,11 @@
     },
 
     methods: {
+      ...mapActions({
+        addToFavourites: "resume/addToFavourites",
+        removeFromFavourites: "resume/removeFromFavourites",
+      }),
+
       formatUrl(url) {
         try {
           const { protocol } = new URL(url);
@@ -371,6 +438,29 @@
           return url.substr(protocol.length + 2);
         } catch {
           return url;
+        }
+      },
+
+      async toggleFavourite() {
+        const doToggle = async () => {
+          if (this.isFavourite) {
+            return await this.removeFromFavourites({ resumeId: this.resume.id });
+          } else {
+            return await this.addToFavourites({ resumeId: this.resume.id });
+          }
+        };
+        this.snackbar.open = false;
+        this.snackbar.text = "";
+
+        this.favouriteLoading = true;
+        const { error } = await doToggle();
+        this.favouriteLoading = false;
+
+        if (!error) {
+          this.isFavourite = !this.isFavourite;
+        } else {
+          this.snackbar.text = "Something went wrong. Please try again.";
+          this.snackbar.open = true;
         }
       },
     },
@@ -390,6 +480,18 @@
   @import "assets/styles/include/all";
 
   .container {
+
+    .breadcrumbs {
+
+      :global(.v-breadcrumbs__item) {
+        font-weight: 600;
+        color: $fer-dark-blue;
+
+        &:not(:global(.v-breadcrumbs__item--disabled)) {
+          opacity: .7;
+        }
+      }
+    }
 
     .sectionsContainer {
       color: $fer-dark-blue;
@@ -460,7 +562,8 @@
       .resume {
         overflow: auto;
         width: 100%;
-        height: calc(100vh - #{$nav-height} - 50px);
+        min-height: 250px;
+        max-height: calc(100vh - #{$nav-height} - 50px);
         border-radius: 4px;
       }
     }
