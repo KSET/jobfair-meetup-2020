@@ -186,6 +186,18 @@
     hid,
   } from "~/helpers/head";
 
+  const getUrl = (query, param) => {
+    const params = new URLSearchParams(location.search);
+
+    if (query) {
+      params.set(param, query);
+    } else {
+      params.delete(param);
+    }
+
+    return `${ location.pathname }?${ params.toString() }`;
+  };
+
   export default {
     name: "PageCompanyResumes",
 
@@ -195,9 +207,14 @@
     },
 
     async asyncData({ store, route }) {
+      const {
+        q: search,
+        p: rawPage,
+      } = route.query;
+
       return {
-        search: route.query.q,
-        page: 1,
+        search,
+        page: Number(rawPage),
         pageCount: 0,
         itemsPerPage: 10,
 
@@ -264,18 +281,15 @@
 
     watch: {
       search(val) {
-        const getUrl = (query) => {
-          if (!query) {
-            return location.pathname;
-          }
+        window.history.replaceState({}, "", getUrl(val, "q"));
+      },
 
-          const params = new URLSearchParams(location.search);
-          params.set("q", query);
+      page(val) {
+        if (1 === val) {
+          val = null;
+        }
 
-          return `${ location.pathname }?${ params.toString() }`;
-        };
-
-        window.history.replaceState({}, "", getUrl(val));
+        window.history.replaceState({}, "", getUrl(val, "p"));
       },
     },
 
