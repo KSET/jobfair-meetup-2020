@@ -137,27 +137,26 @@
     data() {
       return {
         isOpen: false,
-        pages: this.getPages(),
+        pages: [
+          {
+            to: {
+              name: "PageCompanyResumes",
+            },
+            name: "page.company.adminPanel.resumes",
+          },
+          {
+            to: {
+              name: "PageCompanyViewInfo",
+            },
+            name: "page.company.adminPanel.info",
+          },
+        ],
       };
     },
 
     methods: {
       setOpen(state) {
         this.isOpen = state;
-      },
-
-      getPages() {
-        const companyId = Number(this.$route.params.companyId);
-
-        return [
-          {
-            to: {
-              name: "PageCompanyResumes",
-              params: { companyId },
-            },
-            name: "page.company.adminPanel.resumes",
-          },
-        ];
       },
     },
 
