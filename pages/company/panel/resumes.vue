@@ -50,6 +50,7 @@
               <v-btn
                 v-ripple
                 :class="$style.scanQrBtn"
+                :to="{ name: 'PageCompanyScanQrCode' }"
                 class="secondary--text d-none d-md-flex"
                 color="primary"
                 depressed
@@ -160,6 +161,7 @@
       <v-btn
         v-ripple
         :class="$style.scanQrBtn"
+        :to="{ name: 'PageCompanyScanQrCode' }"
         block
         class="secondary--text"
         color="primary"
