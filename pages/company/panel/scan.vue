@@ -45,7 +45,7 @@
 
         <div :class="$style.actions">
           <v-btn
-            :disabled="onlyAutoCamera"
+            v-if="!onlyAutoCamera"
             :loading="loading"
             fab
             @click.prevent="switchCamera"
@@ -150,7 +150,7 @@
             }
             break;
           default:
-            this.camera = "rear";
+            this.camera = "auto";
             break;
         }
 
@@ -227,13 +227,12 @@
           const triedFrontCamera = "front" === this.camera;
           const triedRearCamera = "rear" === this.camera;
           const cameraMissingError = "OverconstrainedError" === error.name;
-          const { noFrontCamera, noRearCamera } = this;
 
           if (triedRearCamera && cameraMissingError) {
             this.noRearCamera = true;
 
-            if (noFrontCamera) {
-              this.camera = "auto";
+            if (!this.noFrontCamera) {
+              this.camera = "front";
               return;
             }
           }
@@ -241,10 +240,15 @@
           if (triedFrontCamera && cameraMissingError) {
             this.noFrontCamera = true;
 
-            if (noRearCamera) {
-              this.camera = "auto";
+            if (!this.noRearCamera) {
+              this.camera = "rear";
               return;
             }
+          }
+
+          if (this.noFrontCamera && this.noRearCamera && "auto" !== this.camera) {
+            this.camera = "auto";
+            return;
           }
 
           switch (error.name) {
