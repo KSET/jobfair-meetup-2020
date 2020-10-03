@@ -195,7 +195,12 @@
       params.delete(param);
     }
 
-    return `${ location.pathname }?${ params.toString() }`;
+    let queryString = params.toString();
+    if (queryString) {
+      queryString = `?${ queryString }`;
+    }
+
+    return `${ location.pathname }${ queryString }`;
   };
 
   export default {
@@ -209,7 +214,7 @@
     async asyncData({ store, route }) {
       const {
         q: search,
-        p: rawPage,
+        p: rawPage = 1,
       } = route.query;
 
       return {
@@ -435,6 +440,10 @@
 
         :global(.v-pagination) {
           justify-content: left;
+
+          @include media(sm) {
+            justify-content: center;
+          }
 
           :global(li) > :global(button) {
             font-weight: normal;
