@@ -280,7 +280,7 @@
       },
 
       eventUsers(ids) {
-        return ids.map((id) => this.users[id]);
+        return ids.map((id) => this.users[id]).filter((x) => x);
       },
 
       filterFunction(elements, query) {
