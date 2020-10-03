@@ -113,24 +113,6 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="sections.languages.values.length">
-          <v-col cols="12">
-            <h2 :class="$style.sectionTitle">
-              <translated-text trans-key="company.adminPanel.resumes.languages.title" />
-            </h2>
-          </v-col>
-
-          <v-col class="py-0" cols="12">
-            <v-divider />
-          </v-col>
-
-          <v-col class="pt-1" cols="12">
-            <info-table
-              v-bind="sections.languages"
-            />
-          </v-col>
-        </v-row>
-
         <v-row v-if="sections.technicalSkills.length">
           <v-col cols="12">
             <h2 :class="$style.sectionTitle">
