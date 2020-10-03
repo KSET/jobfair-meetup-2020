@@ -1,5 +1,5 @@
 <template>
-  <company-max-width-container>
+  <company-max-width-container :class="$style.container">
     <v-row class="mb-n3">
       <v-col class="d-flex" cols="12" md="auto" order="2" order-md="1">
         <div class="d-flex flex-row align-self-center">
@@ -307,6 +307,12 @@
 
 <style lang="scss" module>
   @import "../../../assets/styles/include/all";
+
+  .container {
+    @include media(sm) {
+      margin-bottom: 45px;
+    }
+  }
 
   .scanQrBtn {
     font-weight: 600;
