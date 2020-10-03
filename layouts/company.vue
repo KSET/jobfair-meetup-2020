@@ -121,7 +121,7 @@
   import NavUserModule from "~/components/NavUserModule";
   import TranslatedText from "~/components/TranslatedText";
   import {
-    hid,
+    generateMetadata,
   } from "~/helpers/head";
   import MenuIcon from "~/assets/images/icons/menu.svg";
 
@@ -164,7 +164,10 @@
       return {
         title: "Company panel",
         meta: [
-          hid({ name: "og:locale", content: "hr_HR" }),
+          ...generateMetadata({
+            title: "Company panel",
+            locale: "hr",
+          }),
         ],
       };
     },

@@ -115,7 +115,7 @@
   } from "vuex";
   import NavUserModule from "~/components/NavUserModule";
   import {
-    hid,
+    generateMetadata,
   } from "~/helpers/head";
   import MenuIcon from "~/assets/images/icons/menu.svg";
 
@@ -146,7 +146,10 @@
       return {
         title: "Admin panel",
         meta: [
-          hid({ name: "og:locale", content: "hr_HR" }),
+          ...generateMetadata({
+            title: "Admin panel",
+            locale: "hr",
+          }),
         ],
       };
     },
