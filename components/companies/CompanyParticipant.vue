@@ -8,7 +8,7 @@
       v-if="!isPanel"
 
       :lazy-src="company.thumbnail"
-      :src="company.image"
+      :src="getSrcWithWidth(company.images, 400)"
       aspect-ratio="1.78"
       class="mx-6"
       contain
@@ -60,6 +60,13 @@
 </template>
 
 <script>
+  import {
+    dotGet,
+  } from "~/helpers/data";
+  import {
+    getSrcWithWidth,
+  } from "~/helpers/image";
+
   export default {
     name: "CompanyParticipant",
 
@@ -125,14 +132,16 @@
       companyImageList() {
         const { companies = [] } = this.event;
 
-        return companies.map(({ info }) => ({
-          src: info.image,
-          "lazy-src": info.thumbnail,
+        return companies.map(({ info: company }) => ({
+          src: getSrcWithWidth(company.images, 400),
+          "lazy-src": dotGet(company, "images.small.url"),
         }));
       },
     },
 
     methods: {
+      getSrcWithWidth,
+
       weekday(date) {
         const days = [
           "nedjelja",

@@ -55,12 +55,11 @@
 
           <v-list-item>
             <v-list-item-avatar
-              v-if="company.image"
+              v-if="company.thumbnail"
               tile
             >
               <v-img
-                :lazy-src="company.thumbnail"
-                :src="company.image"
+                :src="company.thumbnail"
                 contain
               />
             </v-list-item-avatar>

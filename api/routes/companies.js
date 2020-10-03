@@ -1,4 +1,7 @@
 import {
+ dotGet,
+} from "../../helpers/data";
+import {
   keysFromSnakeToCamelCase,
   pipe,
 } from "../../helpers/object";
@@ -36,8 +39,8 @@ const fixCompanyKeys =
       legalName: name,
       brandName,
       description,
-      image: logo && logo.original.url,
-      thumbnail: logo && logo.small && logo.small.url,
+      image: dotGet(logo, "large.url"),
+      thumbnail: dotGet(logo, "small.url"),
       images: logo,
       ...rest,
     })
