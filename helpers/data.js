@@ -28,11 +28,9 @@ export const dotGet =
 
     if (v !== undefined) {
       return v;
+    } else if (!isFunction(defaultValue)) {
+      return defaultValue;
     } else {
-      if (!isFunction(defaultValue)) {
-        defaultValue = () => defaultValue;
-      }
-
       return defaultValue();
     }
   }
