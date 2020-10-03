@@ -38,50 +38,9 @@
           </v-col>
 
           <v-col cols="12">
-            <table :class="[$style.section, $style.sectionTable]">
-              <tbody>
-                <tr
-                  v-for="(value, key) in sections.basicInfo"
-                  :key="`basicInfo:${key}`"
-                >
-                  <td>
-                    <translated-text
-                      :class="$style.sectionKey"
-                      :trans-key="`company.adminPanel.resumes.basicInfo.${key}`"
-                    />
-                  </td>
-
-                  <td>
-                    <basic-info-value
-                      :class="$style.sectionValue"
-                      :entry="value"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <v-row :class="[$style.section, $style.sectionStaggered]">
-              <v-col
-                v-for="(value, key) in sections.basicInfo"
-                :key="`basicInfo:${key}`"
-                cols="12"
-              >
-                <div>
-                  <translated-text
-                    :class="$style.sectionKey"
-                    :trans-key="`company.adminPanel.resumes.basicInfo.${key}`"
-                  />
-                </div>
-
-                <div>
-                  <basic-info-value
-                    :class="$style.sectionValue"
-                    :entry="value"
-                  />
-                </div>
-              </v-col>
-            </v-row>
+            <basic-info-table
+              :basic-info="sections.basicInfo"
+            />
           </v-col>
         </v-row>
 
@@ -283,12 +242,12 @@
   import {
     mapGetters,
   } from "vuex";
-  import BasicInfoValue from "~/components/company/admin-panel/resume/basic-info-value";
+  import BasicInfoTable from "~/components/student/resume/basic-info-table";
   import {
     EntryType,
-  } from "~/components/company/admin-panel/resume/entry-type";
-  import InfoTable from "~/components/company/admin-panel/resume/info-table";
-  import PdfViewer from "~/components/company/admin-panel/resume/pdf-viewer";
+  } from "~/components/student/resume/entry-type";
+  import InfoTable from "~/components/student/resume/info-table";
+  import PdfViewer from "~/components/student/resume/pdf-viewer";
   import CompanyMaxWidthContainer from "~/components/CompanyMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
   import {
@@ -301,7 +260,7 @@
     components: {
       PdfViewer,
       InfoTable,
-      BasicInfoValue,
+      BasicInfoTable,
       TranslatedText,
       CompanyMaxWidthContainer,
     },
@@ -447,39 +406,10 @@
 
       .section {
 
-        &.sectionTable {
-          display: table;
-          margin: -1.5em 0;
-          border-spacing: 0 1.5em;
-          border-collapse: separate;
-
-          @include media(sm) {
-            display: none;
-          }
-        }
-
-        &.sectionStaggered {
-          display: none;
-
-          @include media(sm) {
-            display: block;
-          }
-        }
-
-        .sectionKey,
         .sectionValue {
           font-weight: 600;
-          color: $fer-black;
-        }
-
-        .sectionKey {
-          margin-right: 4em;
-          text-transform: uppercase;
-          opacity: .6;
-        }
-
-        .sectionValue {
           opacity: .8;
+          color: $fer-black;
         }
       }
 

@@ -14,50 +14,9 @@
           </v-col>
 
           <v-col cols="12">
-            <table :class="[$style.section, $style.sectionTable]">
-              <tbody>
-                <tr
-                  v-for="(value, key) in basicInfo"
-                  :key="`basicInfo:${key}`"
-                >
-                  <td>
-                    <translated-text
-                      :class="$style.sectionKey"
-                      :trans-key="`studentPanel.basicInfo.${key}`"
-                    />
-                  </td>
-
-                  <td>
-                    <basic-info-value
-                      :class="$style.sectionValue"
-                      :entry="value"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <v-row :class="[$style.section, $style.sectionStaggered]">
-              <v-col
-                v-for="(value, key) in basicInfo"
-                :key="`basicInfo:${key}`"
-                cols="12"
-              >
-                <div>
-                  <translated-text
-                    :class="$style.sectionKey"
-                    :trans-key="`studentPanel.basicInfo.${key}`"
-                  />
-                </div>
-
-                <div>
-                  <basic-info-value
-                    :class="$style.sectionValue"
-                    :entry="value"
-                  />
-                </div>
-              </v-col>
-            </v-row>
+            <basic-info-table
+              :basic-info="basicInfo"
+            />
           </v-col>
         </v-row>
 
@@ -237,10 +196,10 @@
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import CompanyParticipant from "~/components/companies/CompanyParticipant";
-  import BasicInfoValue from "~/components/student/basic-info-value";
+  import BasicInfoTable from "~/components/student/resume/basic-info-table";
   import {
     EntryType,
-  } from "~/components/student/entry-type";
+  } from "~/components/student/resume/entry-type";
   import {
     eventListFromStatus,
     EventStatus,
@@ -269,7 +228,7 @@
     components: {
       CompanyParticipant,
       TranslatedText,
-      BasicInfoValue,
+      BasicInfoTable,
       AppMaxWidthContainer,
     },
 
@@ -485,44 +444,6 @@
       font-weight: bold;
       margin-bottom: -.2em;
       color: $fer-dark-blue;
-    }
-
-    .section {
-
-      &.sectionTable {
-        display: table;
-        margin: -1.5em 0;
-        border-spacing: 0 1.5em;
-        border-collapse: separate;
-
-        @include media(sm) {
-          display: none;
-        }
-      }
-
-      &.sectionStaggered {
-        display: none;
-
-        @include media(sm) {
-          display: block;
-        }
-      }
-
-      .sectionKey,
-      .sectionValue {
-        font-weight: 600;
-        color: $fer-black;
-      }
-
-      .sectionKey {
-        margin-right: 4em;
-        text-transform: uppercase;
-        opacity: .6;
-      }
-
-      .sectionValue {
-        opacity: .8;
-      }
     }
 
     .cardContainer {

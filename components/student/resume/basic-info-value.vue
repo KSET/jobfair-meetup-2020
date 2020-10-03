@@ -10,7 +10,10 @@
 <script>
   import {
     EntryType,
-  } from "./entry-type";
+  } from "~/components/student/resume/entry-type";
+  import {
+    pipe,
+  } from "~/helpers/object";
 
   const formatDate = (date) => {
     if (!date) {
@@ -20,19 +23,28 @@
     return new Date(date).toLocaleDateString("hr-HR");
   };
 
-  const formatUrl = (url) => {
-    try {
-      const { protocol } = new URL(url);
+  const withoutProtocol =
+    (url) => {
+      try {
+        const { protocol } = new URL(url);
 
-      if (!protocol) {
+        if (!protocol) {
+          return url;
+        }
+
+        return url.substr(protocol.length + 2);
+      } catch {
         return url;
       }
-
-      return url.substr(protocol.length + 2);
-    } catch {
-      return url;
     }
-  };
+  ;
+
+  const formatUrl =
+    pipe(
+      withoutProtocol,
+      decodeURI,
+    )
+  ;
 
   export default {
     name: "BasicInfoValue",
@@ -100,22 +112,6 @@
         }
 
         return base;
-      },
-    },
-
-    methods: {
-      formatUrl(url) {
-        try {
-          const { protocol } = new URL(url);
-
-          if (!protocol) {
-            return url;
-          }
-
-          return url.substr(protocol.length + 2);
-        } catch {
-          return url;
-        }
       },
     },
   };
