@@ -11,10 +11,6 @@ import {
   morgan,
 } from "../helpers/logger";
 import {
-  HttpStatus,
-} from "../api/helpers/http";
-
-import {
   getClient,
   query,
 } from "../db/methods";
@@ -22,10 +18,9 @@ import {
   base as dbBase,
   versions as dbVersions,
 } from "../db/structure";
-
 import {
   apiRoute,
-  ApiError,
+  ApiNotFoundError,
   registerRoutesInFolder,
 } from "./helpers/route";
 
@@ -61,7 +56,7 @@ app.use(Sentry.Handlers.errorHandler());
 
 // Fallback route (404)
 app.use("*", apiRoute(() => {
-  throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
+  throw new ApiNotFoundError();
 }));
 
 const client = getClient();
