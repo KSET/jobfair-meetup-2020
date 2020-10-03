@@ -40,6 +40,19 @@ export const actions = {
     return data;
   },
 
+  async fetchResumeByUid({ commit }, { uid }) {
+    const { data } = await this.$api.$get(`/resumes/for-user/${ encodeURIComponent(uid) }`);
+
+    if (data) {
+      // data.pdfUrl = `/api/resumes/info/${ resumeId }.pdf`;
+      data.pdfUrl = data.resumeFileData;
+    }
+
+    await commit("SET_RESUME", data);
+
+    return data;
+  },
+
   addToFavourites(_context, { resumeId }) {
     return this.$api.$post(
       "/resumes/favourites/add",
