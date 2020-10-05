@@ -359,6 +359,10 @@ name: PageStudentIndex
     },
 
     mounted() {
+      if (!this.hasCv) {
+        return;
+      }
+
       this.fetchInterval = setInterval(async () => {
         const participants = await this.fetchEventsParticipants();
 
