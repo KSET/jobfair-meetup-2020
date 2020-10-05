@@ -345,7 +345,7 @@ export class AuthRouter extends Router {
    * @returns {AuthRouter}
    */
   static boundToRouter(router, authConfig) {
-    const self = new this();
+    const self = new this(authConfig);
 
     return self.bindToRouter(router);
   }
