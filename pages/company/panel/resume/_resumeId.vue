@@ -299,13 +299,35 @@
       CompanyMaxWidthContainer,
     },
 
-    async asyncData({ store }) {
-      const resume = store.getters["resume/getResume"];
-      const resumeUrl = store.getters["resume/getResumeUrl"];
+    async asyncData({ store, params }) {
       const favourites = await store.dispatch("resume/listFavourites");
 
-      const breadcrumbItems =
-        [
+      return {
+        isFavourite: favourites[params.resumeId],
+        favouriteLoading: false,
+        snackbar: {
+          open: false,
+          text: "",
+          type: "error",
+          timeout: 2000,
+        },
+      };
+    },
+
+    computed: {
+      ...mapGetters({
+        resume: "resume/getResume",
+        sections: "resume/getResumeSections",
+      }),
+
+      EntryType() {
+        return EntryType;
+      },
+
+      breadcrumbItems() {
+        const { fullName } = this.sections.basicInfo;
+
+        return [
           {
             transKey: "page.company.adminPanel.resumes",
             disabled: false,
@@ -314,7 +336,7 @@
             },
           },
           {
-            text: resume.fullName,
+            text: fullName.text,
             disabled: true,
             href: "#",
           },
@@ -324,82 +346,7 @@
           }
 
           return item;
-        })
-      ;
-
-      const basicInfo = Object.fromEntries(Object.entries({
-        fullName: {
-          text: resume.fullName,
-        },
-        city: {
-          text: resume.city,
-        },
-        birthday: {
-          text: resume.birthday,
-          type: EntryType.Date,
-        },
-        phone: {
-          text: resume.phone,
-          type: EntryType.Phone,
-        },
-        email: {
-          text: resume.email,
-          type: EntryType.Email,
-        },
-        githubUrl: {
-          text: resume.githubUrl,
-          type: EntryType.Url,
-        },
-        linkedinUrl: {
-          text: resume.linkedinUrl,
-          type: EntryType.Url,
-        },
-      }).filter(([ , { text } ]) => text));
-
-      return {
-        breadcrumbItems,
-
-        isFavourite: favourites[resume.id],
-        favouriteLoading: false,
-        snackbar: {
-          open: false,
-          text: "",
-          type: "error",
-          timeout: 2000,
-        },
-
-        sections: {
-          basicInfo,
-          education: {
-            headers: [ "Obrazovna institucija", "Usmjerenje", "Godina završetka" ],
-            values: resume.educations.map(({ awardedTitle, module, name, year }) => [ name, module, year ]),
-          },
-          projects: {
-            headers: [ "Tvrtka/projekt", "Pozicija", "Trajanje" ],
-            values: resume.workExperiences.map(({ company, description, years }) => [ company, description, years ]),
-          },
-          technicalSkills: resume.computerSkills,
-          otherSkills: resume.skills,
-          languages: {
-            headers: [ "Jezik", "Razina" ],
-            values: resume.languages,
-          },
-          awards: {
-            headers: [ "Award", "Godina" ],
-            values: resume.awards,
-          },
-          resume: resumeUrl,
-        },
-      };
-    },
-
-    computed: {
-      ...mapGetters({
-        resume: "resume/getResume",
-      }),
-
-      EntryType() {
-        return EntryType;
+        });
       },
     },
 
