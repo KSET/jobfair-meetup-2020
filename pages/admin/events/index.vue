@@ -22,6 +22,28 @@
 
     <v-row>
       <v-col cols="12">
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header>Svi sudionici</v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-chip
+                v-for="user in users"
+                :key="user.userId"
+                :class="$style.eventUser"
+                :title="user.email"
+                label
+                outlined
+              >
+                {{ user.fullName }}
+              </v-chip>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12">
         <v-row v-if="rawEvents.length > 0">
           <v-col cols="12">
             <v-text-field
