@@ -1,5 +1,6 @@
 const aliasMap = {
   "og:title": [ "apple-mobile-web-app-title" ],
+  locale: [ "og:locale" ],
 };
 
 const renameMap = {
@@ -11,6 +12,13 @@ const renameMap = {
 
 const mappedContent = {
   "og:title": (title) => `${ title } | JobFair Meetup`,
+  "og:image": (imageUrl) => {
+    if (!imageUrl.startsWith(process.env.BASE_URL)) {
+      imageUrl = process.env.BASE_URL + imageUrl;
+    }
+
+    return imageUrl;
+  },
 };
 
 const getMappedContent = (key, content) => mappedContent[key] ? mappedContent[key](content) : content;
@@ -18,7 +26,11 @@ const getRenamedKey = (key) => renameMap[key] || key;
 const getKeyAliases = (key) => aliasMap[key] || [];
 const getKeyWithAliases = (key) => [ key, ...getKeyAliases(key) ];
 
-export const hid = ({ name, content }) => ({ hid: name, name, content });
+export const hid = ({ name, content }) =>
+  name.startsWith("og:")
+  ? ({ hid: name, property: name, content })
+  : ({ hid: name, name, content })
+;
 
 export const generateMetadata =
   (pageData) =>

@@ -5,6 +5,10 @@
   />
 </template>
 
+<router>
+name: PageAdminPanelsNew
+</router>
+
 <script>
   import EditSkeleton from "~/components/admin/panels/edit-skeleton";
 

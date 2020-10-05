@@ -87,6 +87,11 @@
     </v-row>
   </app-max-width-container>
 </template>
+
+<router>
+name: PageAdminNewsList
+</router>
+
 <script>
   import {
     mapActions,

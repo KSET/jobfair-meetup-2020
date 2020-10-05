@@ -82,6 +82,10 @@
   </company-max-width-container>
 </template>
 
+<router>
+name: PageCompanyResumeDetails
+</router>
+
 <script>
   import {
     mapActions,

@@ -1,6 +1,11 @@
 <template>
   <PageAdminPressReleaseCreate :release="release" />
 </template>
+
+<router>
+name: PageAdminPressReleaseEdit
+</router>
+
 <script>
   import PageAdminPressReleaseCreate from "~/pages/admin/press/releases/new";
 

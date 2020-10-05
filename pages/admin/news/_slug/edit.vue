@@ -185,6 +185,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminNewsEdit
+</router>
+
 <script>
   import {
     mapActions,

@@ -226,6 +226,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageSudioniciInfo
+</router>
+
 <script>
   import {
     mapGetters,

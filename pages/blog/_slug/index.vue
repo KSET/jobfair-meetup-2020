@@ -111,6 +111,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageBlogPost
+</router>
+
 <script>
   import {
     mapGetters,

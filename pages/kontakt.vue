@@ -126,6 +126,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageKontakt
+</router>
+
 <script>
   import {
     mapGetters,

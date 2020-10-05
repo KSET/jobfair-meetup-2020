@@ -28,7 +28,7 @@
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/pwa": "^3.0.0-0",
-    "@nuxtjs/router": "^1.5.0",
+    "@nuxtjs/router-extras": "^1.1.0",
     "@nuxtjs/sentry": "^4.3.5",
     "@sentry/node": "^5.24.2",
     "adm-zip": "^0.4.16",

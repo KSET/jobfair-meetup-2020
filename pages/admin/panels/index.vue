@@ -79,6 +79,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminPanelsIndex
+</router>
+
 <script>
   import {
     mapActions,

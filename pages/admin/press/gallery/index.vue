@@ -152,6 +152,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminPressGalleryList
+</router>
+
 <script>
   import {
     mapActions,

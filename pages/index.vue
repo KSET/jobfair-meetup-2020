@@ -272,6 +272,10 @@
   </div>
 </template>
 
+<router>
+name: Index
+</router>
+
 <script>
   import {
     mapActions,

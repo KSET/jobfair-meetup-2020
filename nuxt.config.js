@@ -103,7 +103,7 @@ export default {
       ],
     },
     ],
-    [ "@nuxtjs/router", { keepDefaultRouter: true } ],
+    "@nuxtjs/router-extras",
     "nuxt-svg-loader",
     [ "cookie-universal-nuxt", { parseJSON: false } ],
     "@nuxtjs/sentry",
@@ -231,15 +231,6 @@ export default {
       },
     },
 
-    filenames: {
-      app: ({ isDev }) => isDev ? "[name].js" : "[chunkhash].js",
-      chunk: ({ isDev }) => isDev ? "[name].js" : "[id].[chunkhash].js",
-      css: ({ isDev }) => isDev ? "[name].css" : "[contenthash].css",
-      img: ({ isDev }) => isDev ? "[path][name].[ext]" : "img/[hash].[ext]",
-      font: ({ isDev }) => isDev ? "[path][name].[ext]" : "fonts/[hash].[ext]",
-      video: ({ isDev }) => isDev ? "[path][name].[ext]" : "videos/[hash].[ext]",
-    },
-
     optimization: {
       concatenateModules: true,
       moduleIds: "hashed",
@@ -250,6 +241,12 @@ export default {
         name: false,
       },
     },
+
+    splitChunks: {
+      layouts: true,
+      pages: true,
+      commons: true,
+    },
   },
 
   optimizedImages: {
@@ -257,6 +254,8 @@ export default {
   },
 
   render: {
+
+    resourceHints: false,
 
     bundleRenderer: {
 

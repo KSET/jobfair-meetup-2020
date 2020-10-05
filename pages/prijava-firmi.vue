@@ -24,6 +24,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PagePrijavaFirmi
+</router>
+
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 

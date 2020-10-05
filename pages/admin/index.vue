@@ -23,6 +23,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminIndex
+</router>
+
 <script>
   import {
     mapGetters,
