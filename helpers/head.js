@@ -18,7 +18,11 @@ const getRenamedKey = (key) => renameMap[key] || key;
 const getKeyAliases = (key) => aliasMap[key] || [];
 const getKeyWithAliases = (key) => [ key, ...getKeyAliases(key) ];
 
-export const hid = ({ name, content }) => ({ hid: name, name, content });
+export const hid = ({ name, content }) =>
+  name.startsWith("og:")
+  ? ({ hid: name, property: name, content })
+  : ({ hid: name, name, content })
+;
 
 export const generateMetadata =
   (pageData) =>
