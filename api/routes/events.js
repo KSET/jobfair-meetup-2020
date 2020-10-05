@@ -30,6 +30,7 @@ import {
   RoleNames,
 } from "../helpers/permissions";
 import {
+  error,
   ApiError,
   AuthRouter,
 } from "../helpers/route";
@@ -42,11 +43,35 @@ const router = new AuthRouter({
   role: RoleNames.BASE,
 });
 
-router.post("/status", async ({ body, authUser }) => {
+const requireCv =
+  (req, res, next) => {
+    const { authUser } = req;
+    const { uid } = authUser;
+
+    if (!uid) {
+      const status = HttpStatus.Error.Client.NotAcceptable;
+
+      res.status(status);
+
+      return res.json(error({
+        reason: "No CV submitted",
+        status,
+      }));
+    }
+
+    return next();
+  }
+;
+
+router.post("/status", requireCv, async ({ body, authUser }) => {
   const { id: rawId, type: rawEventType, status: rawStatus } = body;
   const id = String(rawId);
   const status = Number(rawStatus);
   const eventType = String(rawEventType);
+
+  if (!id || !status || !eventType) {
+    throw new ApiError("Data missing", HttpStatus.Error.Client.UnprocessableEntity);
+  }
 
   const { data } = await internalRequest(
     "get",
@@ -127,7 +152,7 @@ router.post("/status", async ({ body, authUser }) => {
   }
 });
 
-router.get("/mine", async ({ authUser }) => {
+router.get("/mine", requireCv, async ({ authUser }) => {
   const rawEvents = await Client.queryOnce(queryReservationsGetByUserId({ userId: authUser.id }));
 
   const fixEvent =
@@ -148,7 +173,7 @@ router.get("/mine", async ({ authUser }) => {
   }, {});
 });
 
-router.get("/participants", async () => {
+router.get("/participants", requireCv, async () => {
   const rawEvents = await Client.queryOnce(queryReservationsCountVisitorsByEvent());
   const events = {};
 
@@ -171,7 +196,7 @@ router.get("/participants", async () => {
   return events;
 });
 
-router.get("/participants/:eventType/:eventId", async ({ params }) => {
+router.get("/participants/:eventType/:eventId", requireCv, async ({ params }) => {
   const { eventType, eventId } = params;
 
   const rawEvents = await Client.queryOnce(queryReservationsGetByEventId({ eventType, eventId }));
@@ -192,7 +217,7 @@ const moderatorRouter = AuthRouter.boundToRouter(router, {
 
 const timeoutMs = 1.5 * 1000;
 
-router.get("/users", cachedFetcher(timeoutMs, async ({ authHeader }) => {
+moderatorRouter.get("/users", cachedFetcher(timeoutMs, async ({ authHeader }) => {
   const auth = {
     headers: {
       Authorization: authHeader,
