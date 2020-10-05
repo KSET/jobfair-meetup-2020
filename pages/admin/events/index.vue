@@ -134,6 +134,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminEventsIndex
+</router>
+
 <script>
   import fuzzySearch from "fuzzysearch";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";

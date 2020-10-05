@@ -43,6 +43,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminPressIndex
+</router>
+
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 

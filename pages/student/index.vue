@@ -188,6 +188,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageStudentIndex
+</router>
+
 <script>
   import fuzzySearch from "fuzzysearch";
   import {

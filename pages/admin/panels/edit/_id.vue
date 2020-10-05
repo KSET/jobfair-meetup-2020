@@ -5,6 +5,10 @@
   />
 </template>
 
+<router>
+name: PageAdminPanelsEdit
+</router>
+
 <script>
   import {
     mapGetters,

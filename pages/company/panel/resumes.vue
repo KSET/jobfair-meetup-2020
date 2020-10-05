@@ -181,6 +181,10 @@
   </company-max-width-container>
 </template>
 
+<router>
+name: PageCompanyResumes
+</router>
+
 <script>
   import CompanyMaxWidthContainer from "~/components/CompanyMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";

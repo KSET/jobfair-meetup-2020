@@ -191,6 +191,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminPressKitList
+</router>
+
 <script>
   import {
     mapActions,

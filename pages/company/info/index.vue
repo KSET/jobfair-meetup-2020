@@ -4,6 +4,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageCompanyViewInfo
+</router>
+
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import CompanyInfoPage from "~/components/company/info";

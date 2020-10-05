@@ -299,6 +299,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAbout
+</router>
+
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";

@@ -71,6 +71,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageBlogHome
+</router>
+
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import AppNewsCard from "~/components/news/NewsCard";

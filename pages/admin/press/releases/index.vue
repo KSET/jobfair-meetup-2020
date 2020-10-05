@@ -80,6 +80,11 @@
     </v-row>
   </app-max-width-container>
 </template>
+
+<router>
+name: PageAdminPressReleaseList
+</router>
+
 <script>
   import {
     mapActions,

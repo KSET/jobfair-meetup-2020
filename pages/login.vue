@@ -82,6 +82,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageLogin
+</router>
+
 <script>
   import {
     mapActions,

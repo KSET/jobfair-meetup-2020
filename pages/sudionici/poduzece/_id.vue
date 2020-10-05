@@ -4,6 +4,10 @@
   </company-max-width-container>
 </template>
 
+<router>
+name: PageSudioniciCompanyInfo
+</router>
+
 <script>
   import {
     mapGetters,

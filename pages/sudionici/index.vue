@@ -157,6 +157,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageSudionici
+</router>
+
 <script>
   import fuzzySearch from "fuzzysearch";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";

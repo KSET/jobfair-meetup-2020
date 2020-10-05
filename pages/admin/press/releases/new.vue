@@ -60,6 +60,11 @@
     </v-row>
   </app-max-width-container>
 </template>
+
+<router>
+name: PageAdminPressReleaseCreate
+</router>
+
 <script>
   import {
     mapActions,

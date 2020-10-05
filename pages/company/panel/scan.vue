@@ -77,6 +77,10 @@
   </client-only>
 </template>
 
+<router>
+name: PageCompanyScanQrCode
+</router>
+
 <script>
   import {
     mapActions,

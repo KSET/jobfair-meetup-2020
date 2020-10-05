@@ -140,6 +140,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PageAdminTranslationsList
+</router>
+
 <script>
   import {
     mapActions,

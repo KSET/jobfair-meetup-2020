@@ -181,6 +181,10 @@
   </app-max-width-container>
 </template>
 
+<router>
+name: PagePress
+</router>
+
 <script>
   import downloadIconSrc from "@/assets/images/icons/icon-download.svg?inline";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
