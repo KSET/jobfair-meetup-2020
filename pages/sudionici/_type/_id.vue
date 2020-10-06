@@ -30,14 +30,16 @@
         </div>
         <h4 :class="$style.info">
           <v-img
+            :alt="capitalize(eventObj.type)"
             :class="$style.icon"
             :src="icons[eventObj.type]"
+            :title="capitalize(eventObj.type)"
             aspect-ratio="1"
             class="mr-2"
             contain
           />
-          <span :class="$style.infoText">
-            {{ eventObj.date | weekday }} | {{ eventObj.date | time }} | {{ eventObj.location || "TBA" }}
+          <span :class="$style.infoText" :title="eventDate">
+            {{ eventDay }} | {{ eventTime }} | {{ eventObj.location || "TBA" }}
           </span>
         </h4>
       </v-col>
@@ -245,6 +247,9 @@ name: PageSudioniciInfo
   import {
     getSrcWithWidth,
   } from "~/helpers/image";
+  import {
+    capitalize,
+  } from "~/helpers/string";
 
   export default {
     name: "PageSudioniciInfo",
@@ -252,29 +257,6 @@ name: PageSudioniciInfo
     components: {
       TranslatedText,
       AppMaxWidthContainer,
-    },
-
-    filters: {
-      weekday(date) {
-        const days = [
-          "nedjelja",
-          "ponedjeljak",
-          "utorak",
-          "srijeda",
-          "četvrtak",
-          "petak",
-          "subota",
-        ];
-        const dateObj = new Date(date);
-
-        return days[dateObj.getDay()];
-      },
-
-      time(date) {
-        const dateObj = new Date(date);
-        const zeroPad = (n) => String(n).padStart(2, "0");
-        return `${ zeroPad(dateObj.getHours()) }:${ zeroPad(dateObj.getMinutes()) }`;
-      },
     },
 
     computed: {
@@ -294,6 +276,23 @@ name: PageSudioniciInfo
           date: new Date(occuresAt),
           type: this.$route.params.type,
         };
+      },
+
+      eventDay() {
+        return this.weekday(this.eventObj.date);
+      },
+
+      eventTime() {
+        return this.time(this.eventObj.date);
+      },
+
+      eventDate() {
+        const { date: eventDate, location: eventLocation } = this.eventObj;
+
+        const date = new Date(eventDate).toLocaleString("hr-HR");
+        const location = eventLocation || "TBA";
+
+        return `${ date } @ ${ location }`;
       },
 
       icons() {
@@ -317,6 +316,28 @@ name: PageSudioniciInfo
     methods: {
       dotGet,
       getSrcWithWidth,
+      capitalize,
+
+      weekday(date) {
+        const days = [
+          "nedjelja",
+          "ponedjeljak",
+          "utorak",
+          "srijeda",
+          "četvrtak",
+          "petak",
+          "subota",
+        ];
+        const dateObj = new Date(date);
+
+        return days[dateObj.getDay()];
+      },
+
+      time(date) {
+        const dateObj = new Date(date);
+        const zeroPad = (n) => String(n).padStart(2, "0");
+        return `${ zeroPad(dateObj.getHours()) }:${ zeroPad(dateObj.getMinutes()) }`;
+      },
     },
 
     validate({ store, params }) {

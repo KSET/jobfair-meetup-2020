@@ -41,18 +41,22 @@
       {{ companyNameList }}
     </v-card-subtitle>
 
-    <v-card-title :class="$style.title">
+    <v-card-title :class="$style.title" :title="event.description">
       {{ event.title }}
     </v-card-title>
 
     <v-card-text>
       <v-img
+        :alt="capitalize(event.type)"
         :class="$style.icon"
         :src="icons[event.type]"
+        :title="capitalize(event.type)"
         aspect-ratio="1"
         contain
       />
-      {{ eventDay }} | {{ eventTime }} | {{ event.location || "TBA" }}
+      <span :title="eventDate">
+        {{ eventDay }} | {{ eventTime }} | {{ event.location || "TBA" }}
+      </span>
     </v-card-text>
 
     <slot />
@@ -66,6 +70,9 @@
   import {
     getSrcWithWidth,
   } from "~/helpers/image";
+  import {
+    capitalize,
+  } from "~/helpers/string";
 
   export default {
     name: "CompanyParticipant",
@@ -115,6 +122,13 @@
         return this.time(this.event.date);
       },
 
+      eventDate() {
+        const date = new Date(this.event.date).toLocaleString("hr-HR");
+        const location = this.event.location || "TBA";
+
+        return `${ date } @ ${ location }`;
+      },
+
       isPanel() {
         return "panel" === this.event.type;
       },
@@ -141,6 +155,8 @@
 
     methods: {
       getSrcWithWidth,
+
+      capitalize,
 
       weekday(date) {
         const days = [
