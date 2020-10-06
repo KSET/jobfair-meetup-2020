@@ -1,6 +1,8 @@
 NODE_MODULES := ./node_modules
 DB_CONTAINER := meetup-db
 WEB_CONTAINER := nuxt
+BUILD_OUTPUT_DIR := .nuxt.tmp
+FINAL_OUTPUT_DIR := .nuxt
 
 .PHONY: stop start up up-db up-web prod dev down down-web restart restart-web reboot reboot-web rebuild install yarn-install build clean build-containers
 
@@ -40,7 +42,9 @@ yarn-install:
 	docker/yarn install
 
 build: yarn-install
-	docker/yarn build
+	docker/yarn build -c nuxt.config.build
+	rm -rf "$(FINAL_OUTPUT_DIR)"
+	mv "$(BUILD_OUTPUT_DIR)" "$(FINAL_OUTPUT_DIR)"
 
 clean:
 	rm -rf $(NODE_MODULES) .nuxt

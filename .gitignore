@@ -67,6 +67,7 @@ typings/
 
 # nuxt.js temp build output
 .nuxt
+.nuxt.tmp
 
 # nuxt.js prod build output
 .nuxt-prod
