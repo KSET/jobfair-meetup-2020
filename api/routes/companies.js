@@ -1,5 +1,5 @@
 import {
- fixCompany,
+  fixCompany,
 } from "../../helpers/company";
 import {
   keysFromSnakeToCamelCase,
@@ -38,14 +38,47 @@ router.get("/participants", cachedFetcher(cacheForMs, async () => {
 }));
 
 router.get("/events", cachedFetcher(cacheForMs, async () => {
-  const { companies, ...events } = await graphQlQuery(participantEventsQuery());
+  const { companies, ...eventList } = await graphQlQuery(participantEventsQuery());
 
   const { data: panels } = await internalRequest("get", "/panels/list/with-info");
 
+  const eventHasNotPassed =
+    (
+      {
+        date,
+        occuresAt,
+        occures_at: occuresAtOther,
+      },
+    ) =>
+      new Date(date || occuresAt || occuresAtOther) >= new Date()
+  ;
+
+  const removePassedEvents =
+    (
+      [
+        key,
+        events,
+      ],
+    ) =>
+      [
+        key,
+        events.filter(eventHasNotPassed),
+      ]
+  ;
+
+  const events = Object.fromEntries(
+    Object
+      .entries({
+        panels,
+        ...eventList,
+      })
+      .map(removePassedEvents)
+    ,
+  );
+
   return keysFromSnakeToCamelCase({
     companies: companies.map(fixCompany),
-    panels: panels.map((id) => id),
-    ...events,
+    events,
   });
 }));
 
