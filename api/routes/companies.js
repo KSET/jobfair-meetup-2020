@@ -78,7 +78,7 @@ router.get("/events", cachedFetcher(cacheForMs, async () => {
 
   return keysFromSnakeToCamelCase({
     companies: companies.map(fixCompany),
-    events,
+    ...events,
   });
 }));
 
