@@ -87,6 +87,12 @@ const fixResume = (resume) => {
   return fixResumes(resume);
 };
 
+const gdprDate = new Date("2018-05-25T00:00:00Z");
+const afterGdpr =
+  ({ updatedAt }) =>
+    new Date(updatedAt) >= gdprDate
+;
+
 const listCacheTimeoutMs = 10 * 1000;
 const fetchListCached = cachedFetcher(
   listCacheTimeoutMs,
@@ -97,7 +103,7 @@ const fetchListCached = cachedFetcher(
       return [];
     }
 
-    return resumes.map(fixResume);
+    return resumes.map(fixResume).filter(afterGdpr);
   },
 );
 
