@@ -11,12 +11,18 @@
         <v-btn
           :to="{ name: 'PageAdminPressIndex' }"
         >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
           Back
         </v-btn>
         <v-btn
           :to="{ name: 'PageAdminPressReleaseCreate' }"
           color="success"
         >
+          <v-icon left>
+            mdi-text-box-plus
+          </v-icon>
           Create
         </v-btn>
       </v-col>

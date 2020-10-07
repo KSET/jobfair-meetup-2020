@@ -39,6 +39,9 @@
                   :to="{ name: 'PageAdminPressReleaseList' }"
                   color="warning"
                 >
+                  <v-icon left>
+                    mdi-cancel
+                  </v-icon>
                   Cancel
                 </v-btn>
 
@@ -50,6 +53,9 @@
                   color="success"
                   @click.prevent="doSave"
                 >
+                  <v-icon left>
+                    mdi-content-save
+                  </v-icon>
                   Save
                 </v-btn>
               </div>

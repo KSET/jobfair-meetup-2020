@@ -24,18 +24,27 @@
         <v-btn
           :to="{ name: 'PageAdminPressReleaseList' }"
         >
+          <v-icon left>
+            mdi-file-document-multiple
+          </v-icon>
           Press releases
         </v-btn>
         <v-btn
           :to="{ name: 'PageAdminPressGalleryList' }"
           class="ml-3"
         >
+          <v-icon left>
+            mdi-folder-multiple-image
+          </v-icon>
           Press gallery
         </v-btn>
         <v-btn
           :to="{ name: 'PageAdminPressKitList' }"
           class="ml-3"
         >
+          <v-icon left>
+            mdi-briefcase-download
+          </v-icon>
           Press kit
         </v-btn>
       </v-col>

@@ -11,6 +11,9 @@
         <v-btn
           :to="{ name: 'PageAdminPressIndex' }"
         >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
           Back
         </v-btn>
       </v-col>
@@ -130,6 +133,9 @@
                   color="warning"
                   @click.prevent="clearInputs"
                 >
+                  <v-icon left>
+                    mdi-cancel
+                  </v-icon>
                   Cancel
                 </v-btn>
 
@@ -141,6 +147,9 @@
                   color="success"
                   @click.prevent="doSave"
                 >
+                  <v-icon left>
+                    mdi-content-save
+                  </v-icon>
                   Save
                 </v-btn>
               </v-card-actions>

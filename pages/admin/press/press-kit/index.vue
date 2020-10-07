@@ -11,6 +11,9 @@
         <v-btn
           :to="{ name: 'PageAdminPressIndex' }"
         >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
           Back
         </v-btn>
 
@@ -19,6 +22,9 @@
           class="ml-3"
           @click.native.prevent="refreshPressKits"
         >
+          <v-icon left>
+            mdi-refresh
+          </v-icon>
           Refresh
         </v-btn>
       </v-col>
@@ -181,6 +187,9 @@
                 color="success"
                 @click="submitForm"
               >
+                <v-icon left>
+                  mdi-content-save
+                </v-icon>
                 Save
               </v-btn>
             </v-col>
