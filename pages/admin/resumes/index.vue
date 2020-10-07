@@ -24,7 +24,26 @@
       <v-col cols="12">
         <v-row class="mb-n3">
           <v-col class="align-self-center ml-md-3 font-weight-light text--secondary" cols="auto">
-            Total: {{ resumes.length }}
+            <v-row>
+              <v-col class="py-1" cols="12">
+                Total: {{ resumes.length }}
+              </v-col>
+              <v-col class="py-1" cols="12">
+                <div
+                  class="d-inline-block"
+                  :style="`width: ${96 + String(this.daysAgo).length * 8}px;`"
+                >
+                  <v-text-field
+                    v-model="daysAgo"
+                    :class="$style.daysAgoInput"
+                    type="number"
+                    prefix="Last"
+                    :suffix="daysAgoSuffix"
+                  />
+                </div>
+                : {{ resumesFromLastWeek.length }}
+              </v-col>
+            </v-row>
           </v-col>
 
           <v-spacer />
@@ -189,6 +208,8 @@ name: PageAdminResumes
         pageCount: 0,
         itemsPerPage: 10,
 
+        daysAgo: 7,
+
         resumes: await store.dispatch("resume/fetchResumes"),
 
         headers: [
@@ -206,6 +227,23 @@ name: PageAdminResumes
       };
     },
 
+    computed: {
+      resumesFromLastWeek() {
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - this.daysAgo);
+
+        return this.resumes.filter(({ updatedAt }) => new Date(updatedAt) >= oneWeekAgo);
+      },
+
+      daysAgoSuffix() {
+        if (1 < this.daysAgo) {
+          return "days";
+        } else {
+          return "day";
+        }
+      },
+    },
+
     watch: {
       search(val) {
         window.history.replaceState({}, "", getUrl(val, "q"));
@@ -217,6 +255,16 @@ name: PageAdminResumes
         }
 
         window.history.replaceState({}, "", getUrl(val, "p"));
+      },
+
+      daysAgo(val) {
+        if (1 < val) {
+          return;
+        }
+
+        this.$nextTick(() => {
+          this.$set(this, "daysAgo", 1);
+        });
       },
     },
 
@@ -252,6 +300,17 @@ name: PageAdminResumes
   .container {
     @include media(sm) {
       margin-bottom: 45px;
+    }
+  }
+
+  .daysAgoInput {
+
+    :global(.v-input__slot) {
+
+      &::before,
+      &::after {
+        display: none;
+      }
     }
   }
 
