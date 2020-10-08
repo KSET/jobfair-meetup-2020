@@ -11,7 +11,7 @@
       :items="filteredEventsByType"
       :items-per-page.sync="itemsPerPage"
       :page.sync="page"
-      :search="filterValue"
+      :search.sync="filterValue"
       hide-default-footer
     >
       <template v-slot:header>
@@ -172,6 +172,9 @@ name: PageSudionici
   import {
     generateMetadata,
   } from "~/helpers/head";
+  import {
+    getUrlWithQueryParam,
+  } from "~/helpers/url";
 
   export default {
     name: "PageSudionici",
@@ -188,18 +191,20 @@ name: PageSudionici
       };
     },
 
-    data: () => ({
-      filterType: null,
-      filterValue: "",
-      page: 1,
-      itemsPerPage: 8,
-      itemsPerPageArray: [ 2, 4, 8, 16, 32 ],
-      searchFields: [
-        "title",
-        "location",
-        "company.name",
-      ],
-    }),
+    data() {
+      return {
+        filterType: null,
+        filterValue: dotGet(this.$route, "query.q", ""),
+        page: Number(dotGet(this.$route, "query.p", 1)),
+        itemsPerPage: 8,
+        itemsPerPageArray: [ 2, 4, 8, 16, 32 ],
+        searchFields: [
+          "title",
+          "location",
+          "company.name",
+        ],
+      };
+    },
 
     computed: {
       filteredEventsByType() {
@@ -213,7 +218,7 @@ name: PageSudionici
       },
 
       filteredEvents() {
-        return this.filterFunction(this.filteredEventsByType);
+        return this.filterFunction(this.filteredEventsByType, this.filterValue);
       },
 
       numberOfPages() {
@@ -239,6 +244,20 @@ name: PageSudionici
             value: "talk",
           },
         ];
+      },
+    },
+
+    watch: {
+      filterValue(val) {
+        window.history.replaceState({}, "", getUrlWithQueryParam("q", val));
+      },
+
+      page(val) {
+        if (1 >= val) {
+          val = null;
+        }
+
+        window.history.replaceState({}, "", getUrlWithQueryParam("p", val));
       },
     },
 
@@ -271,7 +290,7 @@ name: PageSudionici
         const search =
           (object, key) =>
             fuzzySearch(
-              query,
+              String(query).toLowerCase(),
               String(dotGet(object, key) || "").toLowerCase(),
             )
         ;
