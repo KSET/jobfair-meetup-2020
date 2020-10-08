@@ -54,7 +54,7 @@
           :disabled="!isValid"
           :loading="isLoading"
           class="ml-auto"
-          color="success"
+          color="primary"
           light
           x-large
           @click="login"
