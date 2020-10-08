@@ -261,11 +261,11 @@ name: PageAdminResumes
 
     computed: {
       resumesFromLastWeek() {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - this.daysAgoBound);
+        const nDaysAgo = new Date();
+        nDaysAgo.setDate(nDaysAgo.getDate() - this.daysAgoBound);
 
-        const created = this.resumes.filter(({ createdAt }) => new Date(createdAt) >= oneWeekAgo).length;
-        const updated = this.resumes.filter(({ updatedAt }) => new Date(updatedAt) >= oneWeekAgo).length - created;
+        const created = this.resumes.filter(({ createdAt }) => new Date(createdAt) >= nDaysAgo).length;
+        const updated = this.resumes.filter(({ updatedAt }) => new Date(updatedAt) >= nDaysAgo).length - created;
         const total = created + updated;
 
         return {
