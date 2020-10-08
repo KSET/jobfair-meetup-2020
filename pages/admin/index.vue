@@ -13,7 +13,7 @@
           :key="JSON.stringify(page.to)"
 
           :to="page.to"
-          class="ml-3"
+          class="ml-3 mb-3"
         >
           <v-icon left v-text="page.icon" />
           {{ page.name }}
