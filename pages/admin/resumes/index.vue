@@ -31,17 +31,49 @@
               <v-col class="py-1" cols="12">
                 <div
                   class="d-inline-block"
-                  :style="`width: ${96 + String(this.daysAgo).length * 8}px;`"
+                  :style="`width: ${daysAgoInputWidth}px;`"
                 >
                   <v-text-field
                     v-model="daysAgo"
                     :class="$style.daysAgoInput"
                     type="number"
                     prefix="Last"
-                    :suffix="daysAgoSuffix"
+                    :suffix="`${daysAgoSuffix}: `"
                   />
                 </div>
-                : {{ resumesFromLastWeek.length }}
+                <span class="pl-1" />
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                      v-bind="attrs"
+                      v-on="on"
+                      v-text="resumesFromLastWeek.updated"
+                    />
+                  </template>
+                  Updated
+                </v-tooltip>
+                +
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                      v-bind="attrs"
+                      v-on="on"
+                      v-text="resumesFromLastWeek.created"
+                    />
+                  </template>
+                  Created (new)
+                </v-tooltip>
+                =
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                      v-bind="attrs"
+                      v-on="on"
+                      v-text="resumesFromLastWeek.total"
+                    />
+                  </template>
+                  Total (active)
+                </v-tooltip>
               </v-col>
             </v-row>
           </v-col>
@@ -230,17 +262,37 @@ name: PageAdminResumes
     computed: {
       resumesFromLastWeek() {
         const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - this.daysAgo);
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - this.daysAgoBound);
 
-        return this.resumes.filter(({ updatedAt }) => new Date(updatedAt) >= oneWeekAgo);
+        const created = this.resumes.filter(({ createdAt }) => new Date(createdAt) >= oneWeekAgo).length;
+        const updated = this.resumes.filter(({ updatedAt }) => new Date(updatedAt) >= oneWeekAgo).length - created;
+        const total = created + updated;
+
+        return {
+          updated,
+          created,
+          total,
+        };
       },
 
       daysAgoSuffix() {
-        if (1 < this.daysAgo) {
+        if (1 < this.daysAgoBound) {
           return "days";
         } else {
           return "day";
         }
+      },
+
+      daysAgoBound() {
+        if (1 > this.daysAgo) {
+          return 1;
+        }
+
+        return this.daysAgo;
+      },
+
+      daysAgoInputWidth() {
+        return 96 + String(this.daysAgoBound).length * 8;
       },
     },
 
@@ -255,16 +307,6 @@ name: PageAdminResumes
         }
 
         window.history.replaceState({}, "", getUrl(val, "p"));
-      },
-
-      daysAgo(val) {
-        if (1 < val) {
-          return;
-        }
-
-        this.$nextTick(() => {
-          this.$set(this, "daysAgo", 1);
-        });
       },
     },
 
