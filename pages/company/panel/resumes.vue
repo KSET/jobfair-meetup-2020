@@ -191,23 +191,9 @@ name: PageCompanyResumes
   import {
     hid,
   } from "~/helpers/head";
-
-  const getUrl = (query, param) => {
-    const params = new URLSearchParams(location.search);
-
-    if (query) {
-      params.set(param, query);
-    } else {
-      params.delete(param);
-    }
-
-    let queryString = params.toString();
-    if (queryString) {
-      queryString = `?${ queryString }`;
-    }
-
-    return `${ location.pathname }${ queryString }`;
-  };
+  import {
+    getUrlWithQueryParam,
+  } from "~/helpers/url";
 
   export default {
     name: "PageCompanyResumes",
@@ -292,15 +278,15 @@ name: PageCompanyResumes
 
     watch: {
       search(val) {
-        window.history.replaceState({}, "", getUrl(val, "q"));
+        window.history.replaceState({}, "", getUrlWithQueryParam("q", val));
       },
 
       page(val) {
-        if (1 === val) {
+        if (1 <= val) {
           val = null;
         }
 
-        window.history.replaceState({}, "", getUrl(val, "p"));
+        window.history.replaceState({}, "", getUrlWithQueryParam("p", val));
       },
     },
 

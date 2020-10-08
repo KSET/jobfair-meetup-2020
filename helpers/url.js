@@ -37,3 +37,21 @@ export const decodeRedirectParam =
     }
   }
 ;
+
+
+export const getUrlWithQueryParam = (param, value) => {
+  const params = new URLSearchParams(location.search);
+
+  if (value) {
+    params.set(param, value);
+  } else {
+    params.delete(param);
+  }
+
+  let queryString = params.toString();
+  if (queryString) {
+    queryString = `?${ queryString }`;
+  }
+
+  return `${ location.pathname }${ queryString }`;
+};
