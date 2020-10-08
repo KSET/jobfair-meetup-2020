@@ -42,6 +42,9 @@ router.get("/events", cachedFetcher(cacheForMs, async () => {
 
   const { data: panels } = await internalRequest("get", "/panels/list/with-info");
 
+  const oneHourAgo = new Date();
+  oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+
   const eventHasNotPassed =
     (
       {
@@ -50,7 +53,7 @@ router.get("/events", cachedFetcher(cacheForMs, async () => {
         occures_at: occuresAtOther,
       },
     ) =>
-      new Date(date || occuresAt || occuresAtOther) >= new Date()
+      new Date(date || occuresAt || occuresAtOther) >= oneHourAgo
   ;
 
   const removePassedEvents =
