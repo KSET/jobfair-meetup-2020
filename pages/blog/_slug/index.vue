@@ -6,7 +6,7 @@
           :lazy-src="news.images.thumb.url"
           :src="news.images.default.url"
           aspect-ratio="2.4"
-          position="bottom center"
+          contain
         />
       </v-col>
     </v-row>
@@ -63,11 +63,11 @@
               :key="social.src"
 
               v-ripple
+              v-bind="social.attr || {}"
               :class="$style.socialLink"
               :href="social.href"
               rel="noopener noreferrer"
               target="_blank"
-              v-bind="social.attr || {}"
             >
               <v-img
                 :src="social.src"

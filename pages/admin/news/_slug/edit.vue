@@ -7,7 +7,7 @@
           :lazy-src="rawNews.images.thumb ? rawNews.images.thumb.url : null"
           :src="imagePreview || rawNews.images.default.url"
           aspect-ratio="2.4"
-          position="bottom center"
+          contain
         >
           <div
             :class="$style.headerImageInputContainer"
