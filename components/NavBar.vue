@@ -43,7 +43,7 @@
 
         :class="$style.navLinkButton"
 
-        :to="{ name: 'PageLogin' }"
+        :to="loginRoute"
 
         large
         nuxt
@@ -68,6 +68,9 @@
   import JobfairMeetupLogo from "~/assets/images/logo/jobfair.svg";
   import NavUserModule from "~/components/NavUserModule";
   import TranslatedText from "~/components/TranslatedText";
+  import {
+    encodeRedirectParam,
+  } from "~/helpers/url";
 
   export default {
     name: "AppNavBar",
@@ -90,6 +93,10 @@
           DEFAULT: "",
           BUTTON: this.$style.navLinkButton,
         };
+      },
+
+      loginRoute() {
+        return { name: "PageLogin", query: { r: encodeRedirectParam(this.$route) } };
       },
 
       pages() {

@@ -57,7 +57,7 @@
         <v-list-item
           v-else
 
-          :to="{ name: 'PageLogin' }"
+          :to="loginRoute"
           ripple
         >
           <v-list-item-content>
@@ -89,6 +89,9 @@
   import JobfairMeetupLogo from "@/assets/images/logo/jobfair.svg";
   import NavUserModule from "~/components/NavUserModule";
   import TranslatedText from "~/components/TranslatedText";
+  import {
+    encodeRedirectParam,
+  } from "~/helpers/url";
 
   export default {
     name: "AppNavDrawer",
@@ -105,6 +108,10 @@
         isOpen: "nav-drawer/isOpen",
         isLoggedIn: "user/isLoggedIn",
       }),
+
+      loginRoute() {
+        return { name: "PageLogin", query: { r: encodeRedirectParam(this.$route) } };
+      },
     },
 
     methods: {
