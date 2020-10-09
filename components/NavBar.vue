@@ -31,8 +31,13 @@
         <translated-text :class="$style.navLinkText" :trans-key="page.name" />
       </nuxt-link>
 
+      <nav-user-module
+        v-if="isLoggedIn"
+        class="ml-6"
+      />
+
       <v-btn
-        v-if="!isLoggedIn"
+        v-else
 
         v-ripple
 
@@ -46,8 +51,6 @@
       >
         <translated-text :class="$style.navLinkText" trans-key="button.joinNow" />
       </v-btn>
-
-      <nav-user-module class="ml-6" />
     </div>
 
     <v-btn :class="$style.navBurgerButton" icon @click.stop="toggleOpen">

@@ -2,9 +2,9 @@
   <v-navigation-drawer
     :value="isOpen"
     app
+    dark
     right
     temporary
-    dark
     @input="setOpen"
   >
     <v-list :class="$style.listNav" flat nav>
@@ -27,8 +27,8 @@
             <v-list-item-title>
               <v-btn
                 v-if="page.href"
-                :href="page.href"
                 :class="$style.navItemButton"
+                :href="page.href"
 
                 large
                 nuxt
@@ -47,9 +47,18 @@
         </v-list-item>
 
         <v-list-item
-          v-if="!isLoggedIn"
-          ripple
+          v-if="isLoggedIn"
+        >
+          <v-list-item-content>
+            <nav-user-module />
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item
+          v-else
+
           :to="{ name: 'PageLogin' }"
+          ripple
         >
           <v-list-item-content>
             <v-list-item-title>
@@ -64,12 +73,6 @@
                 <translated-text trans-key="button.joinNow" />
               </v-btn>
             </v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-list-item>
-          <v-list-item-content>
-            <nav-user-module />
           </v-list-item-content>
         </v-list-item>
       </v-list-item-group>
@@ -127,12 +130,12 @@
     margin-top: 3em;
 
     .navItem {
+      font-size: 137.5%;
       font-weight: 600;
       transition-timing-function: $transition-timing-function;
       transition-duration: 150ms;
       transition-property: color;
       color: $fer-white;
-      font-size: 137.5%;
 
       &:hover {
         color: fer-hover($fer-yellow);
