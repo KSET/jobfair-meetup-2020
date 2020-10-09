@@ -219,6 +219,7 @@ name: PageCompanyResumes
 
         resumeList: await store.dispatch("resume/fetchResumes"),
         favourites: await store.dispatch("resume/listFavourites"),
+        scanned: await store.dispatch("resume/listScans"),
 
         headers: [
           {
@@ -249,6 +250,7 @@ name: PageCompanyResumes
                 ({
                   ...resume,
                   isFavourite: Boolean(this.favourites[resume.id]),
+                  isScanned: Boolean(this.scanned[resume.id]),
                 })
               ,
             )
@@ -257,6 +259,8 @@ name: PageCompanyResumes
         switch (this.filterType) {
           case "favourites":
             return resumes.filter(({ isFavourite }) => isFavourite);
+          case "scanned":
+            return resumes.filter(({ isScanned }) => isScanned);
           default:
             return resumes;
         }
@@ -271,6 +275,10 @@ name: PageCompanyResumes
           {
             name: "resumes.filter.favourites",
             value: "favourites",
+          },
+          {
+            name: "resumes.filter.scanned",
+            value: "scanned",
           },
         ];
       },

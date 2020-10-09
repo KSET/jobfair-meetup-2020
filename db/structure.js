@@ -197,6 +197,18 @@ create table if not exists resume_favourites
 
 create index if not exists resume_favourites_company_id_index
     on resume_favourites (company_id);
+
+create table if not exists resume_scans
+(
+    company_id integer not null,
+    resume_id  integer not null,
+    scanned_at timestamp with time zone default CURRENT_TIMESTAMP,
+    constraint resume_scans_pk
+        unique (company_id, resume_id)
+);
+
+create index if not exists resume_scans_company_id_index
+    on resume_scans (company_id);
 `;
 
 

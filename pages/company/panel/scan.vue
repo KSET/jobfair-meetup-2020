@@ -136,7 +136,7 @@ name: PageCompanyScanQrCode
 
     methods: {
       ...mapActions({
-        fetchResume: "resume/fetchResumeByUid",
+        scanResume: "resume/scanResume",
       }),
 
       switchCamera() {
@@ -198,7 +198,7 @@ name: PageCompanyScanQrCode
         this.turnCameraOff();
         this.message = "Loading info...";
 
-        const { id: resumeId } = await this.fetchResume({ uid });
+        const { id: resumeId } = await this.scanResume({ uid });
 
         if (resumeId) {
           this.message = "Loading user resume...";

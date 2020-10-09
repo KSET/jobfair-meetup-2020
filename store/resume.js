@@ -119,6 +119,17 @@ export const actions = {
     return data;
   },
 
+  async scanResume(_context, { uid }) {
+    const { data } = await this.$api.$post(
+      "/resumes/scans/scan",
+      {
+        uid,
+      },
+    );
+
+    return data;
+  },
+
   addToFavourites(_context, { resumeId }) {
     return this.$api.$post(
       "/resumes/favourites/add",
@@ -134,6 +145,12 @@ export const actions = {
 
   async listFavourites() {
     const { data = [] } = await this.$api.$get("/resumes/favourites/list");
+
+    return Object.fromEntries(data.map((id) => [ id, id ]));
+  },
+
+  async listScans() {
+    const { data = [] } = await this.$api.$get("/resumes/scans/list");
 
     return Object.fromEntries(data.map((id) => [ id, id ]));
   },
