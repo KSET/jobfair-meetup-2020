@@ -69,7 +69,7 @@ router.post("/status", requireCv, async ({ body, authUser }) => {
   const status = Number(rawStatus);
   const eventType = String(rawEventType);
 
-  if (!id || !status || !eventType) {
+  if (!id || isNaN(status) || !eventType) {
     throw new ApiError("Data missing", HttpStatus.Error.Client.UnprocessableEntity);
   }
 
