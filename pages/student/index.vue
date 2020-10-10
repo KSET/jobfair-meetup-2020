@@ -319,7 +319,7 @@ name: PageStudentIndex
       }),
 
       qrImageSrc() {
-        return `/api/image/qr-code/for-uid/${ encodeURIComponent(this.user.uid) }.png`;
+        return `/api/image/qr-code/for-uid/${ encodeURIComponent(this.user.uid) }.svg`;
       },
 
       filteredEvents() {
