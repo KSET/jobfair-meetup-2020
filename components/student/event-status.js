@@ -79,5 +79,5 @@ export const getParticipantCapacityFor = (eventType) => {
 export const hasParticipantCapacityFor = (eventType, currentParticipants = 0) => {
   const maxParticipants = getParticipantCapacityFor(eventType);
 
-  return currentParticipants + 1 < maxParticipants;
+  return currentParticipants < maxParticipants;
 };
