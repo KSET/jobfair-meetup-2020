@@ -45,7 +45,7 @@
     <v-row>
       <v-col cols="12">
         <v-row v-if="rawEvents.length > 0">
-          <v-col cols="12">
+          <v-col cols="8" md="9">
             <v-text-field
               v-model="filterValue"
               :class="$style.search"
@@ -56,6 +56,24 @@
               label="Search"
               outlined
               prepend-inner-icon="mdi-magnify"
+            />
+          </v-col>
+          <v-col cols="3" md="2">
+            <v-select
+              v-model="sortValue"
+              :items="sortFields"
+              dense
+              label="Sort"
+              outlined
+            />
+          </v-col>
+          <v-col cols="1">
+            <v-select
+              v-model="sortDirection"
+              :items="sortDirections"
+              dense
+              label="Direction"
+              outlined
             />
           </v-col>
 
@@ -87,7 +105,7 @@
           <v-col v-if="events.length !== 0" cols="12">
             <v-row :class="$style.eventsContainer">
               <v-col
-                v-for="event in events"
+                v-for="event in sortedEvents"
                 :key="event.id"
 
                 cols="6"
@@ -187,6 +205,16 @@ name: PageAdminEventsIndex
 
   const noParticipants = () => Object.fromEntries(Object.keys(EventStatus).map((k) => [ k, [] ]));
 
+  const sortDirections = [
+    "⬇",
+    "⬆",
+  ];
+
+  const sortFields = [
+    "Date",
+    "Participants",
+  ];
+
   export default {
     name: "PageAdminEventsIndex",
 
@@ -230,6 +258,11 @@ name: PageAdminEventsIndex
           "company.name",
         ],
 
+        sortDirection: sortDirections[0],
+        sortValue: sortFields[0],
+        sortDirections,
+        sortFields,
+
         fetchInterval: null,
       };
     },
@@ -247,6 +280,56 @@ name: PageAdminEventsIndex
 
       events() {
         return this.filterFunction(this.filteredEvents, this.filterValue);
+      },
+
+      sortedEvents() {
+        const participants =
+          ({
+            maxParticipants,
+            participants: {
+              event,
+            },
+          }) =>
+            event.length / maxParticipants
+        ;
+
+        const date =
+          ({
+            date,
+          }) =>
+            date
+        ;
+
+        const compareFn = (() => {
+          switch (this.sortValue) {
+            case "Date":
+              return date;
+            case "Participants":
+              return participants;
+            default:
+              return () => 1;
+          }
+        })();
+
+        const direction = (() => {
+          switch (this.sortDirection) {
+            case "⬇":
+              return -1;
+            case "⬆":
+              return 1;
+          }
+        })();
+
+        return (
+          [
+            ...this.events,
+          ]
+            .sort(
+              (a, b) =>
+                (compareFn(b) - compareFn(a)) * direction
+              ,
+            )
+        );
       },
 
       filterValues() {
