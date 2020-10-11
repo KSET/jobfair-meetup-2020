@@ -64,9 +64,11 @@
   .headerRow {
 
     .header {
+      overflow: hidden;
       padding: .5em 0;
       text-align: left;
       text-transform: uppercase;
+      text-overflow: ellipsis;
       opacity: .6;
       color: $fer-black;
       border-bottom: 1px solid transparentize($fer-black, .85);
@@ -76,7 +78,9 @@
   .tableRow {
 
     .entry {
+      overflow: hidden;
       padding: .75em 0;
+      text-overflow: ellipsis;
       opacity: .8;
       color: $fer-black;
     }

@@ -61,7 +61,7 @@ export const getters = {
         values: resume.educations.map(({ awardedTitle, module, name, year }) => [ name, module, year ]),
       },
       projects: {
-        headers: [ "Tvrtka/projekt", "Pozicija", "Trajanje" ],
+        headers: [ "Tvrtka / projekt", "Pozicija", "Trajanje" ],
         values: resume.workExperiences.map(({ company, description, years }) => [ company, description, years ]),
       },
       technicalSkills: resume.computerSkills,
