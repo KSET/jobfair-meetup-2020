@@ -30,8 +30,6 @@ router.getRaw("/for-uid/:uid.svg", async (req, res) => {
     return res.end();
   }
 
-  const cacheFor = 7 * 24 * 60 * 60;
-
   const payload = JSON.stringify({
     // eslint-disable-next-line camelcase
     resume_uid: uid,
@@ -51,6 +49,7 @@ router.getRaw("/for-uid/:uid.svg", async (req, res) => {
 
     // res.set("Cache-Control", `public, max-age=${ cacheFor }, s-max-age=${ cacheFor }, immutable`);
     res.set("Content-Type", "image/svg+xml");
+    res.set("Connection", "close");
     res.write(
       qrCode
         .replace(
