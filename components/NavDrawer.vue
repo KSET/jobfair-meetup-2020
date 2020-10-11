@@ -1,6 +1,9 @@
 <template>
   <v-navigation-drawer
     :value="isOpen"
+    :class="{
+      'd-none': !isMounted,
+    }"
     app
     dark
     right
@@ -102,6 +105,10 @@
       JobfairMeetupLogo,
     },
 
+    data: () => ({
+      isMounted: false,
+    }),
+
     computed: {
       ...mapGetters({
         pages: "pages/getPages",
@@ -112,6 +119,10 @@
       loginRoute() {
         return { name: "PageLogin", query: { r: encodeRedirectParam(this.$route) } };
       },
+    },
+
+    mounted() {
+      this.isMounted = true;
     },
 
     methods: {
