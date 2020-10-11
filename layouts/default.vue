@@ -2,7 +2,7 @@
   <v-app>
     <app-nav-bar />
 
-    <app-nav-drawer />
+    <app-nav-drawer class="d-md-none" />
 
     <v-main :class="$style.contentContainer">
       <v-container :class="$style.container" fluid>
