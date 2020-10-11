@@ -49,7 +49,7 @@ router.getRaw("/for-uid/:uid.svg", async (req, res) => {
   try {
     const qrCode = await QRCode.toString(payload, options);
 
-    res.set("Cache-Control", `public, max-age=${ cacheFor }, s-max-age=${ cacheFor }, immutable`);
+    // res.set("Cache-Control", `public, max-age=${ cacheFor }, s-max-age=${ cacheFor }, immutable`);
     res.set("Content-Type", "image/svg+xml");
     res.write(
       qrCode
