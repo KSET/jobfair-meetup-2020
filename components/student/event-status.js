@@ -65,7 +65,7 @@ export const getParticipantCapacityFor = (eventType) => {
       return 15;
     case "talk":
     case "panel":
-      return 80;
+      return 50;
     default:
       return 0;
   }
