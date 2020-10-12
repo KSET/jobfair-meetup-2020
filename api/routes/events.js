@@ -37,6 +37,9 @@ import {
 import {
   cachedFetcher,
 } from "../helpers/fetchCache";
+import {
+ requireAuth,
+} from "../helpers/middleware";
 
 
 const router = new AuthRouter({
@@ -55,6 +58,26 @@ const requireCv =
 
       return res.json(error({
         reason: "No CV submitted",
+        status,
+      }));
+    }
+
+    return next();
+  }
+;
+
+const requireGateGuardian =
+  (req, res, next) => {
+    const { authUser } = req;
+    const { companies } = authUser;
+
+    if (!companies || !companies.find(({ id }) => 428 === Number(id))) {
+      const status = HttpStatus.Error.Client.NotAcceptable;
+
+      res.status(status);
+
+      return res.json(error({
+        reason: "Not gate guardian",
         status,
       }));
     }
@@ -194,6 +217,18 @@ router.get("/participants", requireCv, async () => {
   }
 
   return events;
+});
+
+router.get("/participants/is-participant/:eventType/:eventId/:userId", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+  const { eventType, eventId, userId } = params;
+
+  const reservation = await Client.queryOneOnce(queryReservationsGetByEventAndUserId({
+    eventType,
+    eventId,
+    userId,
+  }));
+
+  return Boolean(reservation);
 });
 
 router.get("/participants/:eventType/:eventId", requireCv, async ({ params }) => {

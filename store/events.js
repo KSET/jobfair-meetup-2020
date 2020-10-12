@@ -56,6 +56,12 @@ export const actions = {
     return { ...noParticipants, ...data };
   },
 
+  async fetchEventParticipantHasReservation(_context, { eventId, eventType, userId }) {
+    const { data } = await this.$api.$get(`/events/participants/is-participant/${ eventType }/${ eventId }/${ userId }`, { progress: false });
+
+    return data;
+  },
+
   async markEventStatus(_context, { eventId, eventType, selected }) {
     // eslint-disable-next-line no-bitwise
     const status = statusFromEventList(selected);
