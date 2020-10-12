@@ -299,7 +299,7 @@ name: PageGateGuardianScanQrCode
           return null;
         }
 
-        // this.turnCameraOff();
+        this.turnCameraOff();
         this.message = "Loading info...";
 
         const { userId, id: resumeId } = await this.fetchResume({ uid });
@@ -324,7 +324,7 @@ name: PageGateGuardianScanQrCode
           this.errorMessage = "";
         }
 
-        // this.turnCameraOn();
+        this.turnCameraOn();
       },
 
       async onInit(promise) {
