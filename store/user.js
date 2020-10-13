@@ -141,11 +141,10 @@ export const actions = {
     }
   },
 
-  async doRefreshToken({ commit, dispatch }) {
-    const {
-      token,
-      refreshToken,
-    } = await dispatch("getJfToken");
+  async doRefreshToken({ commit, dispatch }, { token: t, refreshToken: r } = {}) {
+    const { token: tb, refreshToken: rb } = await dispatch("getJfToken");
+    const token = t || tb;
+    const refreshToken = r || rb;
 
     try {
       const { data = {} } = await this.$api.$post(
