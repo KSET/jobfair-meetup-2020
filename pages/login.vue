@@ -6,10 +6,10 @@
       max-width="600"
     >
       <v-card-title>
-        Login
+        Prijava
       </v-card-title>
       <v-card-subtitle>
-        Use your JobFair credentials (from <a style="color: inherit;" target="_blank" rel="noopener noreferrer" :href="loginUrlHref">{{ loginUrlName }}</a>)
+        Iskoristi Job Fair email i lozinku za prijavu (s <a style="color: inherit;" target="_blank" rel="noopener noreferrer" :href="loginUrlHref">{{ loginUrlName }}</a>)
       </v-card-subtitle>
       <v-card-text>
         <v-form
@@ -32,7 +32,7 @@
             :disabled="isLoading"
             :loading="isLoading"
             :rules="validationRules.password"
-            label="Password"
+            label="Lozinka"
             light
             required
             type="password"
@@ -46,7 +46,7 @@
             v-if="showTimeError"
             class="font-weight-light ml-3 no-select"
           >
-            Still processing...
+            Zahtjev se još procesira...
           </span>
         </transition>
 
@@ -59,7 +59,10 @@
           x-large
           @click="login"
         >
-          Login
+          <v-icon left>
+            mdi-login-variant
+          </v-icon>
+          Prijava
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -70,13 +73,13 @@
       right
       top
     >
-      Invalid username or password
+      Neispravni email ili lozinka
       <v-btn
         light
         text
         @click="hasError = false"
       >
-        Close
+        Zatvori
       </v-btn>
     </v-snackbar>
   </app-max-width-container>
@@ -113,11 +116,11 @@ name: PageLogin
       password: "",
       validationRules: {
         email: [
-          (v) => !!v || "Email is required",
-          (v) => /.+@.+\..+/.test(v) || "Email must be valid",
+          (v) => !!v || "Email je obavezan",
+          (v) => /.+@.+\..+/.test(v) || "Email mora biti valjan",
         ],
         password: [
-          (v) => !!v || "Password is required",
+          (v) => !!v || "Lozinka je obavezna",
         ],
       },
     }),

@@ -46,11 +46,13 @@
     },
 
     head() {
+      const title = "Dobrodošli";
+
       return {
-        title: "Welcome",
+        title,
         meta: [
           ...generateMetadata({
-            title: "Welcome",
+            title,
             locale: "hr",
             image: require("@/assets/images/facebook-share.jpg"),
           }),
