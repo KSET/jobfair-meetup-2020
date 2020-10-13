@@ -1,7 +1,7 @@
 <template>
   <v-card
     :class="$style.cardContainer"
-    :to="infoLink"
+    :to="noLink ? null : infoLink"
     flat
   >
     <v-img
@@ -41,8 +41,17 @@
       {{ companyNameList }}
     </v-card-subtitle>
 
-    <v-card-title :class="$style.title" :title="event.description">
-      {{ event.title }}
+    <v-card-title
+      :class="$style.title"
+      :title="event.description"
+    >
+      <n-link
+        :class="$style.titleLink"
+        :to="noLink ? infoLink : null"
+        target="_blank"
+      >
+        {{ event.title }}
+      </n-link>
     </v-card-title>
 
     <v-card-text>
@@ -101,11 +110,7 @@
       },
 
       infoLink() {
-        const { noLink, event } = this;
-
-        if (noLink) {
-          return null;
-        }
+        const { event } = this;
 
         return { name: "PageSudioniciInfo", params: { type: event.type, id: event.id } };
       },
@@ -204,6 +209,11 @@
       padding-top: 0;
       padding-bottom: 0;
       color: $fer-dark-blue;
+
+      .titleLink {
+        text-decoration: none;
+        color: inherit;
+      }
     }
 
     .icon {
