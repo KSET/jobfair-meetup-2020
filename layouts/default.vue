@@ -74,6 +74,7 @@
 
   .container {
     display: flex;
+    min-height: 100%;
     padding: 0;
   }
 
