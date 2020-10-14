@@ -238,6 +238,14 @@ name: PageGateGuardianScanQrCode
       },
     },
 
+    watch: {
+      resume(val) {
+        if (!val) {
+          this.turnCameraOn();
+        }
+      },
+    },
+
     methods: {
       ...mapActions({
         fetchResume: "resume/fetchResumeByUid",
@@ -316,15 +324,15 @@ name: PageGateGuardianScanQrCode
 
           this.$set(this, "resume", resume);
         } else {
-          this.message = "";
           this.errorMessage = "Unknown user";
 
           await sleep(3000);
 
           this.errorMessage = "";
+          this.turnCameraOn();
         }
 
-        this.turnCameraOn();
+        this.message = "";
       },
 
       async onInit(promise) {
