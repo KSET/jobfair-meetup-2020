@@ -198,7 +198,7 @@
       }),
 
       canViewStudentPanel() {
-        return this.isStudent;
+        return this.isStudent && !this.company;
       },
 
       canViewAdminPanel() {
