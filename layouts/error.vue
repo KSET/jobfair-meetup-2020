@@ -13,7 +13,7 @@
         <p :class="$style.text">
           Prestani tražiti nepostojeće stranice i ulovi
           <br>
-          karijeru na JobFair MeetUp-u!
+          karijeru na Job Fair Meetupu!
         </p>
         <v-btn
           :class="$style.button"
