@@ -185,6 +185,29 @@
         </v-row>
       </v-col>
     </v-row>
+
+    <v-snackbar
+      v-model="snackbar"
+      bottom
+      color="error"
+      style="padding-bottom: 0;"
+      timeout="-1"
+      elevation="8"
+    >
+      {{ errorText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          v-bind="attrs"
+          color="white"
+          icon
+          text
+          @click="snackbar = false"
+        >
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </template>
+    </v-snackbar>
   </app-max-width-container>
 </template>
 
@@ -310,6 +333,9 @@ name: PageStudentIndex
         ],
 
         fetchInterval: null,
+
+        snackbar: false,
+        errorText: "",
       };
     },
 
@@ -388,14 +414,33 @@ name: PageStudentIndex
         const oldSelected = [ ...event.userStatus ];
 
         try {
-          const { status } = await this.doMarkEventStatus({ eventId: event.id, eventType: event.type, selected });
+          const { data, error, reason, errorData } = await this.doMarkEventStatus({ eventId: event.id, eventType: event.type, selected });
+
+          if (error) {
+            this.errorText =
+              reason ||
+              (
+                errorData
+                  ? errorData.join("\n")
+                  : "Something went wrong"
+              )
+            ;
+            this.snackbar = true;
+
+            throw new Error(reason);
+          }
+
+          const { status } = data;
           this.$set(event, "userStatus", eventListFromStatus(status));
         } catch (e) {
           this.$sentry.captureException(e);
           this.$set(event, "userStatus", oldSelected);
         } finally {
-          const participants = await this.fetchEventParticipants({ eventId: event.id, eventType: event.type });
-          this.$set(event, "participants", participants);
+          try {
+            const participants = await this.fetchEventParticipants({ eventId: event.id, eventType: event.type });
+            this.$set(event, "participants", participants);
+          } catch {
+          }
 
           event.loading = false;
         }

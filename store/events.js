@@ -68,8 +68,6 @@ export const actions = {
     const id = Number(eventId);
     const type = String(eventType);
 
-    const { data } = await this.$api.$post("/events/status", { id, type, status }, { progress: false });
-
-    return data;
+    return await this.$api.$post("/events/status", { id, type, status }, { progress: false });
   },
 };
