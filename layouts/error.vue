@@ -8,12 +8,10 @@
           src="../assets/images/404.png"
         >
         <h1 :class="$style.headline">
-          Stranica nije uhvaćena
+          <translated-text trans-key="page.error.notFound.title" />
         </h1>
         <p :class="$style.text">
-          Prestani tražiti nepostojeće stranice i ulovi
-          <br>
-          karijeru na Job Fair Meetupu!
+          <translated-text trans-key="page.error.notFound.text" />
         </p>
         <v-btn
           :class="$style.button"
@@ -21,7 +19,7 @@
           color="primary"
           x-large
         >
-          Početna
+          <translated-text trans-key="page.error.notFound.startPage" />
         </v-btn>
       </v-col>
     </v-row>
@@ -29,7 +27,13 @@
 </template>
 
 <script>
+  import TranslatedText from "~/components/TranslatedText";
+
   export default {
+    components: {
+      TranslatedText,
+    },
+
     layout: "empty",
 
     props: {
