@@ -134,7 +134,7 @@
                             v-for="eventType in getEventStatus(event)"
                             :key="eventType"
 
-                            :disabled="event.loading || event.participants[eventType] >= event.maxParticipants && !event.userStatus.includes(eventType)"
+                            :disabled="isEventTypeDisabled(event, eventType)"
 
                             :ripple="false"
                             :value="eventType"
@@ -153,7 +153,7 @@
                             <v-expand-x-transition>
                               <span v-if="!event.userStatus.includes(eventType)" class="ml-1">
                                 <span :class="$style.parentheses">
-                                  <span>{{ event.maxParticipants - event.participants[eventType] }}</span>
+                                  <span v-text="getEventTypeFreeSlots(event, eventType)" />
                                   <translated-text :trans-key="`studentPanel.event.slots.free`" />
                                 </span>
                               </span>
@@ -448,6 +448,25 @@ name: PageStudentIndex
 
       getEventStatus(event) {
         return eventStatusForEvent(event);
+      },
+
+      getEventTypeFreeSlots(event, eventType) {
+        return Math.max(0, event.maxParticipants - event.participants[eventType]);
+      },
+
+      isEventTypeFull(event, eventType) {
+        return 0 >= this.getEventTypeFreeSlots(event, eventType);
+      },
+
+      isEventTypeDisabled(event, eventType) {
+        if (event.loading) {
+          return true;
+        }
+
+        return (
+          this.isEventTypeFull(event, eventType) &&
+          !event.userStatus.includes(eventType)
+        );
       },
 
       filterFunction(elements, query) {
