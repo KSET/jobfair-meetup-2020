@@ -267,6 +267,35 @@
             </nuxt-link>
           </v-col>
         </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <h1 :class="$style.participantsHeader">
+              <translated-text trans-key="index.participants.mediaPartners.header" />
+            </h1>
+            <p :class="$style.participantsDescription">
+              <translated-text trans-key="index.participants.mediaPartners.text" />
+            </p>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col
+            v-for="partner in mediaPartners"
+            :key="partner.id"
+            :class="$style.participantCol"
+            cols="6"
+          >
+            <div :class="$style.participantContainer">
+              <v-img
+                :alt="partner.description"
+                :src="partner.image"
+                aspect-ratio="1.875"
+                contain
+              />
+            </div>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </div>
@@ -348,6 +377,39 @@ name: Index
           "Meetup",
           "networking",
         ].sort(() => Math.random() - 0.5);
+      },
+
+      mediaPartners() {
+        return [
+          {
+            image: require("@/assets/images/media-partners/logotipovi-02.png"),
+            description: "Global",
+          },
+          {
+            image: require("@/assets/images/media-partners/logotipovi-03.png"),
+            description: "IT Biz Crunch",
+          },
+          {
+            image: require("@/assets/images/media-partners/logotipovi-04.png"),
+            description: "Radio Student",
+          },
+          {
+            image: require("@/assets/images/media-partners/logotipovi-05.png"),
+            description: "studentski.hr",
+          },
+          {
+            image: require("@/assets/images/media-partners/logotipovi-06.png"),
+            description: "Logo",
+          },
+          {
+            image: require("@/assets/images/media-partners/logotipovi-07.png"),
+            description: "VIDI",
+          },
+          {
+            image: require("@/assets/images/media-partners/logotipovi-08.png"),
+            description: "x-ica",
+          },
+        ];
       },
 
       joinSocialImages() {
