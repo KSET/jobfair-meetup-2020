@@ -286,14 +286,21 @@
             :class="$style.participantCol"
             cols="6"
           >
-            <div :class="$style.participantContainer">
+            <v-card
+              :class="$style.participantContainer"
+              :href="partner.link"
+              flat
+              rel="noopener noreferrer"
+              target="_blank"
+              tile
+            >
               <v-img
                 :alt="partner.description"
                 :src="partner.image"
                 aspect-ratio="1.875"
                 contain
               />
-            </div>
+            </v-card>
           </v-col>
         </v-row>
       </v-col>
@@ -384,30 +391,37 @@ name: Index
           {
             image: require("@/assets/images/media-partners/logotipovi-02.png"),
             description: "Global",
+            link: "https://www.globalnovine.eu/",
           },
           {
             image: require("@/assets/images/media-partners/logotipovi-03.png"),
             description: "IT Biz Crunch",
+            link: "https://www.itbizcrunch.com/",
           },
           {
             image: require("@/assets/images/media-partners/logotipovi-04.png"),
             description: "Radio Student",
+            link: "http://www.radiostudent.hr/",
           },
           {
             image: require("@/assets/images/media-partners/logotipovi-05.png"),
-            description: "studentski.hr",
+            description: "Studentski",
+            link: "https://studentski.hr/\n",
           },
           {
             image: require("@/assets/images/media-partners/logotipovi-06.png"),
-            description: "Logo",
+            description: "Televizija student",
+            link: "https://televizijastudent.com/",
           },
           {
             image: require("@/assets/images/media-partners/logotipovi-07.png"),
             description: "VIDI",
+            link: "https://www.vidi.hr/",
           },
           {
             image: require("@/assets/images/media-partners/logotipovi-08.png"),
             description: "x-ica",
+            link: "https://x-ica.com/",
           },
         ];
       },
