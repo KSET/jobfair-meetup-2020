@@ -80,10 +80,9 @@
 
       <v-row>
         <v-col cols="10" offset="1">
-          <v-autocomplete
+          <v-select
             v-model="selectedEventId"
             :items="selectItems"
-            auto-select-first
             label="Event"
             solo
           />
