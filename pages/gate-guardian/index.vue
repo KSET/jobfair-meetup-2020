@@ -184,7 +184,7 @@ name: PageGateGuardianScanQrCode
     name: "PageCompanyScanQrCode",
 
     async asyncData({ store }) {
-      const events = await store.dispatch("companies/fetchParticipantEvents");
+      const events = (await store.dispatch("companies/fetchParticipantEvents")).sort((a, b) => a.date - b.date);
 
       return {
         events: Object.fromEntries(events.map((event) => [ event.id, event ])),
@@ -244,16 +244,21 @@ name: PageGateGuardianScanQrCode
           Object
             .values(this.events)
             .map(
-              ({ title, id }) =>
+              ({
+                title,
+                id,
+                date,
+              }) =>
                 ({
                   text: title,
                   value: id,
+                  date,
                 })
               ,
             )
             .sort(
               (a, b) =>
-                b.date - a.date
+                a.date - b.date
               ,
             )
         );
