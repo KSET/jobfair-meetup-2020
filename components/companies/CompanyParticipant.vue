@@ -13,6 +13,7 @@
       class="mx-6"
       contain
     />
+
     <v-carousel
       v-else
 
@@ -37,21 +38,26 @@
       </v-carousel-item>
     </v-carousel>
 
-    <v-card-subtitle :class="$style.company">
-      {{ companyNameList }}
-    </v-card-subtitle>
+    <v-card-subtitle
+      :class="$style.company"
+      v-text="companyNameList"
+    />
 
     <v-card-title
       :class="$style.title"
       :title="event.description"
     >
       <n-link
+        v-if="noLink"
         :class="$style.titleLink"
-        :to="noLink ? infoLink : null"
+        :to="infoLink"
         target="_blank"
-      >
-        {{ event.title }}
-      </n-link>
+        v-text="event.title"
+      />
+      <span
+        v-else
+        v-text="event.title"
+      />
     </v-card-title>
 
     <v-card-text>
@@ -63,9 +69,10 @@
         aspect-ratio="1"
         contain
       />
-      <span :title="eventDate">
-        {{ eventDay }} | {{ eventTime }} | {{ event.location || "TBA" }}
-      </span>
+      <span
+        :title="eventDate"
+        v-text="eventDateText"
+      />
     </v-card-text>
 
     <slot />
@@ -132,6 +139,10 @@
         const location = this.event.location || "TBA";
 
         return `${ date } @ ${ location }`;
+      },
+
+      eventDateText() {
+        return `${ this.eventDay } | ${ this.eventTime } | ${ this.event.location || "TBA" }`;
       },
 
       isPanel() {
