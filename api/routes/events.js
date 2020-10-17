@@ -1,4 +1,7 @@
 import {
+ isGateGuardian,
+} from "../../helpers/auth";
+import {
   eventListFromStatus,
   EventStatus,
   hasParticipantCapacityFor,
@@ -73,9 +76,8 @@ const requireCv =
 const requireGateGuardian =
   (req, res, next) => {
     const { authUser } = req;
-    const { companies } = authUser;
 
-    if (!companies || !companies.find(({ id }) => 428 === Number(id))) {
+    if (!isGateGuardian(authUser)) {
       const status = HttpStatus.Error.Client.NotAcceptable;
 
       res.status(status);

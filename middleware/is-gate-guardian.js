@@ -1,6 +1,9 @@
 import {
   HttpStatus,
 } from "~/api/helpers/http";
+import {
+ isGateGuardian,
+} from "~/helpers/auth";
 
 export default function({ store, error }) {
   const { user } = store.state.user;
@@ -11,9 +14,7 @@ export default function({ store, error }) {
     });
   }
 
-  const { companies } = user;
-
-  if (!companies.find(({ id }) => 428 === Number(id))) {
+  if (!isGateGuardian(user)) {
     return error({
       statusCode: HttpStatus.Error.Client.NotFound,
     });

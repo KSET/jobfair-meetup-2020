@@ -4,6 +4,9 @@ import {
   isModerator,
   isStudent,
 } from "~/api/helpers/permissions";
+import {
+ isGateGuardian,
+} from "~/helpers/auth";
 
 export const state = () => (
   {
@@ -47,6 +50,10 @@ export const getters = {
 
   isStudent({ user }) {
     return isStudent(user.role);
+  },
+
+  isGateGuardian({ user }) {
+    return isGateGuardian(user);
   },
 
   isLoggedIn({ user }) {
