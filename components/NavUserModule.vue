@@ -95,6 +95,23 @@
           </v-list-item>
         </v-list>
 
+        <v-divider v-if="isGateGuardian" />
+
+        <v-list v-if="isGateGuardian" subheader>
+          <v-subheader>
+            <translated-text trans-key="nav.user.gateGuardian.header" />
+          </v-subheader>
+
+          <v-list-item>
+            <v-btn
+              :to="{ name: 'PageGateGuardianScanQrCode' }"
+              color="primary"
+            >
+              <translated-text trans-key="button.gateGuardian" />
+            </v-btn>
+          </v-list-item>
+        </v-list>
+
         <v-divider v-if="canViewAdminPanel" />
 
         <v-list v-if="canViewAdminPanel" subheader>
@@ -195,6 +212,7 @@
         isStudent: "user/isStudent",
         isModerator: "user/isModerator",
         isAdmin: "user/isAdmin",
+        isGateGuardian: "user/isGateGuardian",
       }),
 
       canViewStudentPanel() {
