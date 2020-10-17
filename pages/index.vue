@@ -303,6 +303,42 @@
             </v-card>
           </v-col>
         </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <h1 :class="$style.participantsHeader">
+              <translated-text trans-key="index.participants.projectFriends.header" />
+            </h1>
+            <p :class="$style.participantsDescription">
+              <translated-text trans-key="index.participants.projectFriends.text" />
+            </p>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col
+            v-for="friend in projectFriends"
+            :key="friend.id"
+            :class="$style.participantCol"
+            cols="6"
+          >
+            <v-card
+              :class="$style.participantContainer"
+              :href="friend.link"
+              flat
+              rel="noopener noreferrer"
+              target="_blank"
+              tile
+            >
+              <v-img
+                :alt="friend.description"
+                :src="friend.image"
+                aspect-ratio="1.875"
+                contain
+              />
+            </v-card>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
   </div>
@@ -422,6 +458,26 @@ name: Index
             image: require("@/assets/images/media-partners/logotipovi-08.png"),
             description: "x-ica",
             link: "https://x-ica.com/",
+          },
+        ];
+      },
+
+      projectFriends() {
+        return [
+          {
+            image: require("@/assets/images/project-friends/prijatelji-meetupa-02.png"),
+            description: "Volim Ljuto",
+            link: "https://www.volimljuto.com/",
+          },
+          {
+            image: require("@/assets/images/project-friends/prijatelji-meetupa-03.png"),
+            description: "Rougemarin",
+            link: "http://www.rougemarin.hr/",
+          },
+          {
+            image: require("@/assets/images/project-friends/prijatelji-meetupa-04.png"),
+            description: "Elektrostudent",
+            link: "http://www.ssfer.hr/",
           },
         ];
       },
