@@ -209,6 +209,21 @@ create table if not exists resume_scans
 
 create index if not exists resume_scans_company_id_index
     on resume_scans (company_id);
+
+create table if not exists event_log_entries
+(
+    user_id    integer                                            not null,
+    event_id   integer                                            not null,
+    event_type varchar(255)                                       not null,
+    scanner_id integer                                            not null,
+    scanned_at timestamp with time zone default CURRENT_TIMESTAMP not null
+);
+
+create index if not exists event_log_entries_user_id_event_id_event_type_index
+    on event_log_entries (user_id, event_id, event_type);
+
+create index if not exists event_log_entries_event_id_event_type_index
+    on event_log_entries (event_id, event_type);
 `;
 
 

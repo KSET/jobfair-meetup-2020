@@ -70,4 +70,14 @@ export const actions = {
 
     return await this.$api.$post("/events/status", { id, type, status }, { progress: false });
   },
+
+  async logEventEntry(_context, { userId, eventId, eventType }) {
+    return await this.$api.$post("/events/entry-log", { userId, eventId, eventType }, { progress: false });
+  },
+
+  async fetchEventEntryList(_context, { eventId, eventType }) {
+    const { data } = await this.$api.$get(`/events/entry-log/${ eventType }/${ eventId }`, { progress: false });
+
+    return data || [];
+  },
 };

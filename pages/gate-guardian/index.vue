@@ -79,13 +79,15 @@
       </v-row>
 
       <v-row>
-        <v-col cols="10" offset="1">
-          <v-select
-            v-model="selectedEventId"
-            :items="selectItems"
-            label="Event"
-            solo
-          />
+        <v-col cols="12">
+          <div class="px-2">
+            <v-select
+              v-model="selectedEventId"
+              :items="selectItems"
+              label="Event"
+              solo
+            />
+          </div>
         </v-col>
       </v-row>
 
@@ -107,7 +109,11 @@
           />
 
           <v-card-subtitle>
-            Ima rezervaciju:
+            <span class="font-weight-bold">Event:</span> [{{ selectedEvent.company.name }}] {{ selectedEvent.title }}
+          </v-card-subtitle>
+
+          <v-card-subtitle>
+            <span class="font-weight-bold">Ima rezervaciju:</span>
             <v-icon v-if="resume.hasReservation" color="success">
               mdi-check
             </v-icon>
@@ -116,9 +122,25 @@
             </v-icon>
           </v-card-subtitle>
 
+          <v-card-subtitle>
+            <span class="font-weight-bold">Rezervirana mjesta:</span> {{ resume.eventSlots.filled }} / {{ resume.eventSlots.total }} ({{ resume.eventSlots.free }} slobodnih)
+          </v-card-subtitle>
+
+          <v-card-subtitle>
+            <span class="font-weight-bold">Propušteni ljudi:</span> {{ resume.logEntries.length }} / {{ resume.eventSlots.total }}
+          </v-card-subtitle>
+
+          <v-card-subtitle v-if="resume.alreadyEntered">
+            <v-alert type="error">
+              Već propušten
+            </v-alert>
+          </v-card-subtitle>
+
           <v-card-actions>
             <v-btn
               :loading="resumeLoading"
+              color="warning"
+              x-large
               @click="resume = null"
             >
               Zatvori
@@ -129,6 +151,7 @@
             <v-btn
               :loading="resumeLoading"
               color="success"
+              x-large
               @click.stop="approveEntry"
             >
               Odobri ulaz
@@ -148,6 +171,9 @@ name: PageGateGuardianScanQrCode
   import {
     mapActions,
   } from "vuex";
+  import {
+    getParticipantCapacityFor,
+  } from "~/components/student/event-status";
   import {
     dotGet,
   } from "~/helpers/data";
@@ -225,6 +251,11 @@ name: PageGateGuardianScanQrCode
                 })
               ,
             )
+            .sort(
+              (a, b) =>
+                b.date - a.date
+              ,
+            )
         );
       },
 
@@ -234,6 +265,16 @@ name: PageGateGuardianScanQrCode
         }
 
         return this.events[this.selectedEventId];
+      },
+
+      eventKey() {
+        const { selectedEvent, resume } = this;
+
+        return {
+          eventId: dotGet(selectedEvent, "id"),
+          eventType: dotGet(selectedEvent, "type"),
+          userId: dotGet(resume, "userId"),
+        };
       },
     },
 
@@ -250,6 +291,9 @@ name: PageGateGuardianScanQrCode
         fetchResume: "resume/fetchResumeByUid",
         fetchResumeData: "resume/fetchResume",
         fetchIsParticipant: "events/fetchEventParticipantHasReservation",
+        fetchEventParticipants: "events/fetchEventParticipants",
+        logEventEntry: "events/logEventEntry",
+        fetchEventEntryList: "events/fetchEventEntryList",
       }),
 
       switchCamera() {
@@ -297,33 +341,74 @@ name: PageGateGuardianScanQrCode
         ctx.stroke();
       },
 
-      async onDecode(content) {
+      async doOnDecode(content) {
         let uid = null;
         try {
           const { resume_uid: userUid } = JSON.parse(content);
           uid = userUid;
         } catch {
-          return null;
+          throw new Error("Could not parse QR Code data");
         }
 
         this.turnCameraOff();
-        this.message = "Loading info...";
 
         const { userId, id: resumeId } = await this.fetchResume({ uid });
 
-        if (userId) {
-          const resume = await this.fetchResumeData({ resumeId });
-          const { selectedEvent } = this;
+        if (!userId) {
+          throw new Error("Unknown user");
+        }
 
-          resume.hasReservation = await this.fetchIsParticipant({
-            eventId: dotGet(selectedEvent, "id"),
-            eventType: dotGet(selectedEvent, "type"),
-            userId,
-          });
+        const { selectedEvent, eventKey: rawEventKey } = this;
+        const eventKey = {
+          ...rawEventKey,
+          userId,
+        };
 
-          this.$set(this, "resume", resume);
-        } else {
-          this.errorMessage = "Unknown user";
+        const [
+          resume,
+          eventParticipants,
+          hasReservation,
+          reservationData,
+        ] = await Promise.all([
+          await this.fetchResumeData({ resumeId }),
+          await this.fetchEventParticipants(eventKey),
+          await this.fetchIsParticipant(eventKey),
+          await this.fetchEventEntryList(eventKey),
+        ]);
+
+        const capacity = getParticipantCapacityFor(selectedEvent.type);
+
+        Object.assign(
+          resume,
+          {
+            hasReservation,
+            eventSlots: {
+              total: capacity,
+              free: Math.max(
+                0,
+                capacity - eventParticipants.event,
+              ),
+              filled: eventParticipants.event,
+            },
+            logEntries: reservationData,
+            alreadyEntered: reservationData.includes(Number(userId)),
+          },
+        );
+
+        this.$set(this, "resume", resume);
+      },
+
+      async onDecode(contents) {
+        this.message = "Loading info...";
+
+        try {
+          await this.doOnDecode(contents);
+        } catch (e) {
+          if ("string" === typeof e) {
+            this.errorMessage = e;
+          } else {
+            this.errorMessage = e.message;
+          }
 
           await sleep(3000);
 
@@ -403,11 +488,27 @@ name: PageGateGuardianScanQrCode
       },
 
       async approveEntry() {
+        const { eventKey } = this;
+
         this.resumeLoading = true;
 
-        await sleep(3000);
+        const { error, reason, errorData } = await this.logEventEntry(eventKey);
 
         this.resumeLoading = false;
+
+        if (error) {
+          const err =
+            reason ||
+            (
+              errorData
+                ? errorData.join("\n")
+                : "Something went wrong"
+            )
+          ;
+
+          return alert(err);
+        }
+
         this.resume = null;
       },
     },

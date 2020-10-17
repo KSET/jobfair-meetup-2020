@@ -4,6 +4,10 @@ import {
   hasParticipantCapacityFor,
 } from "../../components/student/event-status";
 import {
+  queryEventLogEntriesCreate,
+  queryEventLogEntriesGetByEvent,
+} from "../../db/helpers/eventLogEntries";
+import {
   queryReservationsCountVisitorsForEvent,
   queryReservationsCountVisitorsByEvent,
   queryReservationsCreate,
@@ -237,7 +241,66 @@ router.get("/participants/is-participant/:eventType/:eventId/:userId", requireAu
   return Boolean(status);
 });
 
-router.get("/participants/:eventType/:eventId", requireCv, async ({ params }) => {
+router.post("/entry-log", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ body, authUser }) => {
+  const {
+    userId,
+    eventId,
+    eventType,
+  } = body;
+
+  if (!userId || !eventId || !eventType) {
+    throw new ApiError(
+      "Not all data provided",
+      HttpStatus.Error.Client.UnprocessableEntity,
+      {
+        userId,
+        eventId,
+        eventType,
+      },
+    );
+  }
+
+  const payload = {
+    userId,
+    eventId,
+    eventType,
+    scannerId: authUser.id,
+  };
+
+  const data = await Client.queryOneOnce(queryEventLogEntriesCreate(payload));
+
+  return keysFromSnakeToCamelCase(data);
+});
+
+router.get("/entry-log/:eventType/:eventId", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+  const {
+    eventId,
+    eventType,
+  } = params;
+
+  if (!eventId || !eventType) {
+    throw new ApiError(
+      "Not all data provided",
+      HttpStatus.Error.Client.UnprocessableEntity,
+      {
+        eventId,
+        eventType,
+      },
+    );
+  }
+
+  const userIds = new Set();
+
+  const logEntries = await Client.queryOnce(queryEventLogEntriesGetByEvent({ eventId, eventType }));
+
+  for (const { user_id: userId } of logEntries) {
+    userIds.add(userId);
+  }
+
+  return Array.from(userIds);
+});
+
+router.get("/participants/:eventType/:eventId", async ({ params }) => {
   const { eventType, eventId } = params;
 
   const rawEvents = await Client.queryOnce(queryReservationsGetByEventId({ eventType, eventId }));
