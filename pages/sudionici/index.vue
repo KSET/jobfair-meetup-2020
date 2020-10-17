@@ -22,6 +22,7 @@
 
             :class="$style.filterContainer"
             :cols="Math.round(12 / filterValues.length)"
+            md="auto"
             class="d-flex px-2"
           >
             <v-btn
