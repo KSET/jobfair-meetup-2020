@@ -38,7 +38,7 @@ import {
   cachedFetcher,
 } from "../helpers/fetchCache";
 import {
- requireAuth,
+  requireAuth,
 } from "../helpers/middleware";
 
 
@@ -228,7 +228,13 @@ router.get("/participants/is-participant/:eventType/:eventId/:userId", requireAu
     userId,
   }));
 
-  return Boolean(reservation);
+  if (!reservation) {
+    return false;
+  }
+
+  const { status } = reservation;
+
+  return Boolean(status);
 });
 
 router.get("/participants/:eventType/:eventId", requireCv, async ({ params }) => {
