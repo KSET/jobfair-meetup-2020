@@ -9,7 +9,7 @@
         Prijava
       </v-card-title>
       <v-card-subtitle>
-        Iskoristi Job Fair email i lozinku za prijavu (s <a style="color: inherit;" target="_blank" rel="noopener noreferrer" :href="loginUrlHref">{{ loginUrlName }}</a>)
+        Iskoristi Job Fair email i lozinku za prijavu (s <a :href="loginUrlHref" rel="noopener noreferrer" style="color: inherit;" target="_blank">{{ loginUrlName }}</a>)
       </v-card-subtitle>
       <v-card-text>
         <v-form
@@ -48,6 +48,14 @@
           >
             Zahtjev se još procesira...
           </span>
+          <a
+            v-else
+            class="font-weight-light ml-3 black--text"
+            href="https://jobfair.fer.unizg.hr/users/sign_up"
+            target="_blank"
+          >
+            Registriraj se
+          </a>
         </transition>
 
         <v-btn
