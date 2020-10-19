@@ -230,7 +230,7 @@ router.get("/participants", requireCv, async () => {
   return events;
 });
 
-router.get("/participants/is-participant/:eventType/:eventId/:userId", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+router.get("/participants/is-participant/:eventType/:eventId(\\d+)/:userId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
   const { eventType, eventId, userId } = params;
 
   const reservation = await Client.queryOneOnce(queryReservationsGetByEventAndUserId({
@@ -279,7 +279,7 @@ router.post("/entry-log", requireAuth({ fullUserData: true }), requireGateGuardi
   return keysFromSnakeToCamelCase(data);
 });
 
-router.get("/entry-log/:eventType/:eventId", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+router.get("/entry-log/:eventType/:eventId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
   const {
     eventId,
     eventType,
@@ -307,7 +307,7 @@ router.get("/entry-log/:eventType/:eventId", requireAuth({ fullUserData: true })
   return Array.from(userIds);
 });
 
-router.get("/participants/:eventType/:eventId", async ({ params }) => {
+router.get("/participants/:eventType/:eventId(\\d+)", async ({ params }) => {
   const { eventType, eventId } = params;
 
   const rawEvents = await Client.queryOnce(queryReservationsGetByEventId({ eventType, eventId }));
