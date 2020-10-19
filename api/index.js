@@ -42,6 +42,12 @@ app.use(Sentry.Handlers.requestHandler());
 const routes = registerRoutesInFolder(joinPath(__dirname, "routes"));
 
 app.set("x-powered-by", false);
+app.set("etag", false);
+app.use((req, res, next) => {
+  res.set("Connection", "close");
+
+  next();
+});
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
