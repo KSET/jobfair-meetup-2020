@@ -108,6 +108,30 @@ export const asyncWrapper = (fn) => (...args) => {
   );
 };
 
+export const rawRoute = (fn) => asyncWrapper(async (req, res, next) => {
+  try {
+    const result = await fn(req, res, next);
+
+    return res.end(result);
+  } catch (e) {
+    if (e.statusCode) {
+      res.status(e.statusCode);
+    } else {
+      res.status(HttpStatus.Error.Client.Forbidden);
+    }
+
+    if (!(e instanceof ApiError)) {
+      Sentry.captureException(e);
+
+      if ("development" === process.env.NODE_ENV) {
+        console.log(e);
+      }
+    }
+
+    return res.end();
+  }
+});
+
 
 export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
   try {
@@ -215,9 +239,7 @@ export class Router {
   }
 
   getRaw(path, ...handlers) {
-    this.#router.get(path, ...handlers);
-
-    return this;
+    return this.addRawRoute("get", path, handlers);
   }
 
   post(path, ...handlers) {
@@ -225,9 +247,7 @@ export class Router {
   }
 
   postRaw(path, ...handlers) {
-    this.#router.post(path, ...handlers);
-
-    return this;
+    return this.addRawRoute("post", path, handlers);
   }
 
   put(path, ...handlers) {
@@ -284,9 +304,32 @@ export class Router {
    * @returns {Router}
    */
   addRoute(requestMethod, path, handlersList) {
+    return this.addWrappedRoute(requestMethod, path, handlersList, apiRoute);
+  }
+
+  /**
+   * @param {String} requestMethod
+   * @param {String} path
+   * @param {Array} handlersList
+   *
+   * @returns {Router}
+   */
+  addRawRoute(requestMethod, path, handlersList) {
+    return this.addWrappedRoute(requestMethod, path, handlersList, rawRoute);
+  }
+
+  /**
+   * @param {String} requestMethod
+   * @param {String} path
+   * @param {Array} handlersList
+   * @param {Function} wrapper
+   *
+   * @returns {Router}
+   */
+  addWrappedRoute(requestMethod, path, handlersList, wrapper) {
     const handler = handlersList.pop();
 
-    this.#router[requestMethod](path, ...[ ...handlersList, apiRoute(handler) ]);
+    this.#router[requestMethod](path, ...[ ...handlersList, wrapper(handler) ]);
 
     return this;
   }
