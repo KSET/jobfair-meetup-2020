@@ -13,6 +13,7 @@ import {
 } from "../../helpers/string";
 import {
   HttpStatus,
+  internalRequest,
 } from "../helpers/http";
 import {
   cachedFetcher,
@@ -112,7 +113,11 @@ authRouter.get("/list", async ({ authHeader }) => {
 });
 
 authRouter.get("/for-user/:uid", cachedFetcher(listCacheTimeoutMs, async ({ authHeader, params }) => {
-  const resumes = await fetchListCached(authHeader);
+  const { data: resumes } = await internalRequest("get", "/resumes/list", {
+    headers: {
+      Authorization: authHeader,
+    },
+  }) || [];
 
   const [ resume ] = resumes.filter(({ uid }) => uid === params.uid);
 
