@@ -357,10 +357,10 @@ name: PageGateGuardianScanQrCode
 
         this.turnCameraOff();
 
-        const { userId, id: resumeId } = await this.fetchResume({ uid });
+        const { userId, id: resumeId } = await this.fetchResume({ uid }) || {};
 
         if (!userId) {
-          throw new Error("Unknown user");
+          throw new Error("Unknown user / cannot find CV");
         }
 
         const { selectedEvent, eventKey: rawEventKey } = this;
