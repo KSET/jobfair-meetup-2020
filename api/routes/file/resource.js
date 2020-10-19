@@ -1,3 +1,4 @@
+import contentDisposition from "content-disposition";
 import {
   Router,
 } from "express";
@@ -34,7 +35,7 @@ router.get("/:id", async (req, res) => {
 
   res.set("Content-Type", "application/octet-stream");
   res.set("Content-Transfer-Encoding", "binary");
-  res.set("Content-Disposition", `attachment; filename="${ encodeURI(file.name) }"`);
+  res.set("Content-Disposition", contentDisposition(file.name));
 
   return res.sendFile(file.path);
 });
