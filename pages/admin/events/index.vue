@@ -22,6 +22,20 @@
 
     <v-row>
       <v-col cols="12">
+        <v-btn
+          color="secondary"
+          :to="{ name: 'PageAdminEventsScannedStudents' }"
+        >
+          <v-icon left>
+            mdi-account-multiple-check
+          </v-icon>
+          Pristupnici eventima
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12">
         <v-expansion-panels>
           <v-expansion-panel>
             <v-expansion-panel-header>Svi sudionici ({{ Object.keys(users).length }})</v-expansion-panel-header>

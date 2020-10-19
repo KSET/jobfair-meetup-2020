@@ -80,4 +80,10 @@ export const actions = {
 
     return data || [];
   },
+
+  async fetchEventEntryListAll() {
+    const { data } = await this.$api.$get("/events/entry-log/all", { progress: false });
+
+    return data || [];
+  },
 };

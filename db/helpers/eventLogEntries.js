@@ -43,11 +43,29 @@ export const queryEventLogEntriesGetByEvent =
       where
             "event_id" = $1
         and "event_type" = $2
+      order by
+          event_type
+        , event_id
     `,
     values: [
       eventId,
       eventType,
     ],
+  })
+;
+
+export const queryEventLogEntriesGetAll =
+  () => ({
+    text: `
+      select
+        *
+      from
+        event_log_entries
+      order by
+          event_type
+        , event_id
+    `,
+    values: [],
   })
 ;
 
