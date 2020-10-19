@@ -37,10 +37,25 @@ router.get("/participants", cachedFetcher(cacheForMs, async () => {
   return companies.map(fixCompany);
 }));
 
-router.get("/events", cachedFetcher(cacheForMs, async () => {
+router.get("/events/all", cachedFetcher(cacheForMs, async () => {
   const { companies, ...eventList } = await graphQlQuery(participantEventsQuery());
 
   const { data: panels } = await internalRequest("get", "/panels/list/with-info");
+
+  const events = {
+    panels,
+    ...eventList,
+  };
+
+  return keysFromSnakeToCamelCase({
+    companies: companies.map(fixCompany),
+    ...events,
+  });
+}));
+
+router.get("/events", cachedFetcher(cacheForMs, async () => {
+  const { data } = await internalRequest("get", "/companies/events/all");
+  const { companies, ...events } = data;
 
   const oneHourAgo = new Date();
   oneHourAgo.setHours(oneHourAgo.getHours() - 1);
@@ -69,20 +84,17 @@ router.get("/events", cachedFetcher(cacheForMs, async () => {
       ]
   ;
 
-  const events = Object.fromEntries(
+  const filteredEvents = Object.fromEntries(
     Object
-      .entries({
-        panels,
-        ...eventList,
-      })
+      .entries(events)
       .map(removePassedEvents)
     ,
   );
 
-  return keysFromSnakeToCamelCase({
-    companies: companies.map(fixCompany),
-    ...events,
-  });
+  return {
+    companies,
+    ...filteredEvents,
+  };
 }));
 
 router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => {
@@ -147,7 +159,7 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
 }));
 
 router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
-  const { data } = await internalRequest("GET", "/companies/events") || {};
+  const { data } = await internalRequest("GET", "/companies/events/all") || {};
   const { companies, ...rawEvents } = data;
 
   const company = companies.find(({ id }) => String(id) === String(params.id));

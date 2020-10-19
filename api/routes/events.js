@@ -104,7 +104,7 @@ router.post("/status", requireCv, async ({ body, authUser }) => {
 
   const { data } = await internalRequest(
     "get",
-    "/companies/events",
+    "/companies/events/all",
   );
 
   let events = [];
