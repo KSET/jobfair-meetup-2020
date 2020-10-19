@@ -124,8 +124,10 @@ export const rawRoute = (fn) => asyncWrapper(async (req, res, next) => {
       Sentry.captureException(e);
 
       if ("development" === process.env.NODE_ENV) {
-        console.log(e);
+        console.log("|> ERROR", "\n", e);
       }
+    } else {
+      res.set("X-Api-Error", e.message);
     }
 
     return res.end();
