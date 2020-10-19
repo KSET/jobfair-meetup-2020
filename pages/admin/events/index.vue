@@ -226,7 +226,7 @@ name: PageAdminEventsIndex
 
     async asyncData({ store }) {
       const { eventParticipants, users } = await fetchParticipants(store);
-      const eventList = (await store.dispatch("companies/fetchParticipantEvents")).sort((a, b) => a.date - b.date);
+      const eventList = (await store.dispatch("companies/fetchParticipantEventsAll")).sort((a, b) => a.date - b.date);
 
       const getParticipants = ({ type, id }) =>
         dotGet(
