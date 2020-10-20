@@ -121,7 +121,7 @@ name: PageAdminEventsScannedStudents
       ] = await Promise.all([
         store.dispatch("events/fetchEventEntryListAll"),
         store.dispatch("resume/fetchResumes"),
-        store.dispatch("companies/fetchParticipantEvents"),
+        store.dispatch("companies/fetchParticipantEventsAll"),
       ]);
 
       const resumes = rawResumes;
