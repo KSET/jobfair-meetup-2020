@@ -8,5 +8,5 @@ import {
 export const isGateGuardian =
   (user) =>
     isModerator(dotGet(user, "role")) ||
-    dotGet(user, "companies", []).find(({ id }) => 428 === Number(id))
+    (dotGet(user, "companies") || []).find(({ id }) => 428 === Number(id))
 ;
