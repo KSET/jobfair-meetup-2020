@@ -50,7 +50,7 @@
         </v-row>
       </v-col>
 
-      <v-col cols="11" md="8">
+      <v-col cols="12" md="8">
         <v-row>
           <v-col cols="12">
             <h2 :class="$style.sectionTitle">
