@@ -24,14 +24,52 @@
                 <span slot="placeholder" :class="$style.typing">{{ titleTexts[0] }}</span>
               </client-only>
             </h1>
-            <div v-if="!isLoggedIn" :class="$style.heroButtonContainer">
+            <div :class="$style.heroButtonContainer">
               <v-btn
+                v-if="!isLoggedIn"
                 :class="$style.heroButton"
                 :to="{ name: 'PageLogin' }"
                 color="primary"
                 large
               >
                 <translated-text trans-key="button.joinNow" />
+              </v-btn>
+              <v-btn
+                v-else-if="isGateGuardian"
+                :class="$style.heroButton"
+                :to="{ name: 'PageGateGuardianScanQrCode' }"
+                color="primary"
+                large
+              >
+                <translated-text trans-key="button.goToGateGuardian" />
+              </v-btn>
+              <v-btn
+                v-else-if="!hasCv && !hasCompany"
+                :class="$style.heroButton"
+                href="https://jobfair.fer.unizg.hr/hr/zivotopisi/novo"
+                target="_blank"
+                color="primary"
+                large
+              >
+                <translated-text trans-key="button.submitCv" />
+              </v-btn>
+              <v-btn
+                v-else-if="hasCompany"
+                :class="$style.heroButton"
+                :to="{ name: 'PageCompanyResumes' }"
+                color="primary"
+                large
+              >
+                <translated-text trans-key="button.goToCompanyPage" />
+              </v-btn>
+              <v-btn
+                v-else-if="hasCv"
+                :class="$style.heroButton"
+                :to="{ name: 'PageStudentIndex' }"
+                color="primary"
+                large
+              >
+                <translated-text trans-key="button.studentPanel" />
               </v-btn>
             </div>
           </v-col>
@@ -408,6 +446,9 @@ name: Index
       ...mapGetters({
         getSetting: "settings/getSetting",
         isLoggedIn: "user/isLoggedIn",
+        hasCv: "user/hasCv",
+        hasCompany: "user/hasCompany",
+        isGateGuardian: "user/isGateGuardian",
       }),
 
       titleTexts() {

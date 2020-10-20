@@ -5,8 +5,11 @@ import {
   isStudent,
 } from "~/api/helpers/permissions";
 import {
- isGateGuardian,
+  isGateGuardian,
 } from "~/helpers/auth";
+import {
+ dotGet,
+} from "~/helpers/data";
 
 export const state = () => (
   {
@@ -58,6 +61,14 @@ export const getters = {
 
   isLoggedIn({ user }) {
     return Boolean(user);
+  },
+
+  hasCv({ user }) {
+    return Boolean(dotGet(user, "uid", null));
+  },
+
+  hasCompany({ user }) {
+    return Boolean(dotGet(user, "companies.length", 0));
   },
 };
 
