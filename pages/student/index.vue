@@ -355,6 +355,10 @@ name: PageStudentIndex
           return rawEvents;
         }
 
+        if ("reserved" === filterType) {
+          return rawEvents.filter(({ userStatus }) => userStatus.length);
+        }
+
         return rawEvents.filter(({ type }) => type === filterType);
       },
 
@@ -379,6 +383,10 @@ name: PageStudentIndex
           {
             name: "participants.filter.talks",
             value: "talk",
+          },
+          {
+            name: "participants.filter.reserved",
+            value: "reserved",
           },
         ];
       },
