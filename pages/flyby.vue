@@ -24,11 +24,7 @@
       const { href: studentPanelHref } = app.router.resolve({ name: "PageStudentIndex" });
       const { href: homeHref } = app.router.resolve({ name: "Index" });
 
-      const user = store.getters["user/getUser"];
-
-      if (user) {
-        return redirect(studentPanelHref);
-      }
+      await store.commit("user/SET_USER", null);
 
       const { s: token, r: refreshToken } = query;
 
