@@ -85,8 +85,8 @@
                     :key="filter.name"
 
                     :class="$style.filterContainer"
-                    :cols="Math.round(12 / filterValues.length)"
-                    class="d-flex px-2"
+                    cols="auto"
+                    class="d-flex px-0"
                   >
                     <v-btn
                       :class="{
