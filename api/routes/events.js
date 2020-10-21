@@ -230,6 +230,59 @@ router.get("/participants", requireCv, async () => {
   return events;
 });
 
+router.get("/participants/is-participant/networking/-1/:userId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+  const { userId } = params;
+
+  const { data: { panels, workshops, presentations } } = await internalRequest("get", "/companies/events/all") || {};
+  const reservations = await Client.queryOnce(queryReservationsGetByUserId({
+    userId,
+  }));
+
+  const eq = (a, b) => String(a) === String(b);
+  const getEvent = ({ eventType, eventId }) => {
+    switch (eventType) {
+      case "panel":
+        return panels.find(({ id }) => eq(id, eventId));
+      case "workshop":
+        return workshops.find(({ id }) => eq(id, eventId));
+      case "talk":
+        return presentations.find(({ id }) => eq(id, eventId));
+      default:
+        return null;
+    }
+  };
+  const isToday = (rawDate) => {
+    const today = new Date();
+    const date = new Date(rawDate);
+
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
+  for (const reservation of keysFromSnakeToCamelCase(reservations)) {
+    const event = getEvent(reservation);
+
+    if (!isToday(event.occuresAt)) {
+      continue;
+    }
+
+    const isTalk = "talk" === reservation.eventType;
+    if (!isTalk) {
+      return true;
+    }
+
+    const hasNetworking = eventListFromStatus(reservation.status).includes("networking");
+    if (hasNetworking) {
+      return true;
+    }
+  }
+
+  return false;
+});
+
 router.get("/participants/is-participant/:eventType/:eventId(\\d+)/:userId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
   const { eventType, eventId, userId } = params;
 
@@ -279,11 +332,16 @@ router.post("/entry-log", requireAuth({ fullUserData: true }), requireGateGuardi
   return keysFromSnakeToCamelCase(data);
 });
 
-router.get("/entry-log/:eventType/:eventId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+router.get("/entry-log/:eventType/-?:eventId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
   const {
-    eventId,
+    eventId: eventIdRaw,
     eventType,
   } = params;
+  const eventId =
+    "networking" !== eventType
+    ? eventIdRaw
+    : Number(eventIdRaw) * -1
+  ;
 
   if (!eventId || !eventType) {
     throw new ApiError(
@@ -305,6 +363,12 @@ router.get("/entry-log/:eventType/:eventId(\\d+)", requireAuth({ fullUserData: t
   }
 
   return Array.from(userIds);
+});
+
+router.get("/participants/networking/-1", () => {
+  return {
+    event: "0",
+  };
 });
 
 router.get("/participants/:eventType/:eventId(\\d+)", async ({ params }) => {

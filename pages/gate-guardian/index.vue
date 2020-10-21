@@ -177,8 +177,20 @@ name: PageGateGuardianScanQrCode
   import {
     dotGet,
   } from "~/helpers/data";
+  import {
+    generateMetadata,
+  } from "~/helpers/head";
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const NETWORKING_BASE = Object.freeze({
+    id: -1,
+    type: "networking",
+    company: {
+      title: "FER",
+    },
+    title: "Networking",
+  });
 
   export default {
     name: "PageCompanyScanQrCode",
@@ -240,8 +252,8 @@ name: PageGateGuardianScanQrCode
       },
 
       selectItems() {
-        return (
-          Object
+        return ([
+          ...Object
             .values(this.events)
             .map(
               ({
@@ -260,13 +272,24 @@ name: PageGateGuardianScanQrCode
               (a, b) =>
                 a.date - b.date
               ,
-            )
-        );
+            ),
+          {
+            text: NETWORKING_BASE.title,
+            value: NETWORKING_BASE.id,
+            date: new Date(),
+          },
+        ]);
       },
 
       selectedEvent() {
-        if (!this.selectedEventId) {
+        const id = this.selectedEventId;
+
+        if (!id) {
           return null;
+        }
+
+        if (id === NETWORKING_BASE.id) {
+          return NETWORKING_BASE;
         }
 
         return this.events[this.selectedEventId];
@@ -381,7 +404,11 @@ name: PageGateGuardianScanQrCode
           await this.fetchEventEntryList(eventKey),
         ]);
 
-        const capacity = getParticipantCapacityFor(selectedEvent.type);
+        const capacity =
+          NETWORKING_BASE.type === selectedEvent.type
+            ? 300
+            : getParticipantCapacityFor(selectedEvent.type)
+        ;
 
         Object.assign(
           resume,
@@ -516,6 +543,18 @@ name: PageGateGuardianScanQrCode
 
         this.resume = null;
       },
+    },
+
+    head() {
+      return {
+        title: "Gate Guardian",
+        meta: [
+          ...generateMetadata({
+            title: "Gate Guardian",
+            locale: "hr",
+          }),
+        ],
+      };
     },
   };
 </script>
