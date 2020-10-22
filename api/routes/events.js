@@ -446,6 +446,39 @@ moderatorRouter.get("/users", cachedFetcher(timeoutMs, async ({ authHeader }) =>
   };
 }));
 
+router.post("/entry-log/manual", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ body, authUser }) => {
+  const {
+    userId,
+    eventId,
+    eventType,
+    eventDate,
+  } = body;
+
+  if (!userId || !eventId || !eventType || !eventDate) {
+    throw new ApiError(
+      "Not all data provided",
+      HttpStatus.Error.Client.UnprocessableEntity,
+      {
+        userId,
+        eventId,
+        eventType,
+      },
+    );
+  }
+
+  const payload = {
+    userId,
+    eventId,
+    eventType,
+    scannerId: authUser.id,
+    scannedAt: new Date(eventDate),
+  };
+
+  const data = await Client.queryOneOnce(queryEventLogEntriesCreate(payload));
+
+  return keysFromSnakeToCamelCase(data);
+});
+
 moderatorRouter.get("/entry-log/all", async () => {
   const list = await Client.queryOnce(queryEventLogEntriesGetAll());
 

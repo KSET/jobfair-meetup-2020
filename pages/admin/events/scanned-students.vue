@@ -23,15 +23,122 @@
     <v-row>
       <v-col>
         <v-btn
+          :href="downloadAllUrl"
           color="primary"
           target="_blank"
-          :href="downloadAllUrl"
         >
           <v-icon left>
             mdi-download-multiple
           </v-icon>
           Skini popis svih skeniranih ({{ scanned.length }})
         </v-btn>
+      </v-col>
+
+      <v-spacer />
+
+      <v-col class="text-right">
+        <v-dialog
+          v-model="addEntry.dialog"
+          max-width="600px"
+          persistent
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              color="primary"
+              v-on="on"
+              @click.stop="openAddEntry"
+            >
+              <v-icon left>
+                mdi-account-plus
+              </v-icon>
+              Dodaj sudionika ručno
+            </v-btn>
+          </template>
+
+          <v-card
+            :loading="addEntry.loading"
+          >
+            <v-card-title>
+              <span class="headline">Dodaj polaznika manualno</span>
+            </v-card-title>
+
+            <v-card-text>
+              <v-form
+                v-model="addEntry.valid"
+                :disabled="addEntry.loading"
+              >
+                <v-row>
+                  <v-col
+                    cols="12"
+                  >
+                    <v-autocomplete
+                      v-model="addEntry.data.userId"
+                      :filter="itemFilter('fullName', 'email')"
+                      :items="resumes"
+                      :rules="addEntryRules.student"
+                      clearable
+                      item-text="fullName"
+                      item-value="userId"
+                      label="Student"
+                      required
+                    />
+                  </v-col>
+
+                  <v-col
+                    cols="12"
+                  >
+                    <v-autocomplete
+                      v-model="addEntry.data.eventId"
+                      :filter="itemFilter('title', 'company.name')"
+                      :items="events"
+                      :rules="addEntryRules.event"
+                      clearable
+                      item-text="title"
+                      item-value="id"
+                      label="Event"
+                      required
+                    />
+                  </v-col>
+
+                  <v-col
+                    cols="12"
+                  >
+                    <v-time-picker
+                      v-model="addEntry.data.time"
+                      format="24hr"
+                      full-width
+                      landscape
+                      scrollable
+                    />
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+
+            <v-card-actions>
+              <v-btn
+                color="blue darken-1"
+                text
+                @click="closeAddEntry"
+              >
+                Close
+              </v-btn>
+
+              <v-spacer />
+
+              <v-btn
+                :disabled="!addEntryValid"
+                :loading="addEntry.loading"
+                color="blue darken-1"
+                text
+                @click="submitAddEntry"
+              >
+                Save
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
 
@@ -97,6 +204,7 @@ name: PageAdminEventsScannedStudents
 </router>
 
 <script>
+  import fuzzySearch from "fuzzysearch";
   import {
     mapActions,
   } from "vuex";
@@ -105,6 +213,62 @@ name: PageAdminEventsScannedStudents
     dotGet,
   } from "~/helpers/data";
 
+  const getData = async (store) => {
+    const [
+      rawScanned,
+      rawResumes,
+      rawEvents,
+    ] = await Promise.all([
+      store.dispatch("events/fetchEventEntryListAll"),
+      store.dispatch("resume/fetchResumes"),
+      store.dispatch("companies/fetchParticipantEventsAll"),
+    ]);
+
+    const resumes = rawResumes;
+    const scanned =
+      rawScanned
+        .sort(
+          (a, b) =>
+            a.scannedAt - b.scannedAt
+          ,
+        )
+    ;
+    const events =
+      rawEvents
+        .sort(
+          (a, b) =>
+            a.date - b.date
+          ,
+        )
+        .map((event) => Object.assign(event, { listOpen: false }))
+    ;
+
+    return {
+      scanned,
+      resumes,
+      events,
+    };
+  };
+
+  const rules = {
+    required:
+      (errorText = "Required") =>
+        (value) =>
+          (
+            Boolean(value) ||
+            errorText
+          ),
+
+    minLength:
+      (length, errorText = "Required") =>
+        (value) =>
+          (
+            length < String(value || "").length ||
+            errorText
+          )
+    ,
+  };
+
   export default {
 
     components: {
@@ -112,41 +276,23 @@ name: PageAdminEventsScannedStudents
     },
 
     async asyncData({ store }) {
-      const addProp = (prop, value) => (obj) => Object.assign(obj, { [prop]: value });
+      return await getData(store);
+    },
 
-      const [
-        rawScanned,
-        rawResumes,
-        rawEvents,
-      ] = await Promise.all([
-        store.dispatch("events/fetchEventEntryListAll"),
-        store.dispatch("resume/fetchResumes"),
-        store.dispatch("companies/fetchParticipantEventsAll"),
-      ]);
-
-      const resumes = rawResumes;
-      const scanned =
-        rawScanned
-          .sort(
-            (a, b) =>
-              a.scannedAt - b.scannedAt
-            ,
-          )
-      ;
-      const events =
-        rawEvents
-          .sort(
-            (a, b) =>
-              a.date - b.date
-            ,
-          )
-          .map(addProp("listOpen", false))
-      ;
-
+    data() {
       return {
-        scanned,
-        resumes,
-        events,
+        addEntry: {
+          dialog: false,
+          loading: true,
+          search: "",
+
+          valid: false,
+          data: {
+            userId: null,
+            eventId: null,
+            time: null,
+          },
+        },
       };
     },
 
@@ -175,11 +321,31 @@ name: PageAdminEventsScannedStudents
         return "/api/events/entry-log/export/all.csv";
       },
 
+      addEntryRules() {
+        return {
+          student: [
+            rules.required("Required"),
+          ],
+
+          event: [
+            rules.required("Required"),
+          ],
+        };
+      },
+
+      addEntryValid() {
+        const { valid, data } = this.addEntry;
+
+        return valid && data.time;
+      },
+
     },
 
     methods: {
       ...mapActions({
         fetchScannedStudents: "events/fetchEventEntryListAll",
+        logEventEntryManual: "events/logEventEntryManual",
+        fetchResumes: "resume/fetchResumes",
       }),
 
       usersForEvent(event) {
@@ -225,6 +391,102 @@ name: PageAdminEventsScannedStudents
 
       downloadUrl(event) {
         return `/api/events/entry-log/export/${ event.type }/${ event.id }.csv`;
+      },
+
+      async refreshData() {
+        const data = await getData(this.$store);
+
+        for (const [ key, value ] of Object.entries(data)) {
+          this.$set(this, key, value);
+        }
+      },
+
+      async openAddEntry() {
+        this.addEntry.loading = true;
+        try {
+          const resumes = await this.fetchResumes();
+          this.$set(this, "resumes", resumes);
+        } catch {
+        }
+        this.addEntry.loading = false;
+      },
+
+      clearAddEntry() {
+        this.$set(this.addEntry, "data", {});
+      },
+
+      closeAddEntry() {
+        this.addEntry.dialog = false;
+        this.clearAddEntry();
+      },
+
+      async submitAddEntry() {
+        const { data } = this.addEntry;
+        const selectedEvent = this.events.find(({ id }) => String(data.eventId) === String(id));
+
+        if (!selectedEvent) {
+          return alert("Can't find event");
+        }
+
+        const [ hours, minutes ] = data.time.split(":");
+
+        const eventDate = new Date(selectedEvent.date);
+
+        eventDate.setHours(hours);
+        eventDate.setMinutes(minutes);
+
+        const payload = {
+          userId: data.userId,
+          eventId: selectedEvent.id,
+          eventType: selectedEvent.type,
+          eventDate: eventDate.toISOString(),
+        };
+
+        try {
+          this.addEntry.loading = true;
+          const { error, reason, errorData } = await this.logEventEntryManual(payload);
+
+          if (error) {
+            const err =
+              reason ||
+              (
+                errorData
+                  ? errorData.join("\n")
+                  : "Something went wrong"
+              )
+            ;
+
+            throw new Error(err);
+          }
+
+          await this.refreshData();
+          this.clearAddEntry();
+        } catch (e) {
+          return alert(e);
+        } finally {
+          this.addEntry.loading = false;
+        }
+      },
+
+      itemFilter(...searchFields) {
+        const search =
+          (object, key, queryText) =>
+            fuzzySearch(
+              queryText.toLowerCase(),
+              String(dotGet(object, key, "")).toLowerCase(),
+            )
+        ;
+
+        return (
+          (resume, queryText) =>
+            searchFields
+              .flat()
+              .find(
+                (field) =>
+                  search(resume, field, queryText)
+                ,
+              )
+        );
       },
     },
   };

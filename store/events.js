@@ -75,6 +75,10 @@ export const actions = {
     return await this.$api.$post("/events/entry-log", { userId, eventId, eventType }, { progress: false });
   },
 
+  async logEventEntryManual(_context, { userId, eventId, eventType, eventDate }) {
+    return await this.$api.$post("/events/entry-log/manual", { userId, eventId, eventType, eventDate }, { progress: false });
+  },
+
   async fetchEventEntryList(_context, { eventId, eventType }) {
     const { data } = await this.$api.$get(`/events/entry-log/${ eventType }/${ eventId }`, { progress: false });
 

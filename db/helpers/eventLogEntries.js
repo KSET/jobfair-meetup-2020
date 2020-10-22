@@ -76,6 +76,7 @@ export const queryEventLogEntriesCreate =
       eventId,
       eventType,
       scannerId,
+      scannedAt,
     },
   ) => generateInsertQuery({
     table: "event_log_entries",
@@ -84,6 +85,7 @@ export const queryEventLogEntriesCreate =
       eventId,
       eventType,
       scannerId,
+      scannedAt,
     },
   })
 ;
