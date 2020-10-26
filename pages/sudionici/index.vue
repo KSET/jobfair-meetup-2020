@@ -188,7 +188,7 @@ name: PageSudionici
 
     async asyncData({ store }) {
       return {
-        events: (await store.dispatch("companies/fetchParticipantEvents")).sort((a, b) => a.date - b.date),
+        events: (await store.dispatch("companies/fetchParticipantEventsAll")).sort((a, b) => a.date - b.date),
       };
     },
 
