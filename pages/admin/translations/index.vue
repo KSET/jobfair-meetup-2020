@@ -1,10 +1,11 @@
 <template>
   <app-max-width-container class="mb-6">
     <v-data-iterator
-      :items="filteredTranslations"
-      :items-per-page.sync="itemsPerPage"
-      :page="page"
-      :search="search"
+      :items="translations"
+      :items-per-page="itemsPerPage"
+      :search.sync="search"
+      :page.sync="page"
+      :custom-filter="customFilter"
       hide-default-footer
     >
       <template v-slot:header>
@@ -145,6 +146,7 @@ name: PageAdminTranslationsList
 </router>
 
 <script>
+  import fuzzySearch from "fuzzysearch";
   import {
     mapActions,
     mapState,
@@ -191,12 +193,8 @@ name: PageAdminTranslationsList
         translations: (state) => Object.keys(state.translations.translations),
       }),
 
-      filteredTranslations() {
-        return this.translations.filter((key) => key.includes(this.search));
-      },
-
       numberOfPages() {
-        return Math.ceil(this.filteredTranslations.length / this.itemsPerPage);
+        return Math.ceil(this.translations.length / this.itemsPerPage);
       },
     },
 
@@ -219,6 +217,30 @@ name: PageAdminTranslationsList
 
       updateItemsPerPage(number) {
         this.itemsPerPage = number;
+      },
+
+      customFilter(elements, query) {
+        if (!query) {
+          return elements;
+        }
+
+        const search =
+          (haystack) =>
+            fuzzySearch(
+              query.toLowerCase(),
+              String(haystack).toLowerCase(),
+            )
+        ;
+
+        return (
+          Object
+            .entries(this.translationData)
+            .filter(
+              ([ key, { value } ]) =>
+                search(key) || search(value),
+            )
+            .map(([ key ]) => key)
+        );
       },
 
       async saveTranslation(key) {
