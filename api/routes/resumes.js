@@ -36,7 +36,7 @@ import {
 const router = new Router();
 const authRouter = AuthRouter.boundToRouter(router, {});
 
-const fixResume = (resume) => {
+export const fixResume = (resume) => {
   const fixComputerSkills =
     ({ computerSkills }) =>
       mapArray(

@@ -140,13 +140,36 @@
           </template>
 
           <template v-slot:footer="{ props: { pagination } }">
-            <footer :class="$style.tableFooter">
+            <footer
+              :class="$style.tableFooter"
+              class="d-flex"
+            >
               <v-pagination
                 v-model="page"
                 :class="$style.pagination"
                 :length="pagination.pageCount"
                 total-visible="10"
               />
+
+              <v-spacer />
+
+              <v-btn
+                :href="downloadButton.href"
+                target="_blank"
+                text
+                tile
+              >
+                <v-icon left>
+                  mdi-download
+                </v-icon>
+
+                <v-slide-y-reverse-transition leave-absolute>
+                  <translated-text
+                    :key="downloadButton.text"
+                    :trans-key="downloadButton.text"
+                  />
+                </v-slide-y-reverse-transition>
+              </v-btn>
             </footer>
           </template>
         </v-data-table>
@@ -282,6 +305,15 @@ name: PageCompanyResumes
             value: "scanned",
           },
         ];
+      },
+
+      downloadButton() {
+        const filterType = this.filterType || "all";
+
+        return {
+          text: `company.resumes.download.${ filterType }`,
+          href: `/api/resumes/download/${ filterType }.csv`,
+        };
       },
     },
 

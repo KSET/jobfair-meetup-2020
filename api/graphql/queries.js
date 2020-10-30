@@ -56,6 +56,12 @@ export const participantEventsQuery = () => ({
   }) } }`,
 });
 
+export const resumesFullDataQuery = () => ({
+  query: `{ ${ createObject({
+    resumes: resumeData,
+  }) } }`,
+});
+
 export const resumesQuery = () => ({
   query: `{ ${ createObject({
     resumes: basicResumeData,
