@@ -112,7 +112,11 @@ export const rawRoute = (fn) => asyncWrapper(async (req, res, next) => {
   try {
     const result = await fn(req, res, next);
 
-    return res.end(result);
+    if (result instanceof Buffer || "string" === typeof result) {
+      return res.end(result);
+    } else {
+      return res.end();
+    }
   } catch (e) {
     if (e.statusCode) {
       res.status(e.statusCode);
