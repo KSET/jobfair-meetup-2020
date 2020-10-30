@@ -207,6 +207,7 @@ name: PageCompanyResumes
       const {
         q: search,
         p: rawPage = 1,
+        v: filterType = null,
       } = route.query;
 
       return {
@@ -215,7 +216,7 @@ name: PageCompanyResumes
         pageCount: 0,
         itemsPerPage: 10,
 
-        filterType: null,
+        filterType,
 
         resumeList: await store.dispatch("resume/fetchResumes"),
         favourites: await store.dispatch("resume/listFavourites"),
@@ -295,6 +296,10 @@ name: PageCompanyResumes
         }
 
         window.history.replaceState({}, "", getUrlWithQueryParam("p", val));
+      },
+
+      filterType(val) {
+        window.history.replaceState({}, "", getUrlWithQueryParam("v", val));
       },
     },
 
