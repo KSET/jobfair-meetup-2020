@@ -290,7 +290,7 @@ name: PageCompanyResumes
       },
 
       page(val) {
-        if (1 <= val) {
+        if (1 >= val) {
           val = null;
         }
 
