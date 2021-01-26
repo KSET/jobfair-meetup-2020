@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:15-alpine
 
 ENV APP_ROOT /web
 
@@ -7,6 +7,6 @@ WORKDIR ${APP_ROOT}
 
 RUN apk update \
     # Required for Vuetify's Fibers dependency
-    && apk add make python3 g++
+    && apk add make python2 g++
 
 CMD ["node"]
