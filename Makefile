@@ -42,9 +42,11 @@ yarn-install:
 	docker/yarn install
 
 build: yarn-install
-	docker/yarn build -c nuxt.config.build
-	rm -rf "$(FINAL_OUTPUT_DIR)"
-	mv "$(BUILD_OUTPUT_DIR)" "$(FINAL_OUTPUT_DIR)"
+	mkdir -p "$(FINAL_OUTPUT_DIR)" && \
+	docker/yarn build -c nuxt.config.build && \
+	mv "$(FINAL_OUTPUT_DIR)" "$(FINAL_OUTPUT_DIR).old" && \
+	mv "$(BUILD_OUTPUT_DIR)" "$(FINAL_OUTPUT_DIR)" && \
+	rm -rf "$(FINAL_OUTPUT_DIR).old"
 
 clean:
 	rm -rf $(NODE_MODULES) .nuxt

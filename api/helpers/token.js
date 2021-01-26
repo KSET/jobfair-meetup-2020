@@ -2,15 +2,13 @@ import {
   verify,
 } from "jsonwebtoken";
 import {
- fixCompany,
-} from "../../helpers/company";
-import {
  keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
   basicUserQuery,
   currentUserQuery,
 } from "../graphql/queries";
+import CompanyService from "../services/company-service";
 import {
   getSetting,
 } from "./settings";
@@ -123,7 +121,7 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
       const { data: rawParticipants = [] } = await internalRequest("get", "/companies/participants");
       const participantIds = new Set(rawParticipants.map(({ id }) => id));
 
-      user.companies = companies.filter(({ id }) => participantIds.has(id)).map(fixCompany);
+      user.companies = companies.filter(({ id }) => participantIds.has(id)).map(CompanyService.fixCompany);
     }
 
     return user;

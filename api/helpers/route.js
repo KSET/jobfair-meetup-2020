@@ -45,6 +45,7 @@ export const response =
       error,
       data,
       status,
+      ts: Date.now(),
     })
 ;
 

@@ -7,6 +7,7 @@ import {
   resumeData,
   basicResumeData,
   companyDataWithMeta,
+  industry,
 } from "./data";
 import {
   createObject,
@@ -29,6 +30,12 @@ export const currentUserQuery = () => ({
 export const participantsQuery = () => ({
   query: `{ ${ createObject({
     companies: companyData,
+  }) } }`,
+});
+
+export const industriesQuery = () => ({
+  query: `{ ${ createObject({
+    industries: industry,
   }) } }`,
 });
 
