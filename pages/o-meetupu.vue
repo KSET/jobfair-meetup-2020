@@ -230,6 +230,28 @@
             cols="12"
           >
             <v-img
+              :src="require('@/assets/images/hot-talk.png')"
+              aspect-ratio="1"
+              class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
+              contain
+              width="100"
+            />
+            <h2
+              :class="$style.header"
+            >
+              <translated-text trans-key="meetup.hotTalk.header" />
+            </h2>
+            <p>
+              <translated-text trans-key="meetup.hotTalk.text" />
+            </p>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col
+            cols="12"
+          >
+            <v-img
               :src="require('@/assets/images/networking.png')"
               aspect-ratio="1"
               class="ml-md-n ml-md-0 ml-auto mb-n8 mb-md-0"
