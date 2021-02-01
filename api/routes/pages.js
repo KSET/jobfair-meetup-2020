@@ -18,10 +18,12 @@ router.get("/list", () => {
       name: "page.name.about",
       to: { name: "PageAbout" },
     },
+    /*
     {
       name: "page.name.participants",
       to: { name: "PageSudionici" },
     },
+    */
     {
       name: "page.name.contact",
       to: { name: "PageKontakt" },
