@@ -54,7 +54,7 @@
           ...generateMetadata({
             title,
             locale: "hr",
-            image: require("@/assets/images/facebook-share.jpg"),
+            image: require("@/assets/images/facebook-share.png"),
           }),
         ],
       };
