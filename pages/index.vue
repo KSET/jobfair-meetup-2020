@@ -46,10 +46,10 @@
               <v-btn
                 v-else-if="!hasCv && !hasCompany"
                 :class="$style.heroButton"
-                href="https://jobfair.fer.unizg.hr/hr/zivotopisi/novo"
-                target="_blank"
                 color="primary"
+                href="https://jobfair.fer.unizg.hr/hr/zivotopisi/novo"
                 large
+                target="_blank"
               >
                 <translated-text trans-key="button.submitCv" />
               </v-btn>
@@ -512,11 +512,13 @@ name: Index
             description: "Volim Ljuto",
             link: "https://www.volimljuto.com/",
           },
-          {
-            image: require("@/assets/images/project-friends/prijatelji-meetupa-03.png"),
-            description: "Rougemarin",
-            link: "http://www.rougemarin.hr/",
-          },
+          /*
+           {
+           image: require("@/assets/images/project-friends/prijatelji-meetupa-03.png"),
+           description: "Rougemarin",
+           link: "http://www.rougemarin.hr/",
+           },
+           */
           {
             image: require("@/assets/images/project-friends/prijatelji-meetupa-04.png"),
             description: "Elektrostudent",
