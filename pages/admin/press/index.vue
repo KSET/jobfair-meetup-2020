@@ -51,12 +51,18 @@
           :to="{ name: 'PageAdminMediaPartnersList' }"
           class="ml-3"
         >
+          <v-icon left>
+            mdi-handshake
+          </v-icon>
           Medijski pokrovitelji
         </v-btn>
         <v-btn
           :to="{ name: 'PageAdminProjectFriendsList' }"
           class="ml-3"
         >
+          <v-icon left>
+            mdi-hand-heart
+          </v-icon>
           Prijatelji Meetupa
         </v-btn>
       </v-col>
