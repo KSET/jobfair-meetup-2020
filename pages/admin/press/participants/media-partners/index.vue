@@ -195,6 +195,12 @@ name: PageAdminMediaPartnersList
 
   const image404 = require("@/assets/images/404.png");
 
+  const defaultInputs = () => ({
+    image: null,
+    link: "",
+    name: "",
+  });
+
   export default {
     components: {
       AppMaxWidthContainer,
@@ -212,11 +218,7 @@ name: PageAdminMediaPartnersList
         form: {
           valid: true,
           loading: false,
-          inputs: {
-            image: null,
-            link: "",
-            name: "",
-          },
+          inputs: defaultInputs(),
         },
         image: {
           url: image404,
@@ -357,6 +359,9 @@ name: PageAdminMediaPartnersList
         try {
           await this.addMediaPartner(formData);
           await this.refreshPartners();
+          this.$set(this.form, "inputs", defaultInputs());
+          await this.$nextTick();
+          this.$v.$reset();
         } finally {
           this.form.loading = false;
         }
