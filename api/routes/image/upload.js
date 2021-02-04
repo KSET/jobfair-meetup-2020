@@ -1,201 +1,37 @@
 import {
-  mkdir as mkdirCb,
-} from "fs";
-import {
-  promisify,
-} from "util";
-import sharp from "sharp";
-import {
- AuthRouter,
+  AuthRouter,
 } from "../../helpers/route";
 import {
   RoleNames,
 } from "../../helpers/permissions";
-import {
-  apiFilePath,
-  localFilePath,
-  localFolderPath,
-} from "../../helpers/image";
-import {
-  getClient,
-} from "../../../db/methods";
-import {
-  queryImageCreate,
-  queryImageVariationCreate,
-} from "../../../db/helpers/image";
-
-const mkdir = promisify(mkdirCb);
+import ImageService, {
+  ImageUploadError,
+} from "../../services/image-service";
 
 const router = new AuthRouter({ role: RoleNames.MODERATOR });
 
-const extensionMap = {
-  "image/gif": "gif",
-  "image/png": "png",
-  "image/jpeg": "jpg",
-};
+router.postRaw("/", async ({ files, authUser }, res) => {
+  try {
+    const images = await ImageService.upload(files.file, authUser.id);
 
-const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
-
-const maxImageSizeMb = 7;
-const maxImageSizeKb = maxImageSizeMb * 1024;
-const maxImageSize = maxImageSizeKb * 1024;
-
-router.postRaw("/", async (req, res) => {
-  const files = {};
-  const client = getClient();
-
-  const error = (message, data = {}) => {
+    return res.json(Object.values(images).map(({ url }) => url));
+  } catch (e) {
     res.status(415);
 
-    return res.json({
+    const payload = {
       _csError: true,
       type: "HttpError",
       code: "illegalMimeType",
-      message,
-      data,
+      message: e.message,
       level: "warn",
-    });
-  };
-
-  try {
-    const { file } = req.files;
-
-    if (!file) {
-      return error("No file provided");
-    }
-
-    const ext = extensionMap[file.mimetype];
-
-    if (!ext) {
-      return error(`Invalid file type. Only ${ Object.values(extensionMap).map((ext) => `.${ ext }`).join(", ") } supported.`, {
-        mimeType: file.mimetype,
-      });
-    }
-
-    if (file.size > maxImageSize) {
-      return error(`Image too large (Max ${ maxImageSizeMb }MB)`);
-    }
-
-    await client.connect();
-
-    await client.query("BEGIN");
-
-    const [ { id: imageId } ] = await client.query(queryImageCreate({
-      name: file.name,
-      creatorId: req.authUser.id,
-    }));
-
-    const dir = localFolderPath({ imageId });
-
-    await mkdir(dir, { recursive: true });
-
-    const fileUploadName =
-      (name) =>
-        Number.isInteger(name)
-        ? `w${ name }.${ ext }`
-        : `${ name }.${ ext }`
-    ;
-
-    const fileUploadPath =
-      (name) =>
-        localFilePath({
-          imageId,
-          name: fileUploadName(name),
-        })
-    ;
-
-    const createImageVariation =
-      (filenameOverride = "") =>
-        async ({ width, height }) =>
-          await client
-            .query(queryImageVariationCreate({
-              name: filenameOverride || width,
-              path: fileUploadPath(filenameOverride || width),
-              width,
-              height,
-              imageId,
-              mimeType: file.mimetype,
-            }))
-            .then(([ row ]) => row)
-    ;
-
-    const uploadGif = async ({ file }) => {
-      const filePath = fileUploadPath("default");
-
-      await file.mv(filePath);
-
-      const { image_id: imageId, name } = await createImageVariation("default")({
-        width: 300,
-        height: 300,
-      });
-
-      return {
-        default: apiFilePath({ imageId, name }),
-      };
     };
 
-    const uploadImage = async ({ file, imageSizes }) => {
-      const resizedImages =
-        imageSizes
-          .slice(0, -1)
-          .map(
-            (width) =>
-              sharp(file.tempFilePath)
-                .resize({
-                  width,
-                  fit: "contain",
-                })
-                .toFile(fileUploadPath(width))
-                .then(createImageVariation())
-            ,
-          )
-      ;
+    if (e instanceof ImageUploadError) {
+      payload.data = e.data;
+    }
 
-      const imageData = await Promise.all([
-        ...resizedImages,
-        sharp(file.tempFilePath)
-          .resize({
-            width: 2048,
-            withoutEnlargement: true,
-            fit: "contain",
-          })
-          .toFile(fileUploadPath("default"))
-          .then(createImageVariation("default")),
-      ]);
-
-      return Object.fromEntries(
-        imageData
-          .map(
-            ({ image_id: imageId, name }) =>
-              [ name, apiFilePath({ imageId, name }) ]
-            ,
-          ),
-      );
-    };
-
-    const uploadHandler =
-      "gif" === ext
-      ? uploadGif
-      : uploadImage
-    ;
-
-    Object.assign(
-      files,
-      await uploadHandler({ file, imageSizes }),
-    );
-  } catch (e) {
-    await client.query("ROLLBACK");
-    await client.end();
-
-    console.log("|> UPLOAD ERROR", e);
-
-    return error("Something went wrong. Please try again.");
+    return res.json(payload);
   }
-
-  await client.query("COMMIT");
-  await client.end();
-
-  return res.json(files);
 });
 
 export default router;

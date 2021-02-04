@@ -1,41 +1,29 @@
 import {
-  Router,
-} from "express";
-import {
- HttpStatus,
+  HttpStatus,
 } from "../../helpers/http";
 import {
-  queryImageGetById,
-  queryImageVariationGetByNameAndImage,
-} from "../../../db/helpers/image";
-import {
-  query,
-} from "../../../db/methods";
-import {
-  apiRoute,
   ApiError,
+  Router,
 } from "../../helpers/route";
+import ImageService from "../../services/image-service";
 
-const router = Router();
+const router = new Router();
 
-router.get("/:id", apiRoute(async ({ params }) => {
+router.get("/:id", async ({ params }) => {
   const { id } = params;
-  const res = await query(queryImageGetById(id));
+  const res = await ImageService.info(id);
 
   if (!res || !res.length) {
     throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
   }
 
   return res;
-}));
+});
 
-router.get("/:imageId/:name", async (req, res) => {
+router.getRaw("/:imageId/:name", async (req, res) => {
   const { imageId, name } = req.params;
 
-  const [ image ] = await query(queryImageVariationGetByNameAndImage({
-    imageId,
-    name,
-  }));
+  const image = await ImageService.variationInfo(imageId, name);
 
   if (!image) {
     res.status(HttpStatus.Error.Client.NotFound);
@@ -44,16 +32,13 @@ router.get("/:imageId/:name", async (req, res) => {
 
   res.set("Cache-Control", `max-age=${ 86400000 * 30 }`);
 
-  return res.sendFile(image.path);
+  await new Promise((resolve) => res.sendFile(image.path, {}, resolve));
 });
 
-router.get("/:imageId/:name/info", apiRoute(async (req) => {
+router.get("/:imageId/:name/info", async (req) => {
   const { imageId, name } = req.params;
 
-  const [ image ] = await query(queryImageVariationGetByNameAndImage({
-    imageId,
-    name,
-  }));
+  const image = await ImageService.variationInfo(imageId, name);
 
   if (!image) {
     throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
@@ -62,6 +47,6 @@ router.get("/:imageId/:name/info", apiRoute(async (req) => {
   }
 
   return image;
-}));
+});
 
 export default router;
