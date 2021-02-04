@@ -14,7 +14,12 @@ router.postRaw("/", async ({ files, authUser }, res) => {
   try {
     const images = await ImageService.upload(files.file, authUser.id);
 
-    return res.json(Object.values(images).map(({ url }) => url));
+    return res.json(Object.fromEntries(
+      Object
+        .values(images)
+        .map(({ name, url }) => [ name, url ])
+      ,
+    ));
   } catch (e) {
     res.status(415);
 
