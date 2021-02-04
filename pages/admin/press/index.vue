@@ -47,6 +47,12 @@
           </v-icon>
           Press kit
         </v-btn>
+        <v-btn
+          :to="{ name: 'PageAdminMediaPartnersList' }"
+          class="ml-3"
+        >
+          Medijski pokrovitelji
+        </v-btn>
       </v-col>
     </v-row>
   </app-max-width-container>

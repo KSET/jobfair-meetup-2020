@@ -335,8 +335,9 @@
               tile
             >
               <v-img
-                :alt="partner.description"
-                :src="partner.image"
+                :alt="partner.name"
+                :lazy-src="partner.images.lazySrc"
+                :src="partner.images.srcSet"
                 aspect-ratio="1.875"
                 contain
               />
@@ -393,6 +394,9 @@ name: Index
     mapActions,
     mapGetters,
   } from "vuex";
+  import {
+    formatPartner,
+  } from "../helpers/media-partner";
   import AppNewsCard from "~/components/news/NewsCard";
   import TranslatedText from "~/components/TranslatedText";
   import {
@@ -407,7 +411,10 @@ name: Index
   const storeActions = {
     fetchNews: "news/fetchNews",
     fetchParticipants: "companies/fetchParticipants",
+    fetchMediaPartners: "mediaPartners/fetchAllItems",
   };
+
+  const image404 = require("@/assets/images/404.png");
 
   export default {
     name: "Index",
@@ -423,24 +430,33 @@ name: Index
           participants
             .map((participant) => {
               if (!participant.image) {
-                participant.image = require("@/assets/images/404.png");
+                participant.image = image404;
               }
 
               return participant;
             })
       ;
 
+      const formatPartners =
+        (partners) =>
+          partners
+            .map(formatPartner(image404))
+      ;
+
       const [
         news,
         participants,
+        mediaPartners,
       ] = await Promise.all([
         store.dispatch(storeActions.fetchNews).then(ensureArray).then(limitLength(3)),
         store.dispatch(storeActions.fetchParticipants).then(ensureArray).then(ensureHasImage),
+        store.dispatch(storeActions.fetchMediaPartners).then(ensureArray).then(formatPartners),
       ]);
 
       return {
         news,
         participants,
+        mediaPartners,
       };
     },
 
@@ -463,46 +479,6 @@ name: Index
           "Meetup",
           "networking",
         ].sort(() => Math.random() - 0.5);
-      },
-
-      mediaPartners() {
-        return [
-          {
-            image: require("@/assets/images/media-partners/logotipovi-02.png"),
-            description: "Global",
-            link: "https://www.globalnovine.eu/",
-          },
-          {
-            image: require("@/assets/images/media-partners/logotipovi-03.png"),
-            description: "IT Biz Crunch",
-            link: "https://www.itbizcrunch.com/",
-          },
-          {
-            image: require("@/assets/images/media-partners/logotipovi-04.png"),
-            description: "Radio Student",
-            link: "http://www.radiostudent.hr/",
-          },
-          {
-            image: require("@/assets/images/media-partners/logotipovi-05.png"),
-            description: "Studentski",
-            link: "https://studentski.hr/\n",
-          },
-          {
-            image: require("@/assets/images/media-partners/logotipovi-06.png"),
-            description: "Televizija student",
-            link: "https://televizijastudent.com/",
-          },
-          {
-            image: require("@/assets/images/media-partners/logotipovi-07.png"),
-            description: "VIDI",
-            link: "https://www.vidi.hr/",
-          },
-          {
-            image: require("@/assets/images/media-partners/logotipovi-08.png"),
-            description: "x-ica",
-            link: "https://x-ica.com/",
-          },
-        ];
       },
 
       projectFriends() {

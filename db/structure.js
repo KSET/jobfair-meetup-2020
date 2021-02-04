@@ -224,6 +224,19 @@ create index if not exists event_log_entries_user_id_event_id_event_type_index
 
 create index if not exists event_log_entries_event_id_event_type_index
     on event_log_entries (event_id, event_type);
+
+create table if not exists media_partners
+(
+    id       serial       not null
+        constraint media_partners_pk
+            primary key,
+    name     varchar(255) not null,
+    link     varchar(511) not null,
+    "order"  integer default 0,
+    image_id integer      not null
+        constraint media_partners_images_id_fk
+            references images
+);
 `;
 
 
