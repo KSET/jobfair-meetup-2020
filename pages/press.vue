@@ -47,9 +47,9 @@
                 cols="6"
               >
                 <jf-press-kit
+                  :file-url="item.file.url"
                   :image-url="item.image.variations.default.url"
                   :lazy-image-url="item.image.variations.thumb.url"
-                  :file-url="item.file.url"
                   :title="item.title"
                 />
               </v-col>
@@ -91,9 +91,9 @@
                   target="_blank"
                 >
                   <v-img
-                    class="mt-n1"
                     :class="$style.icon"
                     :src="downloadIconSrc"
+                    class="mt-n1"
                     contain
                   />
                 </a>
@@ -156,13 +156,9 @@
               contain
             />
 
-            <v-card-title>
-              {{ selectedImage.title }}
-            </v-card-title>
+            <v-card-title v-text="selectedImage.title" />
 
-            <v-card-text>
-              {{ selectedImage.description }}
-            </v-card-text>
+            <v-card-text style="white-space: pre-line;" v-text="selectedImage.description" />
 
             <v-card-actions>
               <v-spacer />
@@ -351,15 +347,16 @@ name: PagePress
     }
 
     .galleryImage {
+      cursor: pointer;
       border-radius: 4px;
     }
 
     .icon {
       position: relative;
       top: 4px;
+      display: inline-block;
       width: 1.2em;
       height: 1.2em;
-      display: inline-block;
       margin: 0 .3em;
     }
   }

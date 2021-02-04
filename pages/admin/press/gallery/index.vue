@@ -33,8 +33,8 @@
                 aspect-ratio="1.78"
                 cover
               />
-              <v-card-title>{{ item.title }}</v-card-title>
-              <v-card-text>{{ item.description }}</v-card-text>
+              <v-card-title v-text="item.title" />
+              <v-card-text style="white-space: pre-line;" v-text="item.description" />
               <v-card-actions>
                 <v-btn
                   :disabled="item === firstItem"
