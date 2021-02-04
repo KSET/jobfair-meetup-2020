@@ -291,7 +291,7 @@
 
                   <v-card-text>
                     <v-checkbox
-                      v-model="companyExtras.panel.interested"
+                      v-model="companyExtras.panel.chosen"
                       color="primary"
                       label="Zainteresirani smo za potencijalno sudjelovanje na jednom od panela"
                     />
@@ -300,8 +300,11 @@
               </v-card-text>
 
               <v-card-actions>
-                <span class="px-3 text--secondary font-weight-light" style="max-width: 80%;">Slanjem ove prijave potvrđujem da su svi navedeni podatci istiniti i točni te sam ovlašten za zastupanje interesa poduzeća
-                  koje prijavljujem na Job Fair Meetup</span>
+                <span class="px-4 py-2 text--secondary font-weight-light">
+                  Slanjem ove prijave potvrđujem da su svi navedeni podatci istiniti i točni
+                  te sam ovlašten za zastupanje interesa poduzeća
+                  koje prijavljujem na Job Fair Meetup
+                </span>
 
                 <v-spacer />
 
@@ -342,47 +345,185 @@ name: PagePrijavaFirmi
   import {
     required,
     minLength,
+    maxLength,
     url,
   } from "vuelidate/lib/validators";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   const countriesWithoutBrazil = countries.filter(({ name }) => "Brazil" !== name);
 
+  const getFormType =
+    (type, form) =>
+      Object
+        .fromEntries(
+          Object
+            .entries(form)
+            .map(([ key, { [type]: value } ]) => [ key, value ]),
+        )
+  ;
+
   const companyForm = () => ({
-    legalName: "",
-    brandName: "",
-    address: "",
-    industryId: 0,
-    description: "",
-    homepageUrl: "",
-    logo: null,
-    vectorLogo: null,
+    legalName: {
+      value: "",
+      validations: {
+        required,
+      },
+    },
+    brandName: {
+      value: "",
+      validations: {
+        required,
+      },
+    },
+    address: {
+      value: "",
+      validations: {
+        required,
+      },
+    },
+    industryId: {
+      value: 0,
+      validations: {
+        required,
+      },
+    },
+    description: {
+      value: 0,
+      validations: {
+        required,
+        minLength: minLength(100),
+        maxLength: maxLength(350),
+      },
+    },
+    homepageUrl: {
+      value: "",
+      validations: {
+        required,
+        url,
+      },
+    },
+    logo: {
+      value: null,
+      validations: {
+        required,
+      },
+    },
+    vectorLogo: {
+      value: null,
+      validations: {
+        required,
+      },
+    },
   });
+
+  const companyFormInputs =
+    () =>
+      getFormType(
+        "value",
+        companyForm(),
+      )
+  ;
+
+  const companyFormValidations =
+    () =>
+      getFormType(
+        "validations",
+        companyForm(),
+      )
+  ;
 
   const companyExtrasForm = () => ({
     talk: {
       chosen: false,
+
       form: {
-        title: "",
-        description: "",
-        topic: "",
-        image: null,
-        biography: "",
+        title: {
+          value: "",
+          validations: {
+            required,
+          },
+        },
+        description: {
+          value: "",
+          validations: {
+            required,
+            minLength: minLength(100),
+          },
+        },
+        topic: {
+          value: "",
+          validations: {
+            required,
+          },
+        },
+        image: {
+          value: null,
+          validations: {
+            required,
+          },
+        },
+        biography: {
+          value: "",
+          validations: {
+            required,
+          },
+        },
       },
     },
 
     workshop: {
       chosen: false,
+
       form: {
-        title: "",
-        description: "",
+        title: {
+          value: "",
+          validations: {
+            required,
+          },
+        },
+        description: {
+          value: "",
+          validations: {
+            required,
+            minLength: minLength(100),
+          },
+        },
       },
     },
 
     panel: {
-      interested: false,
+      chosen: false,
+
+      form: {
+        chosen: {
+          value: true,
+          validations: {},
+        },
+      },
     },
   });
+
+  const companyExtrasFormInputs =
+    () =>
+      Object
+        .fromEntries(
+          Object
+            .entries(companyExtrasForm())
+            .map(([ category, { form, ...rest } ]) => [ category, { ...rest, form: getFormType("value", form) } ])
+          ,
+        )
+  ;
+
+  const companyExtrasFormValidations =
+    () =>
+      Object
+        .fromEntries(
+          Object
+            .entries(companyExtrasForm())
+            .map(([ category, { form } ]) => [ category, { form: getFormType("validations", form) } ])
+          ,
+        )
+  ;
 
   export default {
     name: "PagePrijavaFirmi",
@@ -397,67 +538,10 @@ name: PagePrijavaFirmi
 
     validations: {
       company: {
-        form: {
-          legalName: {
-            required,
-          },
-          brandName: {
-            required,
-          },
-          address: {
-            required,
-          },
-          industryId: {
-            required,
-          },
-          description: {
-            required,
-            minLength: minLength(100),
-          },
-          homepageUrl: {
-            required,
-            url,
-          },
-          logo: {
-            required,
-          },
-          vectorLogo: {
-            required,
-          },
-        },
+        form: companyFormValidations(),
       },
 
-      companyExtras: {
-        talk: {
-          form: {
-            title: {
-              required,
-            },
-
-            description: {
-              required,
-              minLength: minLength(100),
-            },
-
-            topic: {
-              required,
-            },
-          },
-        },
-
-        workshop: {
-          form: {
-            title: {
-              required,
-            },
-
-            description: {
-              required,
-              minLength: minLength(100),
-            },
-          },
-        },
-      },
+      companyExtras: companyExtrasFormValidations(),
     },
 
     async asyncData({ store }) {
@@ -479,10 +563,10 @@ name: PagePrijavaFirmi
         data: null,
         loading: false,
         formValid: true,
-        form: companyForm(),
+        form: companyFormInputs(),
       },
 
-      companyExtras: companyExtrasForm(),
+      companyExtras: companyExtrasFormInputs(),
     }),
 
     computed: {
@@ -642,6 +726,7 @@ name: PagePrijavaFirmi
       ...mapActions({
         isVatValid: "company/isVatValid",
         getCompanyFromVat: "company/getDataFromVat",
+        submitCompanyApplication: "company/submitCompanyApplication",
       }),
 
       showCompanyExtrasForm(name) {
@@ -650,7 +735,7 @@ name: PagePrijavaFirmi
       },
 
       resetCompanyExtrasForm(name) {
-        const { [name]: form } = companyExtrasForm();
+        const { [name]: form } = companyExtrasFormInputs();
 
         if (name in this.$v.companyExtras) {
           this.$v.companyExtras[name].$reset();
@@ -667,7 +752,25 @@ name: PagePrijavaFirmi
           return;
         }
 
-        alert("Submit");
+        const formData = new FormData();
+
+        for (const [ key, value ] of Object.entries(this.company.form)) {
+          formData.set(key, value);
+        }
+
+        for (const $key of Object.keys(this.companyExtras)) {
+          const { form, chosen } = this.companyExtras[$key];
+
+          if (!chosen) {
+            continue;
+          }
+
+          for (const [ key, value ] of Object.entries(form)) {
+            formData.set(`${ $key }[${ key }]`, value);
+          }
+        }
+
+        await this.submitCompanyApplication(formData);
       },
 
       async showForm() {

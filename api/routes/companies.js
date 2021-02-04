@@ -1,3 +1,4 @@
+import qs from "qs";
 import {
   cachedFetcher,
 } from "../helpers/fetchCache";
@@ -15,6 +16,20 @@ import VatValidator from "../services/vat-validator";
 const router = new Router();
 
 const cacheForMs = 15 * 1000;
+
+router.post("/application/submit", (req) => {
+  const body =
+    qs.parse(
+      Object
+        .entries(req.body)
+        .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(value) }`)
+        .join("&")
+      ,
+    )
+  ;
+
+  return body;
+});
 
 router.get("/participants", cachedFetcher(cacheForMs, async () => {
   return await CompanyService.fetchListAll();

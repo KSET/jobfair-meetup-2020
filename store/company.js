@@ -25,6 +25,15 @@ export const actions = {
     return data;
   },
 
+  async submitCompanyApplication(context, formData) {
+    const { data } = await this.$api.$post(
+      "/companies/application/submit",
+      formData,
+    ) || {};
+
+    return data;
+  },
+
   async getDataFromVat(context, { vat }) {
     const { data } = await this.$api.$post(
       "/companies/vat/info/any",
