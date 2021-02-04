@@ -372,8 +372,9 @@
               tile
             >
               <v-img
-                :alt="friend.description"
-                :src="friend.image"
+                :alt="friend.name"
+                :lazy-src="friend.images.lazySrc"
+                :src="friend.images.srcSet"
                 aspect-ratio="1.875"
                 contain
               />
@@ -396,7 +397,7 @@ name: Index
   } from "vuex";
   import {
     formatPartner,
-  } from "../helpers/media-partner";
+  } from "~/helpers/media-partner";
   import AppNewsCard from "~/components/news/NewsCard";
   import TranslatedText from "~/components/TranslatedText";
   import {
@@ -407,11 +408,15 @@ name: Index
   import {
     getSrcSet,
   } from "~/helpers/image";
+  import {
+    formatFriend,
+  } from "~/helpers/project-friend";
 
   const storeActions = {
     fetchNews: "news/fetchNews",
     fetchParticipants: "companies/fetchParticipants",
     fetchMediaPartners: "mediaPartners/fetchAllItems",
+    fetchProjectFriends: "projectFriends/fetchAllItems",
   };
 
   const image404 = require("@/assets/images/404.png");
@@ -443,20 +448,29 @@ name: Index
             .map(formatPartner(image404))
       ;
 
+      const formatFriends =
+        (friends) =>
+          friends
+            .map(formatFriend(image404))
+      ;
+
       const [
         news,
         participants,
         mediaPartners,
+        projectFriends,
       ] = await Promise.all([
         store.dispatch(storeActions.fetchNews).then(ensureArray).then(limitLength(3)),
         store.dispatch(storeActions.fetchParticipants).then(ensureArray).then(ensureHasImage),
         store.dispatch(storeActions.fetchMediaPartners).then(ensureArray).then(formatPartners),
+        store.dispatch(storeActions.fetchProjectFriends).then(ensureArray).then(formatFriends),
       ]);
 
       return {
         news,
         participants,
         mediaPartners,
+        projectFriends,
       };
     },
 
@@ -479,28 +493,6 @@ name: Index
           "Meetup",
           "networking",
         ].sort(() => Math.random() - 0.5);
-      },
-
-      projectFriends() {
-        return [
-          {
-            image: require("@/assets/images/project-friends/prijatelji-meetupa-02.png"),
-            description: "Volim Ljuto",
-            link: "https://www.volimljuto.com/",
-          },
-          /*
-           {
-           image: require("@/assets/images/project-friends/prijatelji-meetupa-03.png"),
-           description: "Rougemarin",
-           link: "http://www.rougemarin.hr/",
-           },
-           */
-          {
-            image: require("@/assets/images/project-friends/prijatelji-meetupa-04.png"),
-            description: "Elektrostudent",
-            link: "http://www.ssfer.hr/",
-          },
-        ];
       },
 
       joinSocialImages() {

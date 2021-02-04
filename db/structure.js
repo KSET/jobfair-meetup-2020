@@ -237,6 +237,19 @@ create table if not exists media_partners
         constraint media_partners_images_id_fk
             references images
 );
+
+create table if not exists project_friends
+(
+    id       serial       not null
+        constraint project_friends_pk
+            primary key,
+    name     varchar(255) not null,
+    link     varchar(511) not null,
+    "order"  integer default 0,
+    image_id integer      not null
+        constraint project_friends_images_id_fk
+            references images
+);
 `;
 
 

@@ -53,6 +53,12 @@
         >
           Medijski pokrovitelji
         </v-btn>
+        <v-btn
+          :to="{ name: 'PageAdminProjectFriendsList' }"
+          class="ml-3"
+        >
+          Prijatelji Meetupa
+        </v-btn>
       </v-col>
     </v-row>
   </app-max-width-container>
