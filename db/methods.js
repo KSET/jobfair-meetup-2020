@@ -23,6 +23,8 @@ export class Client {
 
   #inTransaction = false;
 
+  #ended = false;
+
   /**
    * @returns {Promise<Client>}
    */
@@ -65,6 +67,10 @@ export class Client {
     return await client.startTransaction();
   }
 
+  get #queryable() {
+    return this.#instance && !this.#ended;
+  }
+
   async connect() {
     if (!this.#instance) {
       this.#instance = await pool.connect();
@@ -84,21 +90,18 @@ export class Client {
   }
 
   async query(...args) {
-    if (!this.#instance) {
+    if (!this.#queryable) {
       return;
     }
 
-    return await (
-      this
-        .#instance
-        .query(...args)
-        .then(({ rows }) => rows)
-        .catch(async (e) => {
-          await this.query("ROLLBACK");
+    try {
+      const { rows } = await this.#instance.query(...args);
 
-          throw e;
-        })
-    );
+      return rows;
+    } catch (e) {
+      await this.query("ROLLBACK");
+      throw e;
+    }
   }
 
   async queryOne(...args) {
@@ -132,15 +135,12 @@ export class Client {
   }
 
   async end() {
-    if (!this.#instance) {
+    if (!this.#queryable) {
       return;
     }
 
-    if (this.#inTransaction) {
-      await this.commit();
-    }
-
     await this.#instance.release();
+    this.#ended = true;
   }
 }
 
