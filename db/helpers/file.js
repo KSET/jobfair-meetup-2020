@@ -1,3 +1,15 @@
+import {
+ rmdir as rmdirOld,
+} from "fs";
+import {
+ dirname,
+} from "path";
+import {
+ promisify,
+} from "util";
+
+const rmdir = promisify(rmdirOld);
+
 export const queryFileCreate =
   ({
      name,
@@ -55,6 +67,43 @@ export const queryFileGetById =
       id,
     ],
   })
+;
+
+export const queryFileDeleteById =
+  ({
+     id,
+   }) => ({
+    text: `
+      delete from
+        files
+      where
+        "id" = $1
+      returning *
+    `,
+    values: [
+      id,
+    ],
+  })
+;
+
+export const deleteFileById =
+  async (
+    client,
+    {
+      id,
+    },
+  ) => {
+    const file = await client.queryOne(queryFileGetById({ id }));
+
+    if (!file) {
+      return false;
+    }
+
+    await client.query(queryFileDeleteById({ id }));
+    await rmdir(dirname(file.path), { recursive: true });
+
+    return true;
+  }
 ;
 
 export const queryFileGetByIds =
