@@ -14,6 +14,7 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    "vue/comment-directive": "off",
     "nuxt/no-cjs-in-config": "off",
     "space-before-function-paren": [
       "error", {
