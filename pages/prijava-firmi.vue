@@ -26,7 +26,7 @@
     </v-row>
 
     <v-expand-transition>
-      <v-row v-if="company.applications.length > 0">
+      <v-row v-if="company.applications && company.applications.length > 0">
         <v-col cols="12">
           <v-alert
             border="left"
@@ -949,12 +949,13 @@ name: PagePrijavaFirmi
 
         this.company.loading = true;
 
+        const vat = String(this.vat.input).trim();
         const [
           company,
           applications,
         ] = await Promise.all([
-          this.getCompanyFromVat({ vat: this.vat.input }),
-          this.getCompanyApplications({ vat: this.vat.input }),
+          this.getCompanyFromVat({ vat }),
+          this.getCompanyApplications({ vat }),
         ]);
 
         this.$set(this.company, "data", company);

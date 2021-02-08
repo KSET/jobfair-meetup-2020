@@ -38,9 +38,12 @@ export const actions = {
   async getCompanyApplications(context, { vat }) {
     const { data } = await this.$api.$get(
       `/companies/application/by-vat/${ encodeURIComponent(vat) }`,
-    ) || [];
+      {
+        progress: false,
+      },
+    ) || {};
 
-    return data;
+    return data || [];
   },
 
   async getDataFromVat(context, { vat }) {
