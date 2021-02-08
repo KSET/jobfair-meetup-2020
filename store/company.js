@@ -26,10 +26,19 @@ export const actions = {
   },
 
   async submitCompanyApplication(context, formData) {
-    const { data } = await this.$api.$post(
+    return await this.$api.$post(
       "/companies/application/submit",
       formData,
+      {
+        progress: false,
+      },
     ) || {};
+  },
+
+  async getCompanyApplications(context, { vat }) {
+    const { data } = await this.$api.$get(
+      `/companies/application/by-vat/${ encodeURIComponent(vat) }`,
+    ) || [];
 
     return data;
   },

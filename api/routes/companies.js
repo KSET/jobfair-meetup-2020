@@ -1,34 +1,61 @@
 import qs from "qs";
 import {
-  cachedFetcher,
+ cachedFetcher,
 } from "../helpers/fetchCache";
 import {
-  HttpStatus,
+ HttpStatus,
 } from "../helpers/http";
 import {
   ApiError,
   Router,
 } from "../helpers/route";
-import CompanyService from "../services/company-service";
 import CompanyEventsService from "../services/company-events-service";
+import CompanyService from "../services/company-service";
 import VatValidator from "../services/vat-validator";
 
 const router = new Router();
 
 const cacheForMs = 15 * 1000;
 
-router.post("/application/submit", (req) => {
-  const body =
+router.post("/application/submit", async ({ body, files }) => {
+  const application =
     qs.parse(
       Object
-        .entries(req.body)
+        .entries(body)
         .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(value) }`)
         .join("&")
       ,
     )
   ;
 
-  return body;
+  try {
+    return await CompanyService.submitApplication(application, files);
+  } catch (e) {
+    if (e instanceof ApiError) {
+      throw e;
+    } else {
+      throw new ApiError(
+        "Nešto je pošlo krivo. Molimo probajte ponovno.",
+        HttpStatus.Error.Server.InternalServerError,
+        e.message,
+      );
+    }
+  }
+});
+
+router.get("/application/by-vat/:vat", async ({ params }) => {
+  const { vat } = params;
+
+  const applications = await CompanyService.fetchApplications(vat) || [];
+
+  if (!applications || !applications.length) {
+    throw new ApiError(
+      "No applications for company",
+      HttpStatus.Error.Client.NotFound,
+    );
+  }
+
+  return applications;
 });
 
 router.get("/participants", cachedFetcher(cacheForMs, async () => {

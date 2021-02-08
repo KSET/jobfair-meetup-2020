@@ -250,6 +250,66 @@ create table if not exists project_friends
         constraint project_friends_images_id_fk
             references images
 );
+
+create table if not exists company_applications_workshops
+(
+    id serial not null
+        constraint company_applications_workshops_pk
+            primary key,
+    title varchar(511) not null,
+    description varchar(511) not null,
+    goal varchar(511) not null,
+    biography text not null,
+    notes text,
+    created_at timestamptz default CURRENT_TIMESTAMP not null
+);
+
+create table if not exists company_applications_talks
+(
+    id serial not null
+        constraint company_applications_talks_pk
+            primary key,
+    title varchar(511) not null,
+    description varchar(511) not null,
+    topic int not null,
+    presenter_photo_id int not null
+        constraint company_applications_talks_images_id_fk
+            references images
+                on update cascade on delete cascade,
+    presenter_description varchar(511) not null,
+    created_at timestamptz default CURRENT_TIMESTAMP not null
+);
+
+create table if not exists company_applications
+(
+    id serial not null
+        constraint company_applications_pk
+            primary key,
+    oib varchar(127) not null,
+    legal_name varchar(511) not null,
+    brand_name varchar(511) not null,
+    address varchar(511) not null,
+    industry_id int not null,
+    description varchar(511) not null,
+    website varchar(511) not null,
+    logo_image_id int not null
+        constraint company_applications_images_id_fk
+            references images
+                on update cascade on delete cascade,
+    vector_logo_file_id int not null
+        constraint company_applications_files_id_fk
+            references files,
+    talk_id int
+        constraint company_applications_company_applications_talks_id_fk
+            references company_applications_talks
+                on update cascade on delete cascade,
+    workshop_id int
+        constraint company_applications_company_applications_workshops_id_fk
+            references company_applications_workshops
+                on update cascade on delete cascade,
+    panel_interested bool default false not null,
+    created_at timestamptz default CURRENT_TIMESTAMP not null
+);
 `;
 
 

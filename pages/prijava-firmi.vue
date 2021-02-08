@@ -26,6 +26,22 @@
     </v-row>
 
     <v-expand-transition>
+      <v-row v-if="company.applications.length > 0">
+        <v-col cols="12">
+          <v-alert
+            border="left"
+            outlined
+            type="warning"
+          >
+            Za ovu firmu postoj{{ String(company.applications.length).endsWith("1") ? "i" : "e" }}
+            već {{ company.applications.length }} prijav{{ String(company.applications.length).endsWith("1") ? "a" : "e" }}
+            ({{ company.applications.map(({ createdAt }) => new Date(createdAt).toLocaleString("hr-HR")).join(", ") }})
+          </v-alert>
+        </v-col>
+      </v-row>
+    </v-expand-transition>
+
+    <v-expand-transition>
       <v-row v-if="!vatError && !vat.loading && !vat.locked">
         <v-col class="text-center" cols="12">
           <v-btn
@@ -136,7 +152,7 @@
                   :error-messages="formErrors.vectorLogo"
                   accept="application/zip"
                   label="Vektorski logo"
-                  placeholder="Logotip u .zip formatu"
+                  placeholder="Vektorski logotip u .zip formatu"
                   show-size
                   @blur="$v.company.form.vectorLogo.$touch()"
                   @input="$v.company.form.vectorLogo.$touch()"
@@ -170,7 +186,7 @@
                         :error-messages="formExtrasErrors.talk.description"
                         auto-grow
                         counter
-                        label="Opis talka"
+                        label="Opis talka*"
                         placeholder="U našoj tvrtci gadgeti i tehnologija su u primjeni na projektima za naše klijente no nerijetko i u službi internih tuluma! ..."
                         required
                         rows="2"
@@ -178,9 +194,10 @@
                         @input="$v.companyExtras.talk.form.description.$touch()"
                       />
 
-                      <v-text-field
+                      <v-select
                         v-model="companyExtras.talk.form.topic"
                         :error-messages="formExtrasErrors.talk.topic"
+                        :items="talkTopics"
                         label="Tema talka"
                         required
                         @blur="$v.companyExtras.talk.form.topic.$touch()"
@@ -189,26 +206,37 @@
 
                       <v-file-input
                         v-model="companyExtras.talk.form.image"
+                        :error-messages="formExtrasErrors.talk.image"
                         accept="image/png, image/jpeg, image/gif"
                         label="Fotografija predavača"
                         show-size
+                        @blur="$v.companyExtras.talk.form.image.$touch()"
+                        @input="$v.companyExtras.talk.form.image.$touch()"
                       />
 
                       <v-textarea
                         v-model="companyExtras.talk.form.biography"
+                        :error-messages="formExtrasErrors.talk.biography"
                         auto-grow
                         counter
                         label="Kratka biografija predavača"
                         placeholder="Kratka biografija predavača..."
                         required
                         rows="2"
+                        @blur="$v.companyExtras.talk.form.biography.$touch()"
+                        @input="$v.companyExtras.talk.form.biography.$touch()"
                       />
+
+                      <span>
+                        *Opis će se koristiti u svrhu promocije prema studentima. U svom tekstu direktno se obraćajte studentima kako biste ih zainteresirali i pozvali na sudjelovanje.
+                      </span>
                     </v-card-text>
                   </v-expand-transition>
 
                   <v-card-actions>
                     <v-btn
                       v-if="!companyExtras.talk.chosen"
+                      :disabled="company.loading"
                       color="primary"
                       outlined
                       @click="showCompanyExtrasForm('talk')"
@@ -254,19 +282,63 @@
                         :error-messages="formExtrasErrors.workshop.description"
                         auto-grow
                         counter
-                        label="Opis radionice"
+                        label="Opis radionice*"
                         placeholder="From zero to hero! Ova radionca je prilagođena za početnike. Naučit ćeš osnove Swifta i napraviti jednostavu iOS aplikaciju u 90 minuta ..."
                         required
                         rows="2"
                         @blur="$v.companyExtras.workshop.form.description.$touch()"
                         @input="$v.companyExtras.workshop.form.description.$touch()"
                       />
+
+                      <v-textarea
+                        v-model="companyExtras.workshop.form.goal"
+                        :error-messages="formExtrasErrors.workshop.goal"
+                        auto-grow
+                        counter
+                        label="Cilj radionice*"
+                        placeholder="Naučiti osnove Swifta i napraviti jednostavu iOS aplikaciju u 90 minuta"
+                        required
+                        rows="2"
+                        @blur="$v.companyExtras.workshop.form.goal.$touch()"
+                        @input="$v.companyExtras.workshop.form.goal.$touch()"
+                      />
+
+                      <v-textarea
+                        v-model="companyExtras.workshop.form.biography"
+                        :error-messages="formExtrasErrors.workshop.biography"
+                        auto-grow
+                        counter
+                        label="Kratka biografija voditelja radionice"
+                        placeholder="Kratka biografija voditelja radionice..."
+                        required
+                        rows="2"
+                        @blur="$v.companyExtras.workshop.form.biography.$touch()"
+                        @input="$v.companyExtras.workshop.form.biography.$touch()"
+                      />
+
+                      <v-textarea
+                        v-model="companyExtras.workshop.form.notes"
+                        :error-messages="formExtrasErrors.workshop.notes"
+                        auto-grow
+                        counter
+                        label="Dodatne napomene (opcionalno)"
+                        placeholder="Dodatne napomene za studente i organizatore. Npr. treba ponijeti laptop, treba ima instaliran program XY, itd."
+                        required
+                        rows="2"
+                        @blur="$v.companyExtras.workshop.form.goal.$touch()"
+                        @input="$v.companyExtras.workshop.form.goal.$touch()"
+                      />
+
+                      <span>
+                        *Opis će se koristiti u svrhu promocije prema studentima. U svom tekstu direktno se obraćajte studentima kako biste ih zainteresirali i pozvali na sudjelovanje.
+                      </span>
                     </v-card-text>
                   </v-expand-transition>
 
                   <v-card-actions>
                     <v-btn
                       v-if="!companyExtras.workshop.chosen"
+                      :disabled="company.loading"
                       color="primary"
                       outlined
                       @click="showCompanyExtrasForm('workshop')"
@@ -293,8 +365,14 @@
                     <v-checkbox
                       v-model="companyExtras.panel.chosen"
                       color="primary"
-                      label="Zainteresirani smo za potencijalno sudjelovanje na jednom od panela"
+                      label="Zainteresirani smo za potencijalno sudjelovanje na jednom od panela*"
                     />
+
+                    <span>
+                      *Poduzeća koja će sudjelovati na panel raspravama bit će naknadno dogovorena. Odabirom panel rasprave u prijavnici iskazujete interes za sudjelovanje, a organizator će naknadno pozvati
+                      zainteresirana poduzeća na sudjelovanje s obzirom na teme panel rasprava koje organizator odredi. U slučaju da je poduzeće odabrano za predstavljanje putem talka ili radionica, naknada za
+                      sudjelovanje na panel raspravi se ne naplaćuje.
+                    </span>
                   </v-card-text>
                 </v-card>
               </v-card-text>
@@ -310,6 +388,7 @@
 
                 <v-btn
                   :disabled="!company.formValid"
+                  :loading="company.loading"
                   class="mr-4"
                   color="primary"
                   x-large
@@ -318,11 +397,49 @@
                   Pošalji prijavu
                 </v-btn>
               </v-card-actions>
+
+              <v-expand-transition>
+                <v-card-text
+                  v-if="!company.formValid"
+                  class="px-6 py-3 pt-0 text-right red--text"
+                >
+                  Prijava sadrži greške. Molimo provjerite jesu li svi podatci pravilno upisani.
+                </v-card-text>
+              </v-expand-transition>
             </v-card>
           </v-form>
         </v-col>
       </v-row>
     </v-expand-transition>
+
+    <v-dialog
+      v-model="formSubmit.dialog"
+      persistent
+      width="500"
+    >
+      <v-card>
+        <v-card-title v-if="formSubmit.isError">
+          Dogodila se greška
+        </v-card-title>
+        <v-card-title v-else>
+          Prijava uspješna
+        </v-card-title>
+
+        <v-card-text v-text="formSubmit.message" />
+
+        <v-card-actions>
+          <v-spacer />
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click.stop="closeFormSubmitDialog(!formSubmit.isError)"
+          >
+            Ok
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </app-max-width-container>
 </template>
 
@@ -332,9 +449,6 @@ name: PagePrijavaFirmi
 
 <script>
   import {
-    mapActions,
-  } from "vuex";
-  import {
     checkVAT,
     countries,
   } from "jsvat";
@@ -343,11 +457,17 @@ name: PagePrijavaFirmi
     validationMixin,
   } from "vuelidate";
   import {
-    required,
-    minLength,
     maxLength,
+    minLength,
+    required,
     url,
   } from "vuelidate/lib/validators";
+  import {
+    mapActions,
+  } from "vuex";
+  import {
+    TOPICS as TALK_TOPICS,
+  } from "../helpers/talk";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   const countriesWithoutBrazil = countries.filter(({ name }) => "Brazil" !== name);
@@ -388,7 +508,7 @@ name: PagePrijavaFirmi
       },
     },
     description: {
-      value: 0,
+      value: "",
       validations: {
         required,
         minLength: minLength(100),
@@ -448,10 +568,11 @@ name: PagePrijavaFirmi
           validations: {
             required,
             minLength: minLength(100),
+            maxLength: maxLength(365),
           },
         },
         topic: {
-          value: "",
+          value: TALK_TOPICS[0].value,
           validations: {
             required,
           },
@@ -466,6 +587,7 @@ name: PagePrijavaFirmi
           value: "",
           validations: {
             required,
+            minLength: minLength(50),
           },
         },
       },
@@ -486,7 +608,26 @@ name: PagePrijavaFirmi
           validations: {
             required,
             minLength: minLength(100),
+            maxLength: minLength(365),
           },
+        },
+        goal: {
+          value: "",
+          validations: {
+            required,
+            minLength: minLength(100),
+          },
+        },
+        biography: {
+          value: "",
+          validations: {
+            required,
+            minLength: minLength(50),
+          },
+        },
+        notes: {
+          value: "",
+          validations: {},
         },
       },
     },
@@ -551,6 +692,12 @@ name: PagePrijavaFirmi
     },
 
     data: () => ({
+      formSubmit: {
+        dialog: false,
+        isError: false,
+        message: "",
+      },
+
       vat: {
         // input: "HR54608519877",
         // input: "HR53943536946",
@@ -564,6 +711,7 @@ name: PagePrijavaFirmi
         loading: false,
         formValid: true,
         form: companyFormInputs(),
+        applications: [],
       },
 
       companyExtras: companyExtrasFormInputs(),
@@ -692,6 +840,10 @@ name: PagePrijavaFirmi
             }),
         );
       },
+
+      talkTopics() {
+        return TALK_TOPICS;
+      },
     },
 
     watch: {
@@ -727,6 +879,7 @@ name: PagePrijavaFirmi
         isVatValid: "company/isVatValid",
         getCompanyFromVat: "company/getDataFromVat",
         submitCompanyApplication: "company/submitCompanyApplication",
+        getCompanyApplications: "company/getCompanyApplications",
       }),
 
       showCompanyExtrasForm(name) {
@@ -754,6 +907,8 @@ name: PagePrijavaFirmi
 
         const formData = new FormData();
 
+        formData.set("oib", this.vat.input);
+
         for (const [ key, value ] of Object.entries(this.company.form)) {
           formData.set(key, value);
         }
@@ -770,7 +925,21 @@ name: PagePrijavaFirmi
           }
         }
 
-        await this.submitCompanyApplication(formData);
+        this.company.loading = true;
+        try {
+          const { error, reason } = await this.submitCompanyApplication(formData);
+
+          this.formSubmit.isError = Boolean(error);
+          this.formSubmit.dialog = true;
+
+          if (error) {
+            this.formSubmit.message = reason;
+          } else {
+            this.formSubmit.message = "Prijava uspješno zaprimljena";
+          }
+        } finally {
+          this.company.loading = false;
+        }
       },
 
       async showForm() {
@@ -780,11 +949,20 @@ name: PagePrijavaFirmi
 
         this.company.loading = true;
 
-        const data = await this.getCompanyFromVat({ vat: this.vat.input });
-        this.$set(this.company, "data", data);
+        const [
+          company,
+          applications,
+        ] = await Promise.all([
+          this.getCompanyFromVat({ vat: this.vat.input }),
+          this.getCompanyApplications({ vat: this.vat.input }),
+        ]);
 
-        if (data) {
-          for (const [ key, value ] of Object.entries(data)) {
+        this.$set(this.company, "data", company);
+
+        this.$set(this.company, "applications", applications);
+
+        if (company) {
+          for (const [ key, value ] of Object.entries(company)) {
             if (key in this.company.form) {
               this.company.form[key] = value;
             }
@@ -808,11 +986,21 @@ name: PagePrijavaFirmi
             return "Polje je obavezno";
           case "minLength":
             return `Mora biti minimalno ${ args.min } znakova`;
+          case "maxLength":
+            return `Mora biti najviše ${ args.max } znakova`;
           case "url":
             return "Mora biti URL (npr https://www.kset.org)";
           default:
             return error.slice(0, 1).toUpperCase() + error.slice(1);
         }
+      },
+
+      async closeFormSubmitDialog(redirect = false) {
+        if (redirect) {
+          await this.$router.push({ name: "Index" });
+        }
+
+        this.formSubmit.dialog = false;
       },
     },
   };
