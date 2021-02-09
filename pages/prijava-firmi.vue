@@ -227,9 +227,10 @@
                         @input="$v.companyExtras.talk.form.biography.$touch()"
                       />
 
-                      <span>
-                        *<translated-text trans-key="prijavaFirmi.talk.notice" />
-                      </span>
+                      <translated-text
+                        :class="$style.prependStar"
+                        trans-key="prijavaFirmi.talk.notice"
+                      />
                     </v-card-text>
                   </v-expand-transition>
 
@@ -329,9 +330,10 @@
                         @input="$v.companyExtras.workshop.form.goal.$touch()"
                       />
 
-                      <span>
-                        *<translated-text trans-key="prijavaFirmi.workshop.notice" />
-                      </span>
+                      <translated-text
+                        :class="$style.prependStar"
+                        trans-key="prijavaFirmi.workshop.notice"
+                      />
                     </v-card-text>
                   </v-expand-transition>
 
@@ -357,9 +359,13 @@
                 </v-card>
 
                 <v-card class="mt-4">
-                  <v-card-title><translated-text trans-key="prijavaFirmi.panel.title" /></v-card-title>
+                  <v-card-title>
+                    <translated-text trans-key="prijavaFirmi.panel.title" />
+                  </v-card-title>
 
-                  <v-card-subtitle><translated-text trans-key="prijavaFirmi.panel.description" /></v-card-subtitle>
+                  <v-card-subtitle>
+                    <translated-text trans-key="prijavaFirmi.panel.description" />
+                  </v-card-subtitle>
 
                   <v-card-text>
                     <v-checkbox
@@ -368,9 +374,10 @@
                       label="Zainteresirani smo za potencijalno sudjelovanje na jednom od panela*"
                     />
 
-                    <span>
-                      *<translated-text trans-key="prijavaFirmi.panel.notice" />
-                    </span>
+                    <translated-text
+                      :class="$style.prependStar"
+                      trans-key="prijavaFirmi.panel.notice"
+                    />
                   </v-card-text>
                 </v-card>
               </v-card-text>
@@ -1004,3 +1011,13 @@ name: PagePrijavaFirmi
     },
   };
 </script>
+
+<style lang="scss" module>
+  .prependStar {
+
+    &::before {
+      display: inline;
+      content: "*";
+    }
+  }
+</style>
