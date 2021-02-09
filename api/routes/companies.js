@@ -33,6 +33,15 @@ router.post("/application/submit", async ({ body, files }) => {
     )
   ;
 
+  const { panel, talk, workshop } = application;
+
+  if (!(panel || talk || workshop)) {
+    throw new ApiError(
+      "Potrebno je izbrati bar jednu aktivnost (talk, radionicu i/ili panel)",
+      HttpStatus.Error.Client.BadRequest,
+    );
+  }
+
   try {
     return await CompanyApplicationService.submitApplication(application, files);
   } catch (e) {
