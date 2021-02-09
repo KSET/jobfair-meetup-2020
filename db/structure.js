@@ -370,4 +370,45 @@ export const versions = [
     drop index if exists event_reservations_event_id_user_id_event_type_uindex;
   `,
   },
+  {
+    name: "company-applications-add-contact-data",
+    up: `
+    alter table
+      company_applications
+    add
+      contact_email varchar(511)
+    ;
+
+    alter table
+      company_applications
+    add
+      contact_name varchar(511)
+    ;
+
+    alter table
+      company_applications
+    add
+      contact_phone varchar(127)
+    ;
+    `,
+    down: `
+    alter table
+      company_applications
+    drop column
+      "contact_email"
+    ;
+
+    alter table
+      company_applications
+    drop column
+      "contact_name"
+    ;
+
+    alter table
+      company_applications
+    drop column
+      "contact_phone"
+    ;
+    `,
+  },
 ];

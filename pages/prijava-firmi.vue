@@ -103,6 +103,36 @@
                   @input="$v.company.form.address.$touch()"
                 />
 
+                <v-text-field
+                  v-model="company.form.contactName"
+                  :error-messages="formErrors.contactName"
+                  label="Ime kontakt osobe"
+                  placeholder="Marko Horvat"
+                  required
+                  @blur="$v.company.form.contactName.$touch()"
+                  @input="$v.company.form.contactName.$touch()"
+                />
+
+                <v-text-field
+                  v-model="company.form.contactEmail"
+                  :error-messages="formErrors.contactEmail"
+                  label="Email kontakt osobe"
+                  placeholder="info@kset.org"
+                  required
+                  @blur="$v.company.form.contactEmail.$touch()"
+                  @input="$v.company.form.contactEmail.$touch()"
+                />
+
+                <v-text-field
+                  v-model="company.form.contactPhone"
+                  :error-messages="formErrors.contactPhone"
+                  label="Broj telefona kontakt osobe"
+                  placeholder="+385 99 123 4567"
+                  required
+                  @blur="$v.company.form.contactPhone.$touch()"
+                  @input="$v.company.form.contactPhone.$touch()"
+                />
+
                 <v-select
                   v-model="company.form.industryId"
                   :error-messages="formErrors.industryId"
@@ -464,6 +494,7 @@ name: PagePrijavaFirmi
     minLength,
     required,
     url,
+    email,
   } from "vuelidate/lib/validators";
   import {
     mapActions,
@@ -494,6 +525,25 @@ name: PagePrijavaFirmi
       },
     },
     brandName: {
+      value: "",
+      validations: {
+        required,
+      },
+    },
+    contactEmail: {
+      value: "",
+      validations: {
+        required,
+        email,
+      },
+    },
+    contactName: {
+      value: "",
+      validations: {
+        required,
+      },
+    },
+    contactPhone: {
       value: "",
       validations: {
         required,
@@ -996,6 +1046,8 @@ name: PagePrijavaFirmi
             return `Mora biti najviše ${ args.max } znakova`;
           case "url":
             return "Mora biti URL (npr https://www.kset.org)";
+          case "email":
+            return "Mora biti email (npr. info@kset.org)";
           default:
             return error.slice(0, 1).toUpperCase() + error.slice(1);
         }

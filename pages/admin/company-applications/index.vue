@@ -37,7 +37,7 @@
 
           <v-card-title v-text="application.brandName" />
 
-          <v-card-text>
+          <v-card-text class="pb-0">
             <div class="d-flex justify-space-around">
               <v-tooltip
                 v-for="{ name, icon, chosen } in applicationParts(application)"
@@ -57,6 +57,33 @@
                 <span v-text="name" />
               </v-tooltip>
             </div>
+
+            <v-divider class="mt-4" />
+
+            <v-card-subtitle>
+              Kontakt
+            </v-card-subtitle>
+
+            <v-card-text>
+              Ime: <span
+                class="font-weight-bold text--primary"
+                v-text="application.contactName"
+              />
+              <br>
+              Email: <a
+                :href="`mailto:${encodeURI(application.contactEmail)}`"
+                class="font-weight-bold text--primary"
+                rel="noopener noreferrer"
+                target="_blank"
+                v-text="application.contactEmail"
+              />
+              <br>
+              Telefon: <a
+                :href="`tel:${encodeURI(application.contactPhone)}`"
+                class="font-weight-bold text--primary"
+                v-text="application.contactPhone"
+              />
+            </v-card-text>
           </v-card-text>
 
           <v-card-actions>
@@ -102,6 +129,24 @@
               <v-text-field
                 :value="dialog.application.brandName"
                 label="Prikazani naziv tvrtke"
+                readonly
+              />
+
+              <v-text-field
+                :value="dialog.application.contactName"
+                label="Ime kontakt osobe"
+                readonly
+              />
+
+              <v-text-field
+                :value="dialog.application.contactEmail"
+                label="Email kontakt osobe"
+                readonly
+              />
+
+              <v-text-field
+                :value="dialog.application.contactPhone"
+                label="Broj telefona kontakt osobe"
                 readonly
               />
 
@@ -250,9 +295,9 @@
                 <v-card-text>
                   <v-checkbox
                     v-model="dialog.application.panelInterested"
-                    readonly
                     color="primary"
                     label="Zainteresirani smo za potencijalno sudjelovanje na jednom od panela*"
+                    readonly
                   />
                 </v-card-text>
               </v-card>
