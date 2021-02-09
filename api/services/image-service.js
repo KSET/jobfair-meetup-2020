@@ -85,6 +85,12 @@ export default class ImageService {
     return res.map(format);
   }
 
+  static async listInfoAsObject(...ids) {
+    const list = await this.listInfo(...ids);
+
+    return this.ImageListToObject(list);
+  }
+
   static async variationInfo(id, name) {
     return await Client.queryOneOnce(queryImageVariationGetByNameAndImage({
       imageId: id,
@@ -278,6 +284,24 @@ export default class ImageService {
     }
 
     return true;
+  }
+
+  static ImageListToObject(images) {
+    return (
+      images
+        .reduce(
+          (acc, img) => {
+            if (!(img.imageId in acc)) {
+              acc[img.imageId] = [];
+            }
+
+            acc[img.imageId].push(img);
+
+            return acc;
+          },
+          {},
+        )
+    );
   }
 
   static GetUploadName(

@@ -6,7 +6,11 @@ import {
   HttpStatus,
 } from "../helpers/http";
 import {
+  RoleNames,
+} from "../helpers/permissions";
+import {
   ApiError,
+  AuthRouter,
   Router,
 } from "../helpers/route";
 import CompanyApplicationService from "../services/company-application-service";
@@ -152,4 +156,12 @@ router.post("/vat/info/any", async ({ body }) => {
   return await VatValidator.remoteInfo(vat);
 });
 
-export default router;
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: RoleNames.ADMIN,
+});
+
+authRouter.get("/application/list/all", async () => {
+  return await CompanyApplicationService.fetchApplicationsFull();
+});
+
+export default authRouter;

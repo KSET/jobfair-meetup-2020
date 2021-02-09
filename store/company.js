@@ -46,6 +46,17 @@ export const actions = {
     return data || [];
   },
 
+  async getCompanyApplicationsAll() {
+    const { data } = await this.$api.$get(
+      "/companies/application/list/all",
+      {
+        progress: false,
+      },
+    ) || {};
+
+    return data || [];
+  },
+
   async getDataFromVat(context, { vat }) {
     const { data } = await this.$api.$post(
       "/companies/vat/info/any",

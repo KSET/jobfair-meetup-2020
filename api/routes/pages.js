@@ -71,6 +71,12 @@ authRouter.get("/admin", () => {
       icon: "mdi-human-queue",
     },
     {
+      name: "Company Applications",
+      to: { name: "PageAdminCompanyApplicationsList" },
+      requiredRole: RoleNames.ADMIN,
+      icon: "mdi-text-box-multiple-outline",
+    },
+    {
       name: "Translations",
       to: { name: "PageAdminTranslationsList" },
       requiredRole: RoleNames.ADMIN,

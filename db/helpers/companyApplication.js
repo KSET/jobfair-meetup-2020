@@ -1,5 +1,5 @@
 import {
- generateInsertQuery,
+  generateInsertQuery,
 } from "../query";
 
 export const table = "company_applications";
@@ -55,3 +55,16 @@ export const queryCompanyApplicationGetByVat =
     ],
   })
 ;
+
+export const queryCompanyApplicationGetAll =
+  () => ({
+    text: `
+      select
+        *
+      from
+        company_applications
+      order by
+        "id" desc
+    `,
+    values: [],
+  });

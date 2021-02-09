@@ -1,19 +1,24 @@
 import {
- mkdir as mkdirCb,
+  mkdir as mkdirCb,
 } from "fs";
 import {
- promisify,
+  promisify,
 } from "util";
 import {
   deleteFileById,
   queryFileCreate,
   queryFileGetByHashAndPath,
+  queryFileGetByIds,
 } from "../../db/helpers/file";
 import {
- Client,
+  Client,
 } from "../../db/methods";
 import {
+ keysFromSnakeToCamelCase,
+} from "../../helpers/object";
+import {
   apiFilePath,
+  fileDbToEntry,
   localFilePath,
   localFolderPath,
 } from "../helpers/file";
@@ -74,5 +79,17 @@ export default class FileService {
     } catch (e) {
       return false;
     }
+  }
+
+  static async listInfo(...ids) {
+    const res = await Client.queryOnce(queryFileGetByIds(...ids.flat())) || [];
+
+    return res.map(fileDbToEntry);
+  }
+
+  static async listInfoAsObject(...ids) {
+    const list = await this.listInfo(...ids);
+
+    return Object.fromEntries(list.map((item) => [ item.id, keysFromSnakeToCamelCase(item) ]));
   }
 }

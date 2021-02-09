@@ -26,3 +26,19 @@ export const queryCompanyApplicationWorkshopCreate =
       },
     })
 ;
+
+export const queryCompanyApplicationWorkshopGetByIds =
+  (...ids) => ({
+    text: `
+      select
+        *
+      from
+        ${ table }
+      where
+        id = ANY($1::int[])
+    `,
+    values: [
+      ids.flat(),
+    ],
+  })
+;
