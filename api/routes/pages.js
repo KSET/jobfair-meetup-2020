@@ -1,10 +1,10 @@
 import {
-  Router,
-  AuthRouter,
-} from "../helpers/route";
-import {
-  RoleNames,
+ RoleNames,
 } from "../helpers/permissions";
+import {
+  AuthRouter,
+  Router,
+} from "../helpers/route";
 
 const router = new Router();
 
@@ -53,11 +53,6 @@ authRouter.get("/admin", () => {
       name: "Press",
       to: { name: "PageAdminPressIndex" },
       icon: "mdi-account-voice",
-    },
-    {
-      name: "News",
-      to: { name: "PageAdminNewsList" },
-      icon: "mdi-newspaper",
     },
     {
       name: "Events",

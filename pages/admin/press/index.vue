@@ -22,48 +22,13 @@
     <v-row>
       <v-col>
         <v-btn
-          :to="{ name: 'PageAdminPressReleaseList' }"
+          v-for="page in pages"
+          :key="page.to.name"
+          :to="page.to"
+          :class="$style.link"
         >
-          <v-icon left>
-            mdi-file-document-multiple
-          </v-icon>
-          Press releases
-        </v-btn>
-        <v-btn
-          :to="{ name: 'PageAdminPressGalleryList' }"
-          class="ml-3"
-        >
-          <v-icon left>
-            mdi-folder-multiple-image
-          </v-icon>
-          Press gallery
-        </v-btn>
-        <v-btn
-          :to="{ name: 'PageAdminPressKitList' }"
-          class="ml-3"
-        >
-          <v-icon left>
-            mdi-briefcase-download
-          </v-icon>
-          Press kit
-        </v-btn>
-        <v-btn
-          :to="{ name: 'PageAdminMediaPartnersList' }"
-          class="ml-3"
-        >
-          <v-icon left>
-            mdi-handshake
-          </v-icon>
-          Medijski pokrovitelji
-        </v-btn>
-        <v-btn
-          :to="{ name: 'PageAdminProjectFriendsList' }"
-          class="ml-3"
-        >
-          <v-icon left>
-            mdi-hand-heart
-          </v-icon>
-          Prijatelji Meetupa
+          <v-icon left v-text="page.icon" />
+          {{ page.name }}
         </v-btn>
       </v-col>
     </v-row>
@@ -83,5 +48,48 @@ name: PageAdminPressIndex
     components: {
       AppMaxWidthContainer,
     },
+
+    computed: {
+      pages() {
+        return [
+          {
+            name: "News",
+            to: { name: "PageAdminNewsList" },
+            icon: "mdi-newspaper",
+          },
+          {
+            name: "Press releases",
+            to: { name: "PageAdminPressReleaseList" },
+            icon: "mdi-file-document-multiple",
+          },
+          {
+            name: "Press gallery",
+            to: { name: "PageAdminPressGalleryList" },
+            icon: "mdi-folder-multiple-image",
+          },
+          {
+            name: "Press kit",
+            to: { name: "PageAdminPressKitList" },
+            icon: "mdi-briefcase-download",
+          },
+          {
+            name: "Medijski pokrovitelji",
+            to: { name: "PageAdminMediaPartnersList" },
+            icon: "mdi-handshake",
+          },
+          {
+            name: "Prijatelji Meetupa",
+            to: { name: "PageAdminProjectFriendsList" },
+            icon: "mdi-hand-heart",
+          },
+        ];
+      },
+    },
   };
 </script>
+
+<style lang="scss" module>
+    .link + .link {
+      margin-left: 12px;
+    }
+</style>

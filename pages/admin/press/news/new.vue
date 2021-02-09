@@ -194,10 +194,10 @@ name: PageAdminNewsCreate
   import {
     mapActions,
   } from "vuex";
+  import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
     processNewsItem,
   } from "~/helpers/news";
-  import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   export default {
     name: "PageAdminNewsCreate",
@@ -417,7 +417,7 @@ name: PageAdminNewsCreate
 </script>
 
 <style lang="scss" module>
-  @import "../../../assets/styles/include/all";
+  @import "assets/styles/include/all";
 
   .container {
 
