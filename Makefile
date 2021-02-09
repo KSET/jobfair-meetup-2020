@@ -18,7 +18,7 @@ up:
 up-db:
 	docker/compose up -d $(DB_CONTAINER)
 
-prod: build reboot
+prod: notify build reboot
 
 dev: $(NODE_MODULES) up-db
 	docker/yarn dev || exit 0
@@ -37,6 +37,9 @@ reboot: down up
 rebuild: build restart
 
 install: clean yarn-install
+
+notify:
+	curl "https://gotify.josip.igr.ec/message?token=A-h6rNx7X51jjF." -F "title=Build počeo" -F "message=Build na Meetupu je započeo" -F "priority=5" || echo "/shrug"
 
 yarn-install:
 	docker/yarn install
