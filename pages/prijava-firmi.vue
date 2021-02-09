@@ -160,11 +160,11 @@
 
                 <v-card class="mt-4">
                   <v-card-title>
-                    Talk
+                    <translated-text trans-key="prijavaFirmi.talk.title" />
                   </v-card-title>
 
                   <v-card-subtitle>
-                    Talk studentima u trajanju od 90 minuta
+                    <translated-text trans-key="prijavaFirmi.talk.description" />
                   </v-card-subtitle>
 
                   <v-expand-transition>
@@ -228,7 +228,7 @@
                       />
 
                       <span>
-                        *Opis će se koristiti u svrhu promocije prema studentima. U svom tekstu direktno se obraćajte studentima kako biste ih zainteresirali i pozvali na sudjelovanje.
+                        *<translated-text trans-key="prijavaFirmi.talk.notice" />
                       </span>
                     </v-card-text>
                   </v-expand-transition>
@@ -256,11 +256,11 @@
 
                 <v-card class="mt-4">
                   <v-card-title>
-                    Radionica
+                    <translated-text trans-key="prijavaFirmi.workshop.title" />
                   </v-card-title>
 
                   <v-card-subtitle>
-                    Interaktivna radionica sa studentima u trajanju od 90 minuta
+                    <translated-text trans-key="prijavaFirmi.workshop.description" />
                   </v-card-subtitle>
 
                   <v-expand-transition>
@@ -330,7 +330,7 @@
                       />
 
                       <span>
-                        *Opis će se koristiti u svrhu promocije prema studentima. U svom tekstu direktno se obraćajte studentima kako biste ih zainteresirali i pozvali na sudjelovanje.
+                        *<translated-text trans-key="prijavaFirmi.workshop.notice" />
                       </span>
                     </v-card-text>
                   </v-expand-transition>
@@ -357,9 +357,9 @@
                 </v-card>
 
                 <v-card class="mt-4">
-                  <v-card-title>Panel</v-card-title>
+                  <v-card-title><translated-text trans-key="prijavaFirmi.panel.title" /></v-card-title>
 
-                  <v-card-subtitle>Panel rasprava sa studentom i drugim firmama ili članovima fakulteta</v-card-subtitle>
+                  <v-card-subtitle><translated-text trans-key="prijavaFirmi.panel.description" /></v-card-subtitle>
 
                   <v-card-text>
                     <v-checkbox
@@ -369,9 +369,7 @@
                     />
 
                     <span>
-                      *Poduzeća koja će sudjelovati na panel raspravama bit će naknadno dogovorena. Odabirom panel rasprave u prijavnici iskazujete interes za sudjelovanje, a organizator će naknadno pozvati
-                      zainteresirana poduzeća na sudjelovanje s obzirom na teme panel rasprava koje organizator odredi. U slučaju da je poduzeće odabrano za predstavljanje putem talka ili radionica, naknada za
-                      sudjelovanje na panel raspravi se ne naplaćuje.
+                      *<translated-text trans-key="prijavaFirmi.panel.notice" />
                     </span>
                   </v-card-text>
                 </v-card>
@@ -379,9 +377,7 @@
 
               <v-card-actions>
                 <span class="px-4 py-2 text--secondary font-weight-light">
-                  Slanjem ove prijave potvrđujem da su svi navedeni podatci istiniti i točni
-                  te sam ovlašten za zastupanje interesa poduzeća
-                  koje prijavljujem na Job Fair Meetup
+                  <translated-text trans-key="prijavaFirmi.submit.notice" />
                 </span>
 
                 <v-spacer />
@@ -468,6 +464,7 @@ name: PagePrijavaFirmi
   import {
     TOPICS as TALK_TOPICS,
   } from "../helpers/talk";
+  import TranslatedText from "~/components/TranslatedText";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   const countriesWithoutBrazil = countries.filter(({ name }) => "Brazil" !== name);
@@ -670,6 +667,7 @@ name: PagePrijavaFirmi
     name: "PagePrijavaFirmi",
 
     components: {
+      TranslatedText,
       AppMaxWidthContainer,
     },
 
