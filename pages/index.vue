@@ -28,7 +28,7 @@
               <v-btn
                 v-if="!isLoggedIn"
                 :class="$style.heroButton"
-                :to="{ name: 'PageLogin' }"
+                :to="joinNowRoute"
                 color="primary"
                 large
               >
@@ -396,6 +396,9 @@ name: Index
     mapGetters,
   } from "vuex";
   import {
+    encodeRedirectParam,
+  } from "../helpers/url";
+  import {
     formatPartner,
   } from "~/helpers/media-partner";
   import AppNewsCard from "~/components/news/NewsCard";
@@ -513,6 +516,12 @@ name: Index
             src: require("@/assets/images/icons/yt.png"),
           },
         ];
+      },
+
+      joinNowRoute() {
+        const name = this.getSetting("Join Now route", "PageLogin");
+
+        return { name, query: { r: encodeRedirectParam(this.$route) } };
       },
     },
 

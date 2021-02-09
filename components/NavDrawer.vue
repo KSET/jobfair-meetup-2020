@@ -60,7 +60,7 @@
         <v-list-item
           v-else
 
-          :to="loginRoute"
+          :to="joinNowRoute"
           ripple
         >
           <v-list-item-content>
@@ -114,10 +114,13 @@
         pages: "pages/getPages",
         isOpen: "nav-drawer/isOpen",
         isLoggedIn: "user/isLoggedIn",
+        getSetting: "settings/getSetting",
       }),
 
-      loginRoute() {
-        return { name: "PageLogin", query: { r: encodeRedirectParam(this.$route) } };
+      joinNowRoute() {
+        const name = this.getSetting("Join Now route", "PageLogin");
+
+        return { name, query: { r: encodeRedirectParam(this.$route) } };
       },
     },
 

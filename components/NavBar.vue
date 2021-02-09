@@ -43,7 +43,7 @@
 
         :class="$style.navLinkButton"
 
-        :to="loginRoute"
+        :to="joinNowRoute"
 
         large
         nuxt
@@ -86,6 +86,7 @@
       ...mapGetters({
         rawPages: "pages/getPages",
         isLoggedIn: "user/isLoggedIn",
+        getSetting: "settings/getSetting",
       }),
 
       HeaderLinkVariants() {
@@ -95,8 +96,10 @@
         };
       },
 
-      loginRoute() {
-        return { name: "PageLogin", query: { r: encodeRedirectParam(this.$route) } };
+      joinNowRoute() {
+        const name = this.getSetting("Join Now route", "PageLogin");
+
+        return { name, query: { r: encodeRedirectParam(this.$route) } };
       },
 
       pages() {
