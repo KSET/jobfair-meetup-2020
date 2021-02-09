@@ -1,14 +1,15 @@
 import qs from "qs";
 import {
- cachedFetcher,
+  cachedFetcher,
 } from "../helpers/fetchCache";
 import {
- HttpStatus,
+  HttpStatus,
 } from "../helpers/http";
 import {
   ApiError,
   Router,
 } from "../helpers/route";
+import CompanyApplicationService from "../services/company-application-service";
 import CompanyEventsService from "../services/company-events-service";
 import CompanyService from "../services/company-service";
 import VatValidator from "../services/vat-validator";
@@ -29,7 +30,7 @@ router.post("/application/submit", async ({ body, files }) => {
   ;
 
   try {
-    return await CompanyService.submitApplication(application, files);
+    return await CompanyApplicationService.submitApplication(application, files);
   } catch (e) {
     if (e instanceof ApiError) {
       throw e;
@@ -46,7 +47,7 @@ router.post("/application/submit", async ({ body, files }) => {
 router.get("/application/by-vat/:vat", async ({ params }) => {
   const { vat } = params;
 
-  const applications = await CompanyService.fetchApplications(vat) || [];
+  const applications = await CompanyApplicationService.fetchApplicationsByVat(vat) || [];
 
   if (!applications || !applications.length) {
     throw new ApiError(
