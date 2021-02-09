@@ -124,7 +124,7 @@
 </script>
 
 <style lang="scss" module>
-  @import "../assets/styles/include/all";
+  @import "assets/styles/include/all";
 
   .translatedText {
     max-width: 100%;

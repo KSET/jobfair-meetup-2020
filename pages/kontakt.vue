@@ -173,7 +173,7 @@ name: PageKontakt
 </script>
 
 <style lang="scss" module>
-  @import "../assets/styles/include/all";
+  @import "assets/styles/include/all";
 
   .container {
 

@@ -56,7 +56,7 @@ name: PageSudioniciCompanyInfo
 </script>
 
 <style lang="scss" module>
-  @import "../../../assets/styles/include/all";
+  @import "assets/styles/include/all";
 
   .container {
     margin-top: 3em;
