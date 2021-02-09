@@ -5,40 +5,51 @@ BUILD_OUTPUT_DIR := .nuxt.tmp
 FINAL_OUTPUT_DIR := .nuxt
 GOTIFY_APP_TOKEN := A-h6rNx7X51jjF.
 
-.PHONY: stop start up up-db up-web prod dev down down-web restart restart-web reboot reboot-web rebuild install yarn-install build clean build-containers
-
+.PHONY: stop
 stop:
 	docker/compose stop
 
+.PHONY: start
 start:
 	docker/compose start
 
+.PHONY: up
 up:
 	docker/compose up -d
 
+.PHONY: up-db
 up-db:
 	docker/compose up -d $(DB_CONTAINER)
 
+.PHONY: prod
 prod: notify-start build reboot notify-end
 
+.PHONY: dev
 dev: $(NODE_MODULES) up-db
 	docker/yarn dev || exit 0
 	$(MAKE) down
 
+.PHONY: down
 down:
 	docker/compose down
 
+.PHONY: restart
 restart: stop start
 
+.PHONY: restart-web
 restart-web:
 	docker/compose restart $(WEB_CONTAINER)
 
+.PHONY: reboot
 reboot: down up
 
+.PHONY: rebuild
 rebuild: build restart
 
+.PHONY: install
 install: clean yarn-install
 
+.PHONY: notify-start
 notify-start:
 	@curl \
 		"https://gotify.josip.igr.ec/message?token=$(GOTIFY_APP_TOKEN)" \
@@ -47,6 +58,7 @@ notify-start:
 		-F "priority=5" &>/dev/null \
 	|| exit 0
 
+.PHONY: notify-end
 notify-end:
 	@curl \
 		"https://gotify.josip.igr.ec/message?token=$(GOTIFY_APP_TOKEN)" \
@@ -55,6 +67,7 @@ notify-end:
 		-F "priority=5" &>/dev/null \
 	|| exit 0
 
+.PHONY: notify-failed
 notify-failed:
 	@curl \
 		"https://gotify.josip.igr.ec/message?token=$(GOTIFY_APP_TOKEN)" \
@@ -63,9 +76,11 @@ notify-failed:
 		-F "priority=10" &>/dev/null \
 	|| exit 0
 
+.PHONY: yarn-install
 yarn-install:
 	docker/yarn install
 
+.PHONY: build
 build: yarn-install
 	mkdir -p "$(FINAL_OUTPUT_DIR)" && \
 	docker/yarn build -c nuxt.config.build && \
@@ -74,9 +89,11 @@ build: yarn-install
 	rm -rf "$(FINAL_OUTPUT_DIR).old" \
 	|| $(MAKE) notify-failed
 
+.PHONY: clean
 clean:
 	rm -rf $(NODE_MODULES) .nuxt
 
+.PHONY: build-containers
 build-containers:
 	docker/compose build
 
