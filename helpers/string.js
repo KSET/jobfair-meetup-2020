@@ -13,6 +13,14 @@ export const snakeToCamelCase =
       )
 ;
 
+export const camelToSnakeCase =
+  (string) =>
+    string
+      .replace(/([A-Z]+)/g, "_$1")
+      .toLowerCase()
+      .replace(/^_/, "")
+;
+
 /**
  * @param {*} maybeString
  * @return {boolean}

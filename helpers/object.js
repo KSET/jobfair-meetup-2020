@@ -1,4 +1,5 @@
 import {
+  camelToSnakeCase,
   isString,
   snakeToCamelCase,
 } from "./string";
@@ -24,6 +25,18 @@ export const pickKeys = (keyList, object) => {
 
   for (const key of keyList) {
     newObject[key] = get(key, undefined);
+  }
+
+  return newObject;
+};
+
+export const pickKeysFn = (pickKeyFn, object) => {
+  const newObject = {};
+
+  for (const key of Object.keys(object)) {
+    if (pickKeyFn(key)) {
+      newObject[key] = object[key];
+    }
   }
 
   return newObject;
@@ -65,6 +78,16 @@ export const keysFromSnakeToCamelCase = (object) =>
   deepMap(
     ({ key, value }) => ({
       key: isString(key) ? snakeToCamelCase(key) : key,
+      value,
+    }),
+    object,
+  )
+;
+
+export const keysFromCamelCaseToSnakeCase = (object) =>
+  deepMap(
+    ({ key, value }) => ({
+      key: isString(key) ? camelToSnakeCase(key) : key,
       value,
     }),
     object,
