@@ -2,7 +2,7 @@
   <app-max-width-container>
     <v-row>
       <v-col cols="12">
-        <h1>Prijava firmi</h1>
+        <h1><translated-text trans-key="prijavaFirmi.header" /></h1>
       </v-col>
     </v-row>
 
