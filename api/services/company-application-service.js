@@ -78,7 +78,7 @@ export default class CompanyApplicationService {
 
       await client.commit();
 
-      return newApplication;
+      return this.FixApplication(newApplication);
     } catch (e) {
       await client.rollback();
 

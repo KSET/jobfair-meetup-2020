@@ -16,6 +16,7 @@ import {
 import CompanyApplicationService from "../services/company-application-service";
 import CompanyEventsService from "../services/company-events-service";
 import CompanyService from "../services/company-service";
+import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
 
 const router = new Router();
@@ -43,7 +44,34 @@ router.post("/application/submit", async ({ body, files }) => {
   }
 
   try {
-    return await CompanyApplicationService.submitApplication(application, files);
+    const company = await CompanyApplicationService.submitApplication(application, files);
+
+    try {
+      const {
+        legalName,
+        website,
+        contactEmail,
+        contactName,
+        contactPhone,
+        talkId,
+        workshopId,
+        panelInterested,
+      } = company;
+
+      await SlackNotificationService.notifyOfNewApplication({
+        companyName: legalName,
+        companyHomepage: website,
+        contactName,
+        contactEmail,
+        contactPhone,
+        talk: Boolean(talkId),
+        workshop: Boolean(workshopId),
+        panel: Boolean(panelInterested),
+      });
+    } catch {
+    }
+
+    return company;
   } catch (e) {
     if (e instanceof ApiError) {
       throw e;
