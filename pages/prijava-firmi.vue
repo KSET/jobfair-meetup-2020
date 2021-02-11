@@ -500,6 +500,9 @@ name: PagePrijavaFirmi
     mapActions,
   } from "vuex";
   import {
+    generateMetadata,
+  } from "../helpers/head";
+  import {
     TOPICS as TALK_TOPICS,
   } from "../helpers/talk";
   import TranslatedText from "~/components/TranslatedText";
@@ -1061,6 +1064,16 @@ name: PagePrijavaFirmi
         this.formSubmit.dialog = false;
       },
     },
+
+    head: () => ({
+      title: "Prijava poduzeća",
+      meta: [
+        ...generateMetadata({
+          title: "Prijava poduzeća",
+          description: "Prijavite svoje poduzeće na ovogodišnji JobFair Meetup!",
+        }),
+      ],
+    }),
   };
 </script>
 
