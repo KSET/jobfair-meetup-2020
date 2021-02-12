@@ -20,10 +20,13 @@ import {
   withoutKeys,
 } from "../../helpers/object";
 import {
-  ApiError,
-} from "../helpers/route";
+  ServiceError,
+} from "./error-service";
 import FileService from "./file-service";
 import ImageService from "./image-service";
+
+export class CompanyApplicationError extends ServiceError {
+}
 
 export default class CompanyApplicationService {
   static async submitApplication(application, files) {
@@ -38,7 +41,7 @@ export default class CompanyApplicationService {
 
       if (talk) {
         if (!("talk[image]" in files)) {
-          throw new ApiError("Nedostaje slika za talk");
+          throw new CompanyApplicationError("Nedostaje slika za talk");
         }
 
         const { default: image } = await ImageService.upload(files["talk[image]"], 0);

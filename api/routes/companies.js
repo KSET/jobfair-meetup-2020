@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import qs from "qs";
 import {
   cachedFetcher,
@@ -14,8 +15,15 @@ import {
   Router,
 } from "../helpers/route";
 import CompanyApplicationService from "../services/company-application-service";
-import CompanyEventsService from "../services/company-events-service";
-import CompanyService from "../services/company-service";
+import CompanyEventsService, {
+  CompanyEventsError,
+} from "../services/company-events-service";
+import CompanyService, {
+  CompanyError,
+} from "../services/company-service";
+import {
+  ServiceError,
+} from "../services/error-service";
 import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
 
@@ -23,7 +31,9 @@ const router = new Router();
 
 const cacheForMs = 15 * 1000;
 
-router.post("/application/submit", async ({ body, files }) => {
+router.post("/application/submit", async (req) => {
+  const { body, files } = req;
+
   const application =
     qs.parse(
       Object
@@ -73,9 +83,20 @@ router.post("/application/submit", async ({ body, files }) => {
 
     return company;
   } catch (e) {
-    if (e instanceof ApiError) {
-      throw e;
+    if (e instanceof ServiceError) {
+      throw new ApiError(
+        e.message,
+        e.statusCode || HttpStatus.Error.Server.InternalServerError,
+        e.data,
+      );
     } else {
+      Sentry.captureException(
+        e,
+        {
+          req,
+        },
+      );
+
       throw new ApiError(
         "Nešto je pošlo krivo. Molimo probajte ponovno.",
         HttpStatus.Error.Server.InternalServerError,
@@ -133,7 +154,15 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
     ]);
   }
 
-  return await CompanyEventsService.listEventsForCompany(id, type);
+  try {
+    return await CompanyEventsService.listEventsForCompany(id, type);
+  } catch (e) {
+    if (e instanceof CompanyEventsError) {
+      throw new ApiError(e.message, HttpStatus.Error.Client.NotFound);
+    }
+
+    throw e;
+  }
 }, ({ params }) => {
   const { type, id } = params;
 
@@ -143,7 +172,15 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
 router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
   const { id } = params;
 
-  return await CompanyService.fetchInfo(id);
+  try {
+    return await CompanyService.fetchInfo(id);
+  } catch (e) {
+    if (e instanceof CompanyError) {
+      throw new ApiError(e.message, HttpStatus.Error.Client.NotFound);
+    }
+
+    throw e;
+  }
 }, ({ params }) => {
   return params.id;
 }));
@@ -165,7 +202,15 @@ router.post("/vat/info/existing", async ({ body }) => {
     throw new ApiError("no-vat", HttpStatus.Error.Client.UnprocessableEntity);
   }
 
-  return await CompanyService.fetchInfoFromVat(vat);
+  try {
+    return await CompanyService.fetchInfoFromVat(vat);
+  } catch (e) {
+    if (e instanceof CompanyError) {
+      throw new ApiError(e.message, HttpStatus.Error.Client.NotFound);
+    }
+
+    throw e;
+  }
 });
 
 router.post("/vat/info/remote", async ({ body }) => {

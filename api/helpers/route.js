@@ -89,7 +89,7 @@ export class ApiError extends Error {
 
   constructor(message, statusCode = HttpStatus.Error.Client.ImATeapot, data = null) {
     super(message);
-    this.statusCode = statusCode;
+    this.statusCode = statusCode || HttpStatus.Error.Client.ImATeapot;
     this.data = data;
   }
 }
@@ -125,14 +125,14 @@ export const rawRoute = (fn) => asyncWrapper(async (req, res, next) => {
       res.status(HttpStatus.Error.Client.Forbidden);
     }
 
-    if (!(e instanceof ApiError)) {
+    if (e instanceof ApiError) {
+      res.set("X-Api-Error", e.message);
+    } else {
       Sentry.captureException(e);
 
       if ("development" === process.env.NODE_ENV) {
         console.log("|> ERROR", "\n", e);
       }
-    } else {
-      res.set("X-Api-Error", e.message);
     }
 
     return res.end();

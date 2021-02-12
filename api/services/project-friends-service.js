@@ -18,14 +18,17 @@ import {
   HttpStatus,
 } from "../helpers/http";
 import {
-  ApiError,
-} from "../helpers/route";
+  ServiceError,
+} from "./error-service";
 import ImageService from "./image-service";
 
 const format = pipe(
   keysFromSnakeToCamelCase,
   withoutKeys.bind(null, [ "imageId" ]),
 );
+
+export class ProjectFriendsError extends ServiceError {
+}
 
 export default class ProjectFriendsService {
   static async create(
@@ -42,9 +45,7 @@ export default class ProjectFriendsService {
     };
 
     if (!imageFile || !name || !link) {
-      throw new ApiError(
-        "All fields required",
-      );
+      throw new ProjectFriendsError("Sva polja su obavezna");
     }
 
     const client = await Client.inTransaction();
@@ -122,7 +123,7 @@ export default class ProjectFriendsService {
       const removed = await ImageService.remove(imageId, client);
 
       if (!removed) {
-        throw new ApiError("Something went wrong");
+        throw new ProjectFriendsError("Nešto je pošlo po zlu");
       }
 
       await client.commit();
@@ -145,9 +146,7 @@ export default class ProjectFriendsService {
       const B = await client.queryOne(queryProjectFriendsGetById({ id: b }));
 
       if (!A || !B) {
-        throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
-          "Partner not found",
-        ]);
+        throw new ProjectFriendsError("Partner nije pronađen", null, HttpStatus.Error.Client.NotFound);
       }
 
       await client.query(queryProjectFriendsUpdate(a, { order: B.order }));

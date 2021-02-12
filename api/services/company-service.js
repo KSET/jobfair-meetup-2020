@@ -13,15 +13,15 @@ import {
   post,
 } from "../helpers/axios";
 import {
-  HttpStatus,
-} from "../helpers/http";
-import {
-  ApiError,
-} from "../helpers/route";
-import {
   getSetting,
 } from "../helpers/settings";
 import CompanyEventsService from "./company-events-service";
+import {
+  ServiceError,
+} from "./error-service";
+
+export class CompanyError extends ServiceError {
+}
 
 export default class CompanyService {
   static async fetchListAll() {
@@ -50,7 +50,7 @@ export default class CompanyService {
     const company = companies.find(({ id: i }) => String(i) === String(id));
 
     if (!company) {
-      throw new ApiError("Company not found", HttpStatus.Error.Client.NotFound);
+      throw new CompanyError("Poduzeće nije pronađeno");
     }
 
     const newType = (key) => {
@@ -115,11 +115,7 @@ export default class CompanyService {
     ;
 
     if (!company) {
-      throw new ApiError(
-        "vat-not-found",
-        HttpStatus.Error.Client.NotFound,
-        "VAT not found",
-      );
+      throw new CompanyError("VAT broj nije pronađen");
     }
 
     return this.fixCompany(company);

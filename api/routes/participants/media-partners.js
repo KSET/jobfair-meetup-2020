@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import {
- HttpStatus,
+  HttpStatus,
 } from "../../helpers/http";
 import {
   RoleNames,
@@ -10,7 +10,9 @@ import {
   AuthRouter,
   Router,
 } from "../../helpers/route";
-import MediaPartnersService from "../../services/media-partners-service";
+import MediaPartnersService, {
+  MediaPartnersError,
+} from "../../services/media-partners-service";
 
 const router = new Router();
 
@@ -37,11 +39,13 @@ authRouter.post("/", async (req) => {
       authUser.id,
     );
   } catch (e) {
-    if (!(e instanceof ApiError)) {
-      Sentry.captureException(e, {
-        req,
-      });
+    if (e instanceof MediaPartnersError) {
+      throw new ApiError(e.message);
     }
+
+    Sentry.captureException(e, {
+      req,
+    });
 
     throw e;
   }
@@ -50,7 +54,15 @@ authRouter.post("/", async (req) => {
 authRouter.delete("/:id", async ({ params }) => {
   const { id } = params;
 
-  return await MediaPartnersService.remove(id);
+  try {
+    return await MediaPartnersService.remove(id);
+  } catch (e) {
+    if (e instanceof MediaPartnersError) {
+      throw new ApiError(e.message);
+    }
+
+    throw e;
+  }
 });
 
 authRouter.post("/swap", async ({ body }) => {
@@ -62,7 +74,15 @@ authRouter.post("/swap", async ({ body }) => {
     ]);
   }
 
-  return await MediaPartnersService.swap(a, b);
+  try {
+    return await MediaPartnersService.swap(a, b);
+  } catch (e) {
+    if (e instanceof MediaPartnersError) {
+      throw new ApiError(e.message, e.statusCode);
+    }
+
+    throw e;
+  }
 });
 
 export default authRouter;

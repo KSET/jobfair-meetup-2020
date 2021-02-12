@@ -11,10 +11,10 @@ import {
   HttpStatus,
   internalRequest,
 } from "../helpers/http";
-import {
-  ApiError,
-} from "../helpers/route";
 import CompanyService from "./company-service";
+import {
+  ServiceError,
+} from "./error-service";
 
 const typeTransformer = (type) => {
   switch (type) {
@@ -27,6 +27,9 @@ const typeTransformer = (type) => {
       return `${ type }s`;
   }
 };
+
+export class CompanyEventsError extends ServiceError {
+}
 
 export default class CompanyEventsServices {
   static async listAll() {
@@ -106,17 +109,17 @@ export default class CompanyEventsServices {
     } = await graphQlQuery(participantEventsQuery());
 
     if (!objList) {
-      throw new ApiError("no-type", HttpStatus.Error.Forbidden, [
-        `Event type not found: ${ transformedType }`,
-      ]);
+      throw new CompanyEventsError(
+        `Nepoznat tip eventa: ${ transformedType }`,
+        null,
+        HttpStatus.Error.Client.Forbidden,
+      );
     }
 
     const obj = objList.find(({ id: i }) => Number(i) === Number(id));
 
     if (!obj) {
-      throw new ApiError("event-not-found", HttpStatus.Error.Client.NotFound, [
-        "Event not found",
-      ]);
+      throw new CompanyEventsError("Event nije pronađen");
     }
 
     return keysFromSnakeToCamelCase({

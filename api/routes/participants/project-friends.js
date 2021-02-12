@@ -10,7 +10,9 @@ import {
   AuthRouter,
   Router,
 } from "../../helpers/route";
-import ProjectFriendsService from "../../services/project-friends-service";
+import ProjectFriendsService, {
+ ProjectFriendsError,
+} from "../../services/project-friends-service";
 
 const router = new Router();
 
@@ -37,11 +39,13 @@ authRouter.post("/", async (req) => {
       authUser.id,
     );
   } catch (e) {
-    if (!(e instanceof ApiError)) {
-      Sentry.captureException(e, {
-        req,
-      });
+    if (e instanceof ProjectFriendsError) {
+      throw new ApiError(e.message);
     }
+
+    Sentry.captureException(e, {
+      req,
+    });
 
     throw e;
   }
@@ -50,7 +54,15 @@ authRouter.post("/", async (req) => {
 authRouter.delete("/:id", async ({ params }) => {
   const { id } = params;
 
-  return await ProjectFriendsService.remove(id);
+  try {
+    return await ProjectFriendsService.remove(id);
+  } catch (e) {
+    if (e instanceof ProjectFriendsError) {
+      throw new ApiError(e.message);
+    }
+
+    throw e;
+  }
 });
 
 authRouter.post("/swap", async ({ body }) => {
@@ -62,7 +74,15 @@ authRouter.post("/swap", async ({ body }) => {
     ]);
   }
 
-  return await ProjectFriendsService.swap(a, b);
+  try {
+    return await ProjectFriendsService.swap(a, b);
+  } catch (e) {
+    if (e instanceof ProjectFriendsError) {
+      throw new ApiError(e.message, e.statusCode);
+    }
+
+    throw e;
+  }
 });
 
 export default authRouter;

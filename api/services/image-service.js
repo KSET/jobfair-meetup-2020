@@ -28,39 +28,27 @@ import {
   pipe,
 } from "../../helpers/object";
 import {
-  HttpStatus,
-} from "../helpers/http";
-import {
   apiFilePath,
   localFilePath,
   localFolderPath,
 } from "../helpers/image";
 import {
-  ApiError,
-} from "../helpers/route";
+  ServiceError,
+} from "./error-service";
 
 const mkdir = promisify(mkdirCb);
 
 const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
 
-export class ImageUploadError extends Error {
-  data;
+export class ImageError extends ServiceError {
+}
 
-  constructor(message, data) {
-    super(message);
-    this.data = data;
-  }
+export class ImageUploadError extends ImageError {
 }
 
 export default class ImageService {
   static async info(id) {
-    const res = await Client.queryOnce(queryImageGetById(id));
-
-    if (!res || !res.length) {
-      throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
-    }
-
-    return res;
+    return await Client.queryOnce(queryImageGetById(id));
   }
 
   static async listInfo(...ids) {
@@ -194,19 +182,19 @@ export default class ImageService {
     let imageFolder = null;
     try {
       if (!file) {
-        throw new ImageUploadError("No file provided");
+        throw new ImageUploadError("Slika nije predana");
       }
 
       const ext = EXTENSION_MAP[file.mimetype];
 
       if (!ext) {
-        throw new ImageUploadError(`Invalid file type. Only ${ Object.values(EXTENSION_MAP).map((ext) => `.${ ext }`).join(", ") } supported.`, {
+        throw new ImageUploadError(`Tip datoteke nije valjan. Podržane su samo ${ Object.values(EXTENSION_MAP).map((ext) => `.${ ext }`).join(", ") } datoteke.`, {
           mimeType: file.mimetype,
         });
       }
 
       if (file.size > MAX_IMAGE_SIZE__B) {
-        throw new ImageUploadError(`Image too large (Max ${ MAX_IMAGE_SIZE__MB }MB)`);
+        throw new ImageUploadError(`Slika prevelika (Najviše ${ MAX_IMAGE_SIZE__MB }MB)`);
       }
 
       const [ { id: imageId } ] = await client.query(queryImageCreate({
