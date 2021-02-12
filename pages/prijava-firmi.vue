@@ -2,7 +2,9 @@
   <app-max-width-container>
     <v-row>
       <v-col cols="12">
-        <h1><translated-text trans-key="prijavaFirmi.header" /></h1>
+        <h1>
+          <translated-text trans-key="prijavaFirmi.header" />
+        </h1>
       </v-col>
     </v-row>
 
@@ -495,20 +497,39 @@ name: PagePrijavaFirmi
     required,
     url,
     email,
+    helpers,
   } from "vuelidate/lib/validators";
   import {
     mapActions,
   } from "vuex";
   import {
     generateMetadata,
-  } from "../helpers/head";
+  } from "~/helpers/head";
+  import {
+    bytesToHumanReadable,
+    MAX_IMAGE_SIZE__B,
+  } from "~/helpers/image";
   import {
     TOPICS as TALK_TOPICS,
-  } from "../helpers/talk";
+  } from "~/helpers/talk";
   import TranslatedText from "~/components/TranslatedText";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   const countriesWithoutBrazil = countries.filter(({ name }) => "Brazil" !== name);
+
+  const maxFileSize =
+    (param) =>
+      helpers.withParams(
+        {
+          type: "maxFileSize",
+          size: param,
+        },
+        (value) =>
+          !helpers.req(value) ||
+          param > value.size
+        ,
+      )
+  ;
 
   const getFormType =
     (type, form) =>
@@ -583,6 +604,7 @@ name: PagePrijavaFirmi
       value: null,
       validations: {
         required,
+        maxFileSize: maxFileSize(MAX_IMAGE_SIZE__B),
       },
     },
     vectorLogo: {
@@ -1051,6 +1073,8 @@ name: PagePrijavaFirmi
             return "Mora biti URL (npr https://www.kset.org)";
           case "email":
             return "Mora biti email (npr. info@kset.org)";
+          case "maxFileSize":
+            return `Mora biti manje od ${ bytesToHumanReadable(args.size) }`;
           default:
             return error.slice(0, 1).toUpperCase() + error.slice(1);
         }

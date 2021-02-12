@@ -18,9 +18,9 @@ import {
   Client,
 } from "../../db/methods";
 import {
+  bytesToHumanReadable,
   EXTENSION_MAP,
   MAX_IMAGE_SIZE__B,
-  MAX_IMAGE_SIZE__MB,
 } from "../../helpers/image";
 import {
   keysFromSnakeToCamelCase,
@@ -194,7 +194,7 @@ export default class ImageService {
       }
 
       if (file.size > MAX_IMAGE_SIZE__B) {
-        throw new ImageUploadError(`Slika prevelika (Najviše ${ MAX_IMAGE_SIZE__MB }MB)`);
+        throw new ImageUploadError(`Slika prevelika (Najviše ${ bytesToHumanReadable(MAX_IMAGE_SIZE__B) })`);
       }
 
       const [ { id: imageId } ] = await client.query(queryImageCreate({

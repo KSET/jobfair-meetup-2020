@@ -57,12 +57,12 @@ export const ALLOWED_MIME_TYPES = Object.keys(EXTENSION_MAP);
 
 
 export const MAX_IMAGE_SIZE__MB = 7;
-export const MAX_IMAGE_SIZE__KB = MAX_IMAGE_SIZE__MB * 1024;
-export const MAX_IMAGE_SIZE__B = MAX_IMAGE_SIZE__KB * 1024;
+export const MAX_IMAGE_SIZE__KB = MAX_IMAGE_SIZE__MB * 1000;
+export const MAX_IMAGE_SIZE__B = MAX_IMAGE_SIZE__KB * 1000;
 
 export const bytesToHumanReadable =
   (bytes) => {
-    const step = 1024;
+    const step = 1000;
 
     if (Math.abs(bytes) < step) {
       return `${ bytes } B`;
