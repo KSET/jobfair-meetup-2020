@@ -59,3 +59,24 @@ export const ALLOWED_MIME_TYPES = Object.keys(EXTENSION_MAP);
 export const MAX_IMAGE_SIZE__MB = 7;
 export const MAX_IMAGE_SIZE__KB = MAX_IMAGE_SIZE__MB * 1024;
 export const MAX_IMAGE_SIZE__B = MAX_IMAGE_SIZE__KB * 1024;
+
+export const bytesToHumanReadable =
+  (bytes) => {
+    const step = 1024;
+
+    if (Math.abs(bytes) < step) {
+      return `${ bytes } B`;
+    }
+
+    const units = [ "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" ];
+    let u = -1;
+    const r = 10 ** 1;
+
+    do {
+      bytes /= step;
+      ++u;
+    } while (Math.round(Math.abs(bytes) * r) / r >= step && u < units.length - 1);
+
+
+    return `${ bytes.toFixed(1) } ${ units[u] }`;
+  };
