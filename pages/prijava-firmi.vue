@@ -20,7 +20,7 @@
           :success="vat.valid === true"
           clearable
           hide-details="auto"
-          label="OIB / VAT"
+          label="VAT"
           outlined
           prepend-inner-icon="mdi-identifier"
         />
@@ -818,7 +818,7 @@ name: PagePrijavaFirmi
         const { country } = this.vatInfo;
 
         if (!country) {
-          return "Potrebno je navesti valjan VAT/OIB (npr. HR57029260362)";
+          return "Potrebno je navesti valjan VAT (npr. HR57029260362)";
         }
 
         const regex = (() => {

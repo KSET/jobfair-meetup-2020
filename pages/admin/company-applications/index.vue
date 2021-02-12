@@ -116,7 +116,7 @@
             <v-card-text>
               <v-text-field
                 :value="dialog.application.oib"
-                label="OIB / VAT"
+                label="VAT"
                 readonly
               />
 
