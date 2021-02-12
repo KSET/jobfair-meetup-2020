@@ -3,30 +3,20 @@ import {
   Router,
 } from "express";
 import {
- HttpStatus,
+  HttpStatus,
 } from "../../helpers/http";
-import {
-  fileDbToEntry,
-} from "../../helpers/file";
-import {
-  queryFileGetById,
-} from "../../../db/helpers/file";
-import {
-  query,
-} from "../../../db/methods";
 import {
   apiRoute,
   ApiError,
 } from "../../helpers/route";
+import FileService from "../../services/file-service";
 
 const router = Router();
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
-  const [ file ] = await query(queryFileGetById({
-    id,
-  }));
+  const file = await FileService.info(id);
 
   if (!file) {
     res.status(HttpStatus.Error.Client.NotFound);
@@ -43,9 +33,7 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/info", apiRoute(async (req) => {
   const { id } = req.params;
 
-  const [ file ] = await query(queryFileGetById({
-    id,
-  }));
+  const file = await FileService.info(id);
 
   if (!file) {
     throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
@@ -53,7 +41,7 @@ router.get("/:id/info", apiRoute(async (req) => {
     ]);
   }
 
-  return fileDbToEntry(file);
+  return file;
 }));
 
 export default router;

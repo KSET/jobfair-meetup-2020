@@ -8,13 +8,14 @@ import {
   deleteFileById,
   queryFileCreate,
   queryFileGetByHashAndPath,
+  queryFileGetById,
   queryFileGetByIds,
 } from "../../db/helpers/file";
 import {
   Client,
 } from "../../db/methods";
 import {
- keysFromSnakeToCamelCase,
+  keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
   apiFilePath,
@@ -79,6 +80,18 @@ export default class FileService {
     } catch (e) {
       return false;
     }
+  }
+
+  static async info(id) {
+    const file = await Client.queryOneOnce(queryFileGetById({
+      id,
+    }));
+
+    if (!file) {
+      return null;
+    }
+
+    return fileDbToEntry(file);
   }
 
   static async listInfo(...ids) {
