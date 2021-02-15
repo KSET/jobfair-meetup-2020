@@ -52,7 +52,7 @@ export default class CompanyApplicationService {
         });
 
         talk.presenterPhotoId = imageId;
-        talk.presenterDescription = talk.description;
+        talk.presenterDescription = talk.biography;
         const { id } = await client.queryOne(queryCompanyApplicationTalkCreate(talk));
 
         company.talkId = id;
