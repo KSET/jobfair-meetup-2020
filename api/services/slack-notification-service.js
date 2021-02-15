@@ -11,7 +11,8 @@ import SettingsService from "./settings-service";
 export default class SlackNotificationService {
   static async notifyOfNewApplication(
     {
-      companyName,
+      companyNameLegal,
+      companyNameDisplay,
       companyHomepage,
       contactName,
       contactEmail,
@@ -27,7 +28,8 @@ export default class SlackNotificationService {
 *NOVA PRIJAVA*
 -------------------------
 *Poduzeće*
- - Ime: <${ companyHomepage }|${ companyName }>
+ - Ime: ${ companyNameDisplay }
+ - Pravno ime: ${ companyNameLegal }
  - Stranica: ${ companyHomepage }
 
 *Kontakt*

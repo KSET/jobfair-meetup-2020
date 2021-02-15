@@ -58,6 +58,7 @@ router.post("/application/submit", async (req) => {
 
     try {
       const {
+        brandName,
         legalName,
         website,
         contactEmail,
@@ -69,7 +70,8 @@ router.post("/application/submit", async (req) => {
       } = company;
 
       await SlackNotificationService.notifyOfNewApplication({
-        companyName: legalName,
+        companyNameDisplay: brandName,
+        companyNameLegal: legalName,
         companyHomepage: website,
         contactName,
         contactEmail,
