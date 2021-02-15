@@ -32,6 +32,10 @@ export class Client {
     return await (new Client()).connect();
   }
 
+  /**
+   * @param args
+   * @returns {Promise<Array<Object>|null>}
+   */
   static async queryOnce(...args) {
     let client;
     try {
@@ -45,6 +49,10 @@ export class Client {
     }
   }
 
+  /**
+   * @param args
+   * @returns {Promise<Object|null>}
+   */
   static async queryOneOnce(...args) {
     let client;
     try {
@@ -67,10 +75,16 @@ export class Client {
     return await client.startTransaction();
   }
 
+  /**
+   * @returns {boolean}
+   */
   get #queryable() {
     return this.#instance && !this.#ended;
   }
 
+  /**
+   * @returns {Promise<Client>}
+   */
   async connect() {
     if (!this.#instance) {
       this.#instance = await pool.connect();
@@ -89,9 +103,13 @@ export class Client {
     return this;
   }
 
+  /**
+   * @param args
+   * @returns {Promise<Array<Object>|null>}
+   */
   async query(...args) {
     if (!this.#queryable) {
-      return;
+      return null;
     }
 
     try {
@@ -104,11 +122,15 @@ export class Client {
     }
   }
 
+  /**
+   * @param args
+   * @returns {Promise<Object|null>}
+   */
   async queryOne(...args) {
     const res = await this.query(...args);
 
     if (!res) {
-      return;
+      return null;
     }
 
     return res.pop();
