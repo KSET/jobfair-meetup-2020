@@ -1,13 +1,13 @@
 import * as Sentry from "@sentry/node";
 import qs from "qs";
 import {
-  cachedFetcher,
+ cachedFetcher,
 } from "../helpers/fetchCache";
 import {
-  HttpStatus,
+ HttpStatus,
 } from "../helpers/http";
 import {
-  RoleNames,
+ RoleNames,
 } from "../helpers/permissions";
 import {
   ApiError,
@@ -16,13 +16,13 @@ import {
 } from "../helpers/route";
 import CompanyApplicationService from "../services/company-application-service";
 import CompanyEventsService, {
-  CompanyEventsError,
+ CompanyEventsError,
 } from "../services/company-events-service";
 import CompanyService, {
-  CompanyError,
+ CompanyError,
 } from "../services/company-service";
 import {
-  ServiceError,
+ ServiceError,
 } from "../services/error-service";
 import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
@@ -109,16 +109,7 @@ router.post("/application/submit", async (req) => {
 router.get("/application/by-vat/:vat", async ({ params }) => {
   const { vat } = params;
 
-  const applications = await CompanyApplicationService.fetchApplicationsByVat(vat) || [];
-
-  if (!applications || !applications.length) {
-    throw new ApiError(
-      "No applications for company",
-      HttpStatus.Error.Client.NotFound,
-    );
-  }
-
-  return applications;
+  return await CompanyApplicationService.fetchApplicationsByVat(vat) || [];
 });
 
 router.get("/participants", cachedFetcher(cacheForMs, async () => {
