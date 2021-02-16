@@ -590,7 +590,7 @@ name: PagePrijavaFirmi
       validations: {
         required,
         minLength: minLength(100),
-        maxLength: maxLength(350),
+        maxLength: maxLength(365),
       },
     },
     homepageUrl: {
@@ -646,8 +646,6 @@ name: PagePrijavaFirmi
           value: "",
           validations: {
             required,
-            minLength: minLength(100),
-            maxLength: maxLength(365),
           },
         },
         topic: {
@@ -666,7 +664,6 @@ name: PagePrijavaFirmi
           value: "",
           validations: {
             required,
-            minLength: minLength(50),
           },
         },
       },
@@ -686,22 +683,18 @@ name: PagePrijavaFirmi
           value: "",
           validations: {
             required,
-            minLength: minLength(100),
-            maxLength: minLength(365),
           },
         },
         goal: {
           value: "",
           validations: {
             required,
-            minLength: minLength(100),
           },
         },
         biography: {
           value: "",
           validations: {
             required,
-            minLength: minLength(50),
           },
         },
         notes: {
