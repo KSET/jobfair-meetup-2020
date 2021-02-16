@@ -44,11 +44,11 @@ router.post("/application/submit", async (req) => {
     )
   ;
 
-  const { panel, talk, workshop } = application;
+  const { talk, workshop } = application;
 
-  if (!(panel || talk || workshop)) {
+  if (!(talk || workshop)) {
     throw new ApiError(
-      "Potrebno je izbrati bar jednu aktivnost (talk, radionicu i/ili panel)",
+      "Potrebno je izbrati bar jednu aktivnost (talk i/ili radionicu)",
       HttpStatus.Error.Client.BadRequest,
     );
   }
