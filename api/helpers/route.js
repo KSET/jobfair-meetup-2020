@@ -6,6 +6,7 @@ import {
 } from "path";
 import express from "express";
 import * as Sentry from "@sentry/node";
+import MobileNotificationService from "../services/mobile-notification-service";
 import {
   HttpStatus,
 } from "./http";
@@ -132,6 +133,15 @@ export const rawRoute = (fn) => asyncWrapper(async (req, res, next) => {
 
       if ("development" === process.env.NODE_ENV) {
         console.log("|> ERROR", "\n", e);
+      } else {
+        try {
+          await MobileNotificationService.notify({
+            title: "[Meetup] Exception",
+            message: e.message,
+            priority: 10,
+          });
+        } catch {
+        }
       }
     }
 
@@ -166,6 +176,15 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
       if ("development" === process.env.NODE_ENV) {
         console.log(e);
         errorData._errorObject = e;
+      } else {
+        try {
+          await MobileNotificationService.notify({
+            title: "[Meetup] Exception",
+            message: e.message,
+            priority: 10,
+          });
+        } catch {
+        }
       }
     }
 
