@@ -411,4 +411,41 @@ export const versions = [
     ;
     `,
   },
+  {
+    name: "company-applications-change-long-fields-to-text",
+    up: `
+    alter table
+      company_applications
+    alter column
+      description type text using description::text
+    ;
+
+    alter table
+      company_applications_talks
+    alter column
+      description type text using description::text
+    ;
+
+    alter table
+      company_applications_talks
+    alter column
+      presenter_description type text using presenter_description::text
+    ;
+
+    alter table
+      company_applications_workshops
+    alter column
+      description type text using description::text
+    ;
+
+    alter table
+      company_applications_workshops
+    alter column
+      goal type text using goal::text
+    ;
+    `,
+    down: `
+    select 1;
+    `,
+  },
 ];
