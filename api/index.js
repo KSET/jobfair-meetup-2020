@@ -22,7 +22,10 @@ import {
   apiRoute,
   ApiNotFoundError,
   registerRoutesInFolder,
+  error,
+  ApiError,
 } from "./helpers/route";
+import MobileNotificationService from "./services/mobile-notification-service";
 
 const fileUploadMiddleware = fileUpload({
   useTempFiles: true,
@@ -135,5 +138,34 @@ query(dbBase)
     }
   })
 ;
+
+app.use((err, req, res, next) => {
+  const status = 500;
+
+  const errorData = error({
+    status,
+    reason: err.message || "Something went wrong",
+    data: err.data,
+  });
+
+  res.status(status).json(errorData);
+
+  if (err instanceof ApiError) {
+    return;
+  }
+
+  if ("development" !== process.env.NODE_ENV) {
+    Sentry.captureException(err);
+
+    try {
+      MobileNotificationService.notify({
+        message: err.message || "HELP",
+        title: "[Meetup] UNCAUGHT ERROR",
+        priority: 10,
+      });
+    } catch {
+    }
+  }
+});
 
 export default app;
