@@ -1,7 +1,6 @@
 import {
   async as StreamZipAsync,
 } from "node-stream-zip";
-import FileType from "file-type";
 import {
   queryCompanyApplicationCreate,
   queryCompanyApplicationGetAll,
@@ -49,19 +48,19 @@ export default class CompanyApplicationService {
 
       const zip = new StreamZipAsync({ file: files.vectorLogo.tempFilePath });
       try {
-        const entries = Object.values(await zip.entries());
-        const allowedFormat = this.ALLOWED_VECTOR_LOGO_FORMATS;
-
-        if (4 < entries.length) {
+        if (4 < await zip.entriesCount) {
           throw new CompanyApplicationError("Najviše 4 stavke dopuštene unutar ZIP datoteke s vektorskim logom");
         }
 
-        for (const entry of entries) {
-          const stream = await zip.stream(entry);
-          const { mime } = await FileType.fromStream(stream);
+        const allowedExtensions =
+          Object
+            .values(this.ALLOWED_VECTOR_LOGO_FORMATS)
+            .map((ext) => `.${ ext }`)
+        ;
 
-          if (!(mime in allowedFormat)) {
-            const [ ext, ...exts ] = Object.values(allowedFormat).map((str) => `.${ str }`);
+        for (const { name } of Object.values(await zip.entries())) {
+          if (!allowedExtensions.some((ext) => name.endsWith(ext))) {
+            const [ ext, ...exts ] = allowedExtensions;
 
             throw new CompanyApplicationError(`ZIP s vektorskim logom smije sadržavati samo ${ exts.join(", ") } i ${ ext } datoteke`);
           }
