@@ -88,7 +88,7 @@ router.post("/application/submit", async (req) => {
     if (e instanceof ServiceError) {
       throw new ApiError(
         e.message,
-        e.statusCode || HttpStatus.Error.Server.InternalServerError,
+        e.statusCode || HttpStatus.Error.Client.UnprocessableEntity,
         e.data,
       );
     } else {
