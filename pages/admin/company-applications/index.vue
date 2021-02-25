@@ -90,21 +90,23 @@
           <v-card-text class="pb-0">
             <div class="d-flex justify-space-around">
               <v-tooltip
-                v-for="{ name, icon, chosen } in applicationParts(application)"
+                v-for="{ name, icon, chosen, text } in applicationParts(application)"
                 :key="name"
+                :disabled="!chosen"
                 top
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-chip
                     v-bind="attrs"
                     :color="chosen ? 'primary' : 'default'"
+                    :title="name"
                     label
                     v-on="on"
                   >
                     <v-icon v-text="icon" />
                   </v-chip>
                 </template>
-                <span v-text="name" />
+                <span v-text="text" />
               </v-tooltip>
             </div>
 
@@ -453,21 +455,26 @@ name: PageAdminCompanyApplicationsList
 
     methods: {
       applicationParts(application) {
+        const checkmarkEmoji = "✅";
+
         return [
           {
             name: "Talk",
             icon: "mdi-account-tie-voice",
             chosen: application.talk,
+            text: application.talk && application.talk.title,
           },
           {
             name: "Workshop",
             icon: "mdi-briefcase-variant",
             chosen: application.workshop,
+            text: application.workshop && application.workshop.title,
           },
           {
             name: "Panel",
             icon: "mdi-human-queue",
             chosen: application.panelInterested,
+            text: application.panelInterested && checkmarkEmoji,
           },
         ];
       },
