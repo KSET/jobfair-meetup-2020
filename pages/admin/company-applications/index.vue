@@ -21,8 +21,58 @@
     </v-row>
 
     <v-row>
+      <v-col cols="12">
+        <v-btn
+          text
+          :class="{
+            'font-weight-bold': filterBy === null
+          }"
+          @click="setFilter(null)"
+        >
+          Prijava: {{ applicationCounts.total }}
+        </v-btn>
+
+        <ul style="list-style: none;">
+          <li>
+            <v-btn
+              text
+              :class="{
+                'font-weight-bold': filterBy === 'talk'
+              }"
+              @click="setFilter('talk')"
+            >
+              Talk: {{ applicationCounts.talks }}
+            </v-btn>
+          </li>
+          <li>
+            <v-btn
+              text
+              :class="{
+                'font-weight-bold': filterBy === 'workshop'
+              }"
+              @click="setFilter('workshop')"
+            >
+              Workshop: {{ applicationCounts.workshops }}
+            </v-btn>
+          </li>
+          <li>
+            <v-btn
+              text
+              :class="{
+                'font-weight-bold': filterBy === 'panelInterested'
+              }"
+              @click="setFilter('panelInterested')"
+            >
+              Panel: {{ applicationCounts.panels }}
+            </v-btn>
+          </li>
+        </ul>
+      </v-col>
+    </v-row>
+
+    <v-row>
       <v-col
-        v-for="application in applications"
+        v-for="application in filteredApplications"
         :key="application.id"
         cols="6"
         lg="3"
@@ -369,12 +419,35 @@ name: PageAdminCompanyApplicationsList
         dialog: {
           application: null,
         },
+
+        filterBy: null,
       };
     },
 
     computed: {
       talkTopics() {
         return TALK_TOPICS;
+      },
+
+      applicationCounts() {
+        const { applications } = this;
+
+        return {
+          total: applications.length,
+          talks: applications.filter(({ talk }) => talk).length,
+          workshops: applications.filter(({ workshop }) => workshop).length,
+          panels: applications.filter(({ panelInterested }) => panelInterested).length,
+        };
+      },
+
+      filteredApplications() {
+        const field = this.filterBy;
+
+        if (!field) {
+          return this.applications;
+        }
+
+        return this.applications.filter((application) => application[field]);
       },
     },
 
@@ -400,6 +473,14 @@ name: PageAdminCompanyApplicationsList
       },
 
       humanFileSize: bytesToHumanReadable,
+
+      setFilter(type) {
+        if (this.filterBy === type) {
+          this.filterBy = null;
+        } else {
+          this.filterBy = type;
+        }
+      },
     },
   };
 </script>
