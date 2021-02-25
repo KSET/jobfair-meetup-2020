@@ -1,6 +1,6 @@
-import {
-  async as StreamZipAsync,
-} from "node-stream-zip";
+// import {
+//   async as StreamZipAsync,
+// } from "node-stream-zip";
 import {
   queryCompanyApplicationCreate,
   queryCompanyApplicationGetAll,
@@ -46,46 +46,46 @@ export default class CompanyApplicationService {
     try {
       const { panel, talk, workshop, ...company } = application;
 
-      let zip;
-      try {
-        zip = new StreamZipAsync({
-          file: files.vectorLogo.tempFilePath,
-        });
-
-        if (4 < await zip.entriesCount) {
-          throw new CompanyApplicationError("Najviše 4 stavke dopuštene unutar ZIP datoteke s vektorskim logom");
-        }
-
-        const allowedExtensions =
-          Object
-            .values(this.ALLOWED_VECTOR_LOGO_FORMATS)
-            .map((ext) => `.${ ext }`)
-        ;
-
-        for (const { name } of Object.values(await zip.entries())) {
-          if (!allowedExtensions.some((ext) => name.endsWith(ext))) {
-            const [ ext, ...exts ] = allowedExtensions;
-
-            throw new CompanyApplicationError(`ZIP s vektorskim logom smije sadržavati samo ${ exts.join(", ") } i ${ ext } datoteke`);
-          }
-        }
-      } catch (e) {
-        if (e instanceof CompanyApplicationError) {
-          throw e;
-        }
-
-        throw new CompanyApplicationError(
-          "Dogodila se greška pri procesiranju ZIP datoteke. Molimo provjerite je li ZIP valjan i probajte ponovno. Ako se greška ponovi probajte stvoriti novu ZIP datoteku.",
-          e.message,
-        );
-      } finally {
-        try {
-          if (zip) {
-            await zip.close();
-          }
-        } catch {
-        }
-      }
+      // let zip;
+      // try {
+      //   zip = new StreamZipAsync({
+      //     file: files.vectorLogo.tempFilePath,
+      //   });
+      //
+      //   if (4 < await zip.entriesCount) {
+      //     throw new CompanyApplicationError("Najviše 4 stavke dopuštene unutar ZIP datoteke s vektorskim logom");
+      //   }
+      //
+      //   const allowedExtensions =
+      //     Object
+      //       .values(this.ALLOWED_VECTOR_LOGO_FORMATS)
+      //       .map((ext) => `.${ ext }`)
+      //   ;
+      //
+      //   for (const { name } of Object.values(await zip.entries())) {
+      //     if (!allowedExtensions.some((ext) => name.endsWith(ext))) {
+      //       const [ ext, ...exts ] = allowedExtensions;
+      //
+      //       throw new CompanyApplicationError(`ZIP s vektorskim logom smije sadržavati samo ${ exts.join(", ") } i ${ ext } datoteke`);
+      //     }
+      //   }
+      // } catch (e) {
+      //   if (e instanceof CompanyApplicationError) {
+      //     throw e;
+      //   }
+      //
+      //   throw new CompanyApplicationError(
+      //     "Dogodila se greška pri procesiranju ZIP datoteke. Molimo provjerite je li ZIP valjan i probajte ponovno. Ako se greška ponovi probajte stvoriti novu ZIP datoteku.",
+      //     e.message,
+      //   );
+      // } finally {
+      //   try {
+      //     if (zip) {
+      //       await zip.close();
+      //     }
+      //   } catch {
+      //   }
+      // }
 
       if (panel) {
         company.panelInterested = true;

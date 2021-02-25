@@ -184,7 +184,7 @@
                   :error-messages="formErrors.vectorLogo"
                   accept="application/zip"
                   label="Vektorski logo"
-                  placeholder="Vektorski logotip u .zip formatu"
+                  placeholder="Vektorski logotip u .zip formatu (.zip koji sadrži .eps, .pdf i/ili .ai datoteke)"
                   show-size
                   @blur="$v.company.form.vectorLogo.$touch()"
                   @input="$v.company.form.vectorLogo.$touch()"
