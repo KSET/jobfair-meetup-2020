@@ -1,5 +1,25 @@
 <template>
   <app-max-width-container class="mb-6">
+    <v-row>
+      <v-col cols="12">
+        <h1>Translations</h1>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <v-btn
+          :to="{ name: 'PageAdminConfigurationIndex' }"
+          exact
+        >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
+          Back
+        </v-btn>
+      </v-col>
+    </v-row>
+
     <v-data-iterator
       :items="translations"
       :items-per-page="itemsPerPage"

@@ -55,37 +55,13 @@ authRouter.get("/admin", () => {
       icon: "mdi-account-voice",
     },
     {
-      name: "Events",
-      to: { name: "PageAdminEventsIndex" },
-      icon: "mdi-clipboard-account",
+      name: "Event management",
+      to: { name: "PageAdminEventIndex" },
+      icon: "mdi-eye-settings",
     },
     {
-      name: "Resumes",
-      to: { name: "PageAdminResumes" },
-      icon: "mdi-file-document",
-    },
-    {
-      name: "Panel",
-      to: { name: "PageAdminPanelsIndex" },
-      requiredRole: RoleNames.ADMIN,
-      icon: "mdi-human-queue",
-    },
-    {
-      name: "Company Applications",
-      to: { name: "PageAdminCompanyApplicationsList" },
-      requiredRole: RoleNames.ADMIN,
-      icon: "mdi-text-box-multiple-outline",
-    },
-    {
-      name: "Translations",
-      to: { name: "PageAdminTranslationsList" },
-      requiredRole: RoleNames.ADMIN,
-      icon: "mdi-transcribe",
-    },
-    {
-      name: "Settings",
-      to: { name: "PageAdminSettingsList" },
-      requiredRole: RoleNames.ADMIN,
+      name: "Site configuration",
+      to: { name: "PageAdminConfigurationIndex" },
       icon: "mdi-cog",
     },
   ].map(({ requiredRole = RoleNames.MODERATOR, ...entry }) => ({ ...entry, requiredRole }));

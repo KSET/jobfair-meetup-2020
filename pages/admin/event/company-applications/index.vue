@@ -9,7 +9,7 @@
     <v-row>
       <v-col>
         <v-btn
-          :to="{ name: 'PageAdminIndex' }"
+          :to="{ name: 'PageAdminEventIndex' }"
           exact
         >
           <v-icon left>

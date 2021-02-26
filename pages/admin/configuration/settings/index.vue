@@ -5,6 +5,21 @@
         <h1>Settings</h1>
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col>
+        <v-btn
+          :to="{ name: 'PageAdminConfigurationIndex' }"
+          exact
+        >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
+          Back
+        </v-btn>
+      </v-col>
+    </v-row>
+
     <v-row>
       <v-col cols="12">
         <v-row
