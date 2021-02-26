@@ -9,5 +9,8 @@ export const TOPICS_BY_ID = {
 export const TOPICS =
   Object
     .entries(TOPICS_BY_ID)
-    .map(([ value, text ]) => ({ text, value }))
+    .map(([ value, text ]) => ({
+      text,
+      value: Number(value),
+    }))
 ;
