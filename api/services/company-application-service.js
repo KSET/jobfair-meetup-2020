@@ -23,10 +23,15 @@ import {
   withoutKeys,
 } from "../../helpers/object";
 import {
+  HttpStatus,
+} from "../helpers/http";
+import CompanyApplicationTokenService from "./company-application-token-service";
+import {
   ServiceError,
 } from "./error-service";
 import FileService from "./file-service";
 import ImageService from "./image-service";
+import SettingsService from "./settings-service";
 
 export class CompanyApplicationError extends ServiceError {
 }
@@ -40,11 +45,17 @@ export default class CompanyApplicationService {
     };
   };
 
+  static async areApplicationsEnabled() {
+    const setting = await SettingsService.getValue("Company Applications Enabled", "no");
+
+    return "yes" === String(setting).toLowerCase();
+  }
+
   static async submitApplication(application, files) {
     const client = await Client.inTransaction();
     const uploadedFiles = [];
     try {
-      const { panel, talk, workshop, ...company } = application;
+      const { panel, talk, workshop, token, ...company } = application;
 
       // let zip;
       // try {
@@ -130,6 +141,24 @@ export default class CompanyApplicationService {
       company.website = company.homepageUrl;
 
       const newApplication = await client.queryOne(queryCompanyApplicationCreate(company));
+
+      if (token) {
+        const tokenConsumed = await CompanyApplicationTokenService.consumeApplicationToken(
+          {
+            token: application.token,
+            applicationId: newApplication.id,
+          },
+          client,
+        );
+
+        if (!tokenConsumed) {
+          throw new CompanyApplicationError(
+            "Nije moguće obraditi prijavu s predanim tokenom",
+            null,
+            HttpStatus.Error.Client.UnprocessableEntity,
+          );
+        }
+      }
 
       await client.commit();
 

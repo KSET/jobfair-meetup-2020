@@ -764,6 +764,26 @@ name: PagePrijavaFirmi
       };
     },
 
+    async validate({ store, query }) {
+      const getSetting = store.getters["settings/getSetting"];
+
+      const enabledForAll = "yes" === String(getSetting("Company Applications Enabled", "no")).toLowerCase();
+
+      if (enabledForAll) {
+        return true;
+      }
+
+      const { token } = query;
+
+      if (!token) {
+        return false;
+      }
+
+      return await store.dispatch("company/checkCompanyApplicationTokenValid", {
+        token,
+      });
+    },
+
     data: () => ({
       formSubmit: {
         dialog: false,
@@ -981,6 +1001,7 @@ name: PagePrijavaFirmi
         const formData = new FormData();
 
         formData.set("oib", this.vat.input);
+        formData.set("token", this.$route.query.token);
 
         for (const [ key, value ] of Object.entries(this.company.form)) {
           formData.set(key, value);

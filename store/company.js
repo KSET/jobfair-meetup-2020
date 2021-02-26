@@ -25,6 +25,20 @@ export const actions = {
     return data;
   },
 
+  async checkCompanyApplicationTokenValid(context, { token }) {
+    const { data } = await this.$api.$post(
+      "/companies/application/token/verify",
+      {
+        token,
+      },
+      {
+        progress: false,
+      },
+    ) || {};
+
+    return Boolean(data);
+  },
+
   async submitCompanyApplication(context, formData) {
     return await this.$api.$post(
       "/companies/application/submit",

@@ -310,6 +310,27 @@ create table if not exists company_applications
     panel_interested bool default false not null,
     created_at timestamptz default CURRENT_TIMESTAMP not null
 );
+
+create table if not exists company_applications_tokens
+(
+    id         serial                                             not null
+        constraint company_applications_tokens_pk
+            primary key,
+    token      varchar(127)                                       not null
+        constraint company_applications_tokens_token
+            unique,
+    note       text                     default ''::text          not null,
+    created_by varchar(255)                                       not null,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP not null,
+    used       boolean                  default false             not null,
+    used_at    timestamp with time zone,
+    used_for   integer
+        constraint company_applications_tokens_company_applications_id_fk
+            references company_applications
+);
+
+create unique index if not exists company_applications_tokens_token_uindex
+    on company_applications_tokens (token);
 `;
 
 

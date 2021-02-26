@@ -1,13 +1,13 @@
 import * as Sentry from "@sentry/node";
 import qs from "qs";
 import {
- cachedFetcher,
+  cachedFetcher,
 } from "../helpers/fetchCache";
 import {
- HttpStatus,
+  HttpStatus,
 } from "../helpers/http";
 import {
- RoleNames,
+  RoleNames,
 } from "../helpers/permissions";
 import {
   ApiError,
@@ -15,14 +15,15 @@ import {
   Router,
 } from "../helpers/route";
 import CompanyApplicationService from "../services/company-application-service";
+import CompanyApplicationTokenService from "../services/company-application-token-service";
 import CompanyEventsService, {
- CompanyEventsError,
+  CompanyEventsError,
 } from "../services/company-events-service";
 import CompanyService, {
- CompanyError,
+  CompanyError,
 } from "../services/company-service";
 import {
- ServiceError,
+  ServiceError,
 } from "../services/error-service";
 import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
@@ -33,6 +34,28 @@ const cacheForMs = 15 * 1000;
 
 router.post("/application/submit", async (req) => {
   const { body, files } = req;
+
+  const applicationsEnabled = await CompanyApplicationService.areApplicationsEnabled();
+
+  if (!applicationsEnabled) {
+    if (!body.token) {
+      throw new ApiError(
+        "Prijave su zatvorene",
+        HttpStatus.Error.Client.Forbidden,
+      );
+    }
+
+    const tokenValid = await CompanyApplicationTokenService.isApplicationTokenValid(body.token);
+
+    if (!tokenValid) {
+      throw new ApiError(
+        "Predani token za prijavu nije valjan",
+        HttpStatus.Error.Client.Forbidden,
+      );
+    }
+  } else {
+    delete body.token;
+  }
 
   const application =
     qs.parse(
@@ -106,6 +129,19 @@ router.post("/application/submit", async (req) => {
       );
     }
   }
+});
+
+router.post("/application/token/verify", async ({ body }) => {
+  const { token } = body;
+
+  if (!token) {
+    throw new ApiError(
+      "Token se mora predati",
+      HttpStatus.Error.Client.UnprocessableEntity,
+    );
+  }
+
+  return await CompanyApplicationTokenService.isApplicationTokenValid(token);
 });
 
 router.get("/application/by-vat/:vat", async ({ params }) => {
@@ -238,5 +274,17 @@ const authRouter = AuthRouter.boundToRouter(router, {
 authRouter.get("/application/list/all", async () => {
   return await CompanyApplicationService.fetchApplicationsFull();
 });
+
+authRouter.post("/application/token", async ({ body, authUser }) => {
+  const createdBy = authUser.id;
+  const { note } = body;
+
+  return await CompanyApplicationTokenService.createApplicationToken(createdBy, note);
+});
+
+authRouter.get("/application/token/list", async () => {
+  return await CompanyApplicationTokenService.listApplicationTokens();
+});
+
 
 export default authRouter;
