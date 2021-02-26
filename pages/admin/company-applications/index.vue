@@ -23,33 +23,55 @@
     <v-row>
       <v-col cols="12">
         <v-btn
-          text
           :class="{
-            'font-weight-bold': filterBy === null
+            'font-weight-bold': isFilterSelected(null),
           }"
+          text
           @click="setFilter(null)"
         >
           Prijava: {{ applicationCounts.total }}
         </v-btn>
 
-        <ul style="list-style: none;">
+        <ul
+          :class="$style.listNone"
+          class="ml-3"
+        >
           <li>
             <v-btn
-              text
               :class="{
-                'font-weight-bold': filterBy === 'talk'
+                'font-weight-bold': isFilterSelected('talk'),
               }"
+              text
               @click="setFilter('talk')"
             >
-              Talk: {{ applicationCounts.talks }}
+              Talk: {{ applicationCounts.talks.total }}
             </v-btn>
+
+            <ul
+              :class="$style.listNone"
+            >
+              <li
+                v-for="(count, category) in applicationCounts.talks.categories"
+                :key="category"
+              >
+                <v-btn
+                  :class="{
+                    'font-weight-bold': isFilterSelected('talk', category),
+                  }"
+                  text
+                  @click="setFilterTopic('talk', category)"
+                >
+                  {{ categoryToName(category) }}: {{ count }}
+                </v-btn>
+              </li>
+            </ul>
           </li>
           <li>
             <v-btn
-              text
               :class="{
-                'font-weight-bold': filterBy === 'workshop'
+                'font-weight-bold': isFilterSelected('workshop'),
               }"
+              text
               @click="setFilter('workshop')"
             >
               Workshop: {{ applicationCounts.workshops }}
@@ -57,10 +79,10 @@
           </li>
           <li>
             <v-btn
-              text
               :class="{
-                'font-weight-bold': filterBy === 'panelInterested'
+                'font-weight-bold': isFilterSelected('panelInterested'),
               }"
+              text
               @click="setFilter('panelInterested')"
             >
               Panel: {{ applicationCounts.panels }}
@@ -382,6 +404,7 @@ name: PageAdminCompanyApplicationsList
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
     TOPICS as TALK_TOPICS,
+    TOPICS_BY_ID,
   } from "~/helpers/talk";
   import {
     bytesToHumanReadable,
@@ -422,7 +445,10 @@ name: PageAdminCompanyApplicationsList
           application: null,
         },
 
-        filterBy: null,
+        filter: {
+          by: null,
+          topic: null,
+        },
       };
     },
 
@@ -434,22 +460,56 @@ name: PageAdminCompanyApplicationsList
       applicationCounts() {
         const { applications } = this;
 
+        const talks = applications.filter(({ talk }) => talk);
+        const workshops = applications.filter(({ workshop }) => workshop);
+        const panels = applications.filter(({ panelInterested }) => panelInterested);
+
+        const talksByTopics =
+          talks
+            .reduce(
+              (acc, { talk }) => {
+                const { topic } = talk;
+
+                if (!(topic in acc)) {
+                  acc[topic] = 0;
+                }
+
+                acc[topic] += 1;
+
+                return acc;
+              },
+              {},
+            )
+        ;
+
         return {
           total: applications.length,
-          talks: applications.filter(({ talk }) => talk).length,
-          workshops: applications.filter(({ workshop }) => workshop).length,
-          panels: applications.filter(({ panelInterested }) => panelInterested).length,
+          talks: {
+            total: talks.length,
+            categories: talksByTopics,
+          },
+          workshops: workshops.length,
+          panels: panels.length,
         };
       },
 
       filteredApplications() {
-        const field = this.filterBy;
+        const field = this.filter.by;
+        const talkTopic = Number(this.filter.topic);
+
+        const list = this.applications;
 
         if (!field) {
-          return this.applications;
+          return list;
         }
 
-        return this.applications.filter((application) => application[field]);
+        const byField = list.filter((application) => application[field]);
+
+        if (!talkTopic) {
+          return byField;
+        }
+
+        return byField.filter(({ talk }) => talk.topic === talkTopic);
       },
     },
 
@@ -481,13 +541,47 @@ name: PageAdminCompanyApplicationsList
 
       humanFileSize: bytesToHumanReadable,
 
+      categoryToName(category) {
+        return TOPICS_BY_ID[category];
+      },
+
       setFilter(type) {
-        if (this.filterBy === type) {
-          this.filterBy = null;
+        this.filter.topic = null;
+
+        if (this.filter.by !== type) {
+          this.filter.by = type;
         } else {
-          this.filterBy = type;
+          this.filter.by = null;
         }
+      },
+
+      setFilterTopic(type, topic) {
+        this.filter.by = type;
+
+        if (this.filter.topic !== topic) {
+          this.filter.topic = topic;
+        } else {
+          this.filter.topic = null;
+        }
+      },
+
+      isFilterSelected(type, topic = undefined) {
+        if (this.filter.by !== type) {
+          return false;
+        }
+
+        if (undefined !== topic && topic !== this.filter.topic) {
+          return false;
+        }
+
+        return true;
       },
     },
   };
 </script>
+
+<style lang="scss" module>
+  .listNone {
+    list-style: none;
+  }
+</style>

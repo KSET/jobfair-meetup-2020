@@ -1,15 +1,13 @@
 let topicId = 1;
-export const TOPICS = [
-  {
-    text: "Career Ladder",
-    value: topicId++,
-  },
-  {
-    text: "Dangerous Dip",
-    value: topicId++,
-  },
-  {
-    text: "(Dis)Continued Tech",
-    value: topicId++,
-  },
-];
+
+export const TOPICS_BY_ID = {
+  [topicId++]: "Career Ladder",
+  [topicId++]: "Dangerous Dip",
+  [topicId++]: "(Dis)Continued Tech",
+};
+
+export const TOPICS =
+  Object
+    .entries(TOPICS_BY_ID)
+    .map(([ value, text ]) => ({ text, value }))
+;
