@@ -1,6 +1,16 @@
 import * as Sentry from "@sentry/node";
 import qs from "qs";
 import {
+  companyExtrasFormLabels,
+  companyExtrasFormValidations,
+  companyFormLabels,
+  companyFormValidations,
+} from "../../helpers/company-applications";
+import {
+  pipe,
+  withoutKeys,
+} from "../../helpers/object";
+import {
   cachedFetcher,
 } from "../helpers/fetchCache";
 import {
@@ -74,6 +84,60 @@ router.post("/application/submit", async (req) => {
       "Potrebno je izbrati bar jednu aktivnost (talk i/ili radionicu)",
       HttpStatus.Error.Client.BadRequest,
     );
+  }
+
+  const formLabels = {
+    ...companyFormLabels(),
+    ...companyExtrasFormLabels(),
+  };
+
+  const mainValidations = withoutKeys(
+    [
+      "logo",
+      "vectorLogo",
+    ],
+    companyFormValidations(),
+  );
+  const partsValidations = pipe(
+    Object.entries,
+    (entries) => entries.map(([ k, v ]) => [ k, v.form ]),
+    Object.fromEntries,
+  )(companyExtrasFormValidations());
+
+  const validateField = (validations, group) => (...path) => {
+    const field = path.reduce((acc, a) => acc[a], application);
+    const label = path.reduce((acc, a) => acc[a], formLabels);
+
+    for (const [ validation, validate ] of Object.entries(validations)) {
+      const isValid = validate(field);
+
+      if (!isValid) {
+        throw new ApiError(
+          "Greška u predanim podatcima.",
+          HttpStatus.Error.Client.ExpectationFailed,
+          {
+            validation,
+            label,
+            group,
+            path,
+          },
+        );
+      }
+    }
+  };
+
+  for (const [ fieldName, validations ] of Object.entries(mainValidations)) {
+    validateField(validations, "main")(fieldName);
+  }
+
+  for (const [ part, validationObject ] of Object.entries(partsValidations)) {
+    if (!(part in application)) {
+      continue;
+    }
+
+    for (const [ fieldName, validations ] of Object.entries(validationObject)) {
+      validateField(validations, "parts")(part, fieldName);
+    }
   }
 
   try {

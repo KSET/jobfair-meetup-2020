@@ -460,7 +460,10 @@
           Prijava uspješna
         </v-card-title>
 
-        <v-card-text v-text="formSubmit.message" />
+        <v-card-text
+          style="white-space: break-spaces;"
+          v-text="formSubmit.message"
+        />
 
         <v-card-actions>
           <v-spacer />
@@ -492,22 +495,19 @@ name: PagePrijavaFirmi
     validationMixin,
   } from "vuelidate";
   import {
-    maxLength,
-    minLength,
-    required,
-    url,
-    email,
-    helpers,
-  } from "vuelidate/lib/validators";
-  import {
     mapActions,
   } from "vuex";
+  import {
+    companyExtrasFormInputs,
+    companyExtrasFormValidations,
+    companyFormInputs,
+    companyFormValidations,
+  } from "~/helpers/company-applications";
   import {
     generateMetadata,
   } from "~/helpers/head";
   import {
     bytesToHumanReadable,
-    MAX_IMAGE_SIZE__B,
   } from "~/helpers/image";
   import {
     TOPICS as TALK_TOPICS,
@@ -516,227 +516,6 @@ name: PagePrijavaFirmi
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   const countriesWithoutBrazil = countries.filter(({ name }) => "Brazil" !== name);
-
-  const maxFileSize =
-    (param) =>
-      helpers.withParams(
-        {
-          type: "maxFileSize",
-          size: param,
-        },
-        (value) =>
-          !helpers.req(value) ||
-          param > value.size
-        ,
-      )
-  ;
-
-  const getFormType =
-    (type, form) =>
-      Object
-        .fromEntries(
-          Object
-            .entries(form)
-            .map(([ key, { [type]: value } ]) => [ key, value ]),
-        )
-  ;
-
-  const companyForm = () => ({
-    legalName: {
-      value: "",
-      validations: {
-        required,
-      },
-    },
-    brandName: {
-      value: "",
-      validations: {
-        required,
-      },
-    },
-    contactEmail: {
-      value: "",
-      validations: {
-        required,
-        email,
-      },
-    },
-    contactName: {
-      value: "",
-      validations: {
-        required,
-      },
-    },
-    contactPhone: {
-      value: "",
-      validations: {
-        required,
-      },
-    },
-    address: {
-      value: "",
-      validations: {
-        required,
-      },
-    },
-    industryId: {
-      value: 0,
-      validations: {
-        required,
-      },
-    },
-    description: {
-      value: "",
-      validations: {
-        required,
-        minLength: minLength(100),
-        maxLength: maxLength(365),
-      },
-    },
-    homepageUrl: {
-      value: "",
-      validations: {
-        required,
-        url,
-      },
-    },
-    logo: {
-      value: null,
-      validations: {
-        required,
-        maxFileSize: maxFileSize(MAX_IMAGE_SIZE__B),
-      },
-    },
-    vectorLogo: {
-      value: null,
-      validations: {
-        required,
-      },
-    },
-  });
-
-  const companyFormInputs =
-    () =>
-      getFormType(
-        "value",
-        companyForm(),
-      )
-  ;
-
-  const companyFormValidations =
-    () =>
-      getFormType(
-        "validations",
-        companyForm(),
-      )
-  ;
-
-  const companyExtrasForm = () => ({
-    talk: {
-      chosen: false,
-
-      form: {
-        title: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-        description: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-        topic: {
-          value: TALK_TOPICS[0].value,
-          validations: {
-            required,
-          },
-        },
-        image: {
-          value: null,
-          validations: {
-            required,
-          },
-        },
-        biography: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-      },
-    },
-
-    workshop: {
-      chosen: false,
-
-      form: {
-        title: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-        description: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-        goal: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-        biography: {
-          value: "",
-          validations: {
-            required,
-          },
-        },
-        notes: {
-          value: "",
-          validations: {},
-        },
-      },
-    },
-
-    panel: {
-      chosen: false,
-
-      form: {
-        chosen: {
-          value: true,
-          validations: {},
-        },
-      },
-    },
-  });
-
-  const companyExtrasFormInputs =
-    () =>
-      Object
-        .fromEntries(
-          Object
-            .entries(companyExtrasForm())
-            .map(([ category, { form, ...rest } ]) => [ category, { ...rest, form: getFormType("value", form) } ])
-          ,
-        )
-  ;
-
-  const companyExtrasFormValidations =
-    () =>
-      Object
-        .fromEntries(
-          Object
-            .entries(companyExtrasForm())
-            .map(([ category, { form } ]) => [ category, { form: getFormType("validations", form) } ])
-          ,
-        )
-  ;
 
   export default {
     name: "PagePrijavaFirmi",
@@ -1021,13 +800,23 @@ name: PagePrijavaFirmi
 
         this.company.loading = true;
         try {
-          const { error, reason } = await this.submitCompanyApplication(formData);
+          const {
+            error,
+            reason,
+            status,
+            errorData,
+          } = await this.submitCompanyApplication(formData);
 
           this.formSubmit.isError = Boolean(error);
           this.formSubmit.dialog = true;
 
           if (error) {
-            this.formSubmit.message = reason;
+            if (417 === status) {
+              const validationError = this.toErrorText(errorData);
+              this.formSubmit.message = `${ reason }\n${ validationError }`;
+            } else {
+              this.formSubmit.message = reason;
+            }
           } else {
             this.formSubmit.message = "Prijava uspješno zaprimljena";
           }
@@ -1092,6 +881,46 @@ name: PagePrijavaFirmi
           default:
             return error.slice(0, 1).toUpperCase() + error.slice(1);
         }
+      },
+
+      toErrorText(errorData) {
+        const {
+          label,
+          path,
+          group,
+        } = errorData;
+
+        let $e;
+        switch (group) {
+          case "main": {
+            const [ key ] = path;
+            $e = this.$v.company.form[key];
+
+            break;
+          }
+          case "parts": {
+            const [ $key, key ] = path;
+            $e = this.$v.companyExtras[$key].form[key];
+            break;
+          }
+        }
+
+        if (!$e) {
+          return;
+        }
+
+        if (!$e.$error) {
+          return "";
+        }
+
+        const errors = [];
+        for (const { type, ...args } of Object.values($e.$params)) {
+          if (!$e[type]) {
+            errors.push(this.translateError(type, args));
+          }
+        }
+
+        return `${ label }: ${ errors.join(", ") }`;
       },
 
       async closeFormSubmitDialog(redirect = false) {
