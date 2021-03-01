@@ -78,7 +78,7 @@
                 <v-text-field
                   v-model="company.form.legalName"
                   :error-messages="formErrors.legalName"
-                  label="Pravni naziv tvrtke"
+                  :label="labels.legalName"
                   placeholder="Elektrostudent d.o.o."
                   required
                   @blur="$v.company.form.legalName.$touch()"
@@ -88,7 +88,7 @@
                 <v-text-field
                   v-model="company.form.brandName"
                   :error-messages="formErrors.brandName"
-                  label="Prikazani naziv tvrtke"
+                  :label="labels.legalName"
                   placeholder="Elektrostudent"
                   required
                   @blur="$v.company.form.brandName.$touch()"
@@ -98,7 +98,7 @@
                 <v-text-field
                   v-model="company.form.address"
                   :error-messages="formErrors.address"
-                  label="Adresa"
+                  :label="labels.address"
                   placeholder="Unska ul. 4"
                   required
                   @blur="$v.company.form.address.$touch()"
@@ -108,7 +108,7 @@
                 <v-text-field
                   v-model="company.form.contactName"
                   :error-messages="formErrors.contactName"
-                  label="Ime kontakt osobe"
+                  :label="labels.contactName"
                   placeholder="Marko Horvat"
                   required
                   @blur="$v.company.form.contactName.$touch()"
@@ -118,7 +118,7 @@
                 <v-text-field
                   v-model="company.form.contactEmail"
                   :error-messages="formErrors.contactEmail"
-                  label="Email kontakt osobe"
+                  :label="labels.contactEmail"
                   placeholder="info@kset.org"
                   required
                   @blur="$v.company.form.contactEmail.$touch()"
@@ -128,7 +128,7 @@
                 <v-text-field
                   v-model="company.form.contactPhone"
                   :error-messages="formErrors.contactPhone"
-                  label="Broj telefona kontakt osobe"
+                  :label="labels.contactPhone"
                   placeholder="+385 99 123 4567"
                   required
                   @blur="$v.company.form.contactPhone.$touch()"
@@ -139,7 +139,7 @@
                   v-model="company.form.industryId"
                   :error-messages="formErrors.industryId"
                   :items="companyIndustries"
-                  label="Industrija"
+                  :label="labels.industryId"
                   required
                   @blur="$v.company.form.industryId.$touch()"
                   @input="$v.company.form.industryId.$touch()"
@@ -150,7 +150,7 @@
                   :error-messages="formErrors.description"
                   auto-grow
                   counter
-                  label="Opis tvrtke"
+                  :label="labels.description"
                   placeholder="Tvrtka se bavi dizajnom i integracijom..."
                   required
                   rows="2"
@@ -161,7 +161,7 @@
                 <v-text-field
                   v-model="company.form.homepageUrl"
                   :error-messages="formErrors.homepageUrl"
-                  label="Adresa web stranice"
+                  :label="labels.homepageUrl"
                   placeholder="https://www.kset.org"
                   required
                   @blur="$v.company.form.homepageUrl.$touch()"
@@ -172,7 +172,7 @@
                   v-model="company.form.logo"
                   :error-messages="formErrors.logo"
                   accept="image/png"
-                  label="Logo"
+                  :label="labels.logo"
                   placeholder="Logotip u .png formatu"
                   show-size
                   @blur="$v.company.form.logo.$touch()"
@@ -183,7 +183,7 @@
                   v-model="company.form.vectorLogo"
                   :error-messages="formErrors.vectorLogo"
                   accept="application/zip"
-                  label="Vektorski logo"
+                  :label="labels.vectorLogo"
                   placeholder="Vektorski logotip u .zip formatu (.zip koji sadrži .eps, .pdf i/ili .ai datoteke)"
                   show-size
                   @blur="$v.company.form.vectorLogo.$touch()"
@@ -206,7 +206,7 @@
                       <v-text-field
                         v-model="companyExtras.talk.form.title"
                         :error-messages="formExtrasErrors.talk.title"
-                        label="Naslov talka"
+                        :label="labels.talk.title"
                         placeholder="Internet of Tulum Things"
                         required
                         @blur="$v.companyExtras.talk.form.title.$touch()"
@@ -218,7 +218,7 @@
                         :error-messages="formExtrasErrors.talk.description"
                         auto-grow
                         counter
-                        label="Opis talka*"
+                        :label="`${labels.talk.description}*`"
                         placeholder="U našoj tvrtci gadgeti i tehnologija su u primjeni na projektima za naše klijente no nerijetko i u službi internih tuluma! ..."
                         required
                         rows="2"
@@ -230,7 +230,7 @@
                         v-model="companyExtras.talk.form.topic"
                         :error-messages="formExtrasErrors.talk.topic"
                         :items="talkTopics"
-                        label="Tema talka"
+                        :label="labels.talk.topic"
                         required
                         @blur="$v.companyExtras.talk.form.topic.$touch()"
                         @input="$v.companyExtras.talk.form.topic.$touch()"
@@ -240,7 +240,7 @@
                         v-model="companyExtras.talk.form.image"
                         :error-messages="formExtrasErrors.talk.image"
                         accept="image/png, image/jpeg, image/gif"
-                        label="Fotografija predavača"
+                        :label="labels.talk.image"
                         show-size
                         @blur="$v.companyExtras.talk.form.image.$touch()"
                         @input="$v.companyExtras.talk.form.image.$touch()"
@@ -251,7 +251,7 @@
                         :error-messages="formExtrasErrors.talk.biography"
                         auto-grow
                         counter
-                        label="Kratka biografija predavača"
+                        :label="labels.talk.biography"
                         placeholder="Kratka biografija predavača..."
                         required
                         rows="2"
@@ -303,7 +303,7 @@
                       <v-text-field
                         v-model="companyExtras.workshop.form.title"
                         :error-messages="formExtrasErrors.workshop.title"
-                        label="Naslov radionice"
+                        :label="labels.workshop.title"
                         placeholder="Izradi svoju prvu iOS aplikaciju u 90 minuta koristeći Swift"
                         required
                         @blur="$v.companyExtras.workshop.form.title.$touch()"
@@ -315,7 +315,7 @@
                         :error-messages="formExtrasErrors.workshop.description"
                         auto-grow
                         counter
-                        label="Opis radionice*"
+                        :label="`${labels.workshop.description}*`"
                         placeholder="From zero to hero! Ova radionca je prilagođena za početnike. Naučit ćeš osnove Swifta i napraviti jednostavu iOS aplikaciju u 90 minuta ..."
                         required
                         rows="2"
@@ -328,7 +328,7 @@
                         :error-messages="formExtrasErrors.workshop.goal"
                         auto-grow
                         counter
-                        label="Cilj radionice*"
+                        :label="`${labels.workshop.goal}*`"
                         placeholder="Naučiti osnove Swifta i napraviti jednostavu iOS aplikaciju u 90 minuta"
                         required
                         rows="2"
@@ -341,7 +341,7 @@
                         :error-messages="formExtrasErrors.workshop.biography"
                         auto-grow
                         counter
-                        label="Kratka biografija voditelja radionice"
+                        :label="labels.workshop.biography"
                         placeholder="Kratka biografija voditelja radionice..."
                         required
                         rows="2"
@@ -354,7 +354,7 @@
                         :error-messages="formExtrasErrors.workshop.notes"
                         auto-grow
                         counter
-                        label="Dodatne napomene (opcionalno)"
+                        :label="labels.workshop.notes"
                         placeholder="Dodatne napomene za studente i organizatore. Npr. treba ponijeti laptop, treba ima instaliran program XY, itd."
                         required
                         rows="2"
@@ -403,7 +403,7 @@
                     <v-checkbox
                       v-model="companyExtras.panel.chosen"
                       color="primary"
-                      label="Zainteresirani smo za potencijalno sudjelovanje na jednom od panela*"
+                      :label="`${labels.panel.chosen}*`"
                     />
 
                     <translated-text
@@ -499,8 +499,10 @@ name: PagePrijavaFirmi
   } from "vuex";
   import {
     companyExtrasFormInputs,
+    companyExtrasFormLabels,
     companyExtrasFormValidations,
     companyFormInputs,
+    companyFormLabels,
     companyFormValidations,
   } from "~/helpers/company-applications";
   import {
@@ -516,6 +518,11 @@ name: PagePrijavaFirmi
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
 
   const countriesWithoutBrazil = countries.filter(({ name }) => "Brazil" !== name);
+
+  const formLabels = {
+    ...companyFormLabels(),
+    ...companyExtrasFormLabels(),
+  };
 
   export default {
     name: "PagePrijavaFirmi",
@@ -587,6 +594,8 @@ name: PagePrijavaFirmi
       },
 
       companyExtras: companyExtrasFormInputs(),
+
+      labels: formLabels,
     }),
 
     computed: {
