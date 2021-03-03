@@ -53,8 +53,6 @@ export const actions = {
 
       return data;
     } catch (e) {
-      console.log("|> FUCKY", e);
-
       return null;
     }
   },
