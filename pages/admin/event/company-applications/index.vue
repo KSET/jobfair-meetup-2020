@@ -93,6 +93,134 @@
     </v-row>
 
     <v-row>
+      <v-col cols="12">
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header>
+              Naknadne prijave
+            </v-expansion-panel-header>
+
+            <v-expansion-panel-content>
+              <v-form
+                :disabled="token.loading"
+              >
+                <v-row>
+                  <v-col cols="12" md="10">
+                    <v-text-field
+                      v-model="token.note"
+                      label="Bilješka"
+                      solo
+                    />
+                  </v-col>
+                  <v-col class="d-flex" cols="12" md="2">
+                    <v-spacer />
+
+                    <v-btn
+                      :loading="token.loading"
+                      color="success"
+                      large
+                      @click="submitToken"
+                    >
+                      Generiraj
+                    </v-btn>
+
+                    <v-spacer class="d-none d-md-block" />
+                  </v-col>
+                </v-row>
+              </v-form>
+
+              <v-row>
+                <v-col cols="12">
+                  <v-simple-table>
+                    <template v-slot:default>
+                      <thead>
+                        <tr>
+                          <th class="text-left">
+                            Bilješka
+                          </th>
+
+                          <th class="text-left">
+                            Iskorišteno
+                          </th>
+
+                          <th class="text-left">
+                            Link
+                          </th>
+
+                          <th />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="token in token.list" :key="token.id">
+                          <td v-text="token.note" />
+
+                          <td
+                            v-if="token.used"
+                          >
+                            <v-tooltip
+                              top
+                            >
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                  v-bind="attrs"
+                                  color="success"
+                                  v-on="on"
+                                >
+                                  mdi-check-circle
+                                </v-icon>
+                              </template>
+
+                              <div>
+                                Datum: {{ (new Date(token.usedAt)).toLocaleString() }}
+                                <br>
+                                Firma: {{ applicationName(token.usedFor) }}
+                              </div>
+                            </v-tooltip>
+                          </td>
+                          <td
+                            v-else
+                          >
+                            <v-icon
+                              color="error"
+                            >
+                              mdi-close-circle
+                            </v-icon>
+                          </td>
+
+                          <td>
+                            <v-text-field
+                              :disabled="token.used || token.loading"
+                              :value="linkForToken(token.token)"
+                              label="Click to copy"
+                              readonly
+                              @focus="copyLink(linkForToken(token.token))"
+                            />
+                          </td>
+
+                          <td>
+                            <v-btn
+                              v-if="!token.used"
+                              color="error"
+                              :loading="token.loading"
+                              icon
+                              @click="deleteToken(token)"
+                            >
+                              <v-icon>mdi-trash-can</v-icon>
+                            </v-btn>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+    </v-row>
+
+    <v-row>
       <v-col
         v-for="application in filteredApplications"
         :key="application.id"
@@ -401,6 +529,9 @@ name: PageAdminCompanyApplicationsList
 </router>
 
 <script>
+  import {
+    mapActions,
+  } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
     TOPICS as TALK_TOPICS,
@@ -449,6 +580,24 @@ name: PageAdminCompanyApplicationsList
           by: null,
           topic: null,
         },
+
+        token: {
+          note: "",
+          list:
+            (await store.dispatch("company/getCompanyApplicationsTokens"))
+              .map(
+                (token) =>
+                  Object.assign(
+                    token,
+                    {
+                      loading: false,
+                    },
+                  ),
+              ),
+          loading: false,
+        },
+
+        copyAvailable: true,
       };
     },
 
@@ -511,9 +660,19 @@ name: PageAdminCompanyApplicationsList
 
         return byField.filter(({ talk }) => talk.topic === talkTopic);
       },
+
+      applicationsById() {
+        return Object.fromEntries(this.applications.map(({ id, ...rest }) => [ id, rest ]));
+      },
     },
 
     methods: {
+      ...mapActions({
+        getCompanyApplicationsTokens: "company/getCompanyApplicationsTokens",
+        createCompanyApplicationsToken: "company/createCompanyApplicationsToken",
+        deleteCompanyApplicationsToken: "company/deleteCompanyApplicationsToken",
+      }),
+
       applicationParts(application) {
         const checkmarkEmoji = "✅";
 
@@ -575,6 +734,120 @@ name: PageAdminCompanyApplicationsList
         }
 
         return true;
+      },
+
+      linkForToken(token) {
+        return `${ process.env.BASE_URL }${ this.$router.resolve({
+          name: "PagePrijavaFirmi",
+          query: {
+            token,
+          },
+        }).href }`;
+      },
+
+      async copyLink(text) {
+        if (!this.copyAvailable) {
+          return;
+        }
+
+        if (!navigator.clipboard) {
+          this.fallbackCopyLink(text);
+          return;
+        }
+
+        try {
+          await navigator.clipboard.writeText(text);
+          alert("Kopirano");
+        } catch (e) {
+          this.fallbackCopyLink(text);
+        }
+      },
+
+      fallbackCopyLink(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+
+        // Avoid scrolling to bottom
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.position = "fixed";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+          const successful = document.execCommand("copy");
+
+          if (!successful) {
+            throw new Error("Something wrong");
+          } else {
+            alert("Kopirano");
+          }
+        } catch (err) {
+          alert("Automatsko kopiranje ne radi");
+          this.copyAvailable = false;
+        }
+
+        document.body.removeChild(textArea);
+      },
+
+      applicationName(id) {
+        const { brandName } = this.applicationsById[id] || { brandName: "?" };
+
+        return brandName;
+      },
+
+      async submitToken() {
+        this.token.loading = true;
+
+        const { error, reason, errorData } = await this.createCompanyApplicationsToken(this.token);
+        const tokenList = await this.getCompanyApplicationsTokens();
+        this.$set(this.token, "list", tokenList);
+
+        this.token.loading = false;
+
+        if (error) {
+          const err =
+            reason ||
+            (
+              errorData
+                ? errorData.join("\n")
+                : "Something went wrong"
+            )
+          ;
+
+          alert(`Error: ${ err }`);
+        } else {
+          this.token.note = "";
+        }
+      },
+
+      async deleteToken(token) {
+        token.loading = true;
+
+        if (!window.confirm("Stvarno želite izbrisati token?")) {
+          return;
+        }
+
+        const { error, reason, errorData } = await this.deleteCompanyApplicationsToken(token);
+        const tokenList = await this.getCompanyApplicationsTokens();
+        this.$set(this.token, "list", tokenList);
+
+        token.loading = false;
+
+        if (error) {
+          const err =
+            reason ||
+            (
+              errorData
+                ? errorData.join("\n")
+                : "Something went wrong"
+            )
+          ;
+
+          alert(`Error: ${ err }`);
+        }
       },
     },
   };

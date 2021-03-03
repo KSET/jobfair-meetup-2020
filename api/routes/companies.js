@@ -346,6 +346,12 @@ authRouter.post("/application/token", async ({ body, authUser }) => {
   return await CompanyApplicationTokenService.createApplicationToken(createdBy, note);
 });
 
+authRouter.delete("/application/token/:id", async ({ params }) => {
+  const { id } = params;
+
+  return await CompanyApplicationTokenService.deleteApplicationTokenById(id);
+});
+
 authRouter.get("/application/token/list", async () => {
   return await CompanyApplicationTokenService.listApplicationTokens();
 });

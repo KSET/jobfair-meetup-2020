@@ -3,6 +3,7 @@ import {
   queryCompanyApplicationTokenGetAll,
   queryCompanyApplicationTokenGetByToken,
   queryCompanyApplicationTokenConsume,
+  queryCompanyApplicationTokenDeleteById,
 } from "../../db/helpers/companyApplicationToken";
 import {
   Client,
@@ -42,6 +43,12 @@ export default class CompanyApplicationTokenService {
     }));
 
     return this.FixToken(dbToken);
+  }
+
+  static async deleteApplicationTokenById(id) {
+    return await Client.queryOneOnce(queryCompanyApplicationTokenDeleteById({
+      id,
+    }));
   }
 
   static async isApplicationTokenValid(token) {

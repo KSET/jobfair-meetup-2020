@@ -38,6 +38,22 @@ export const queryCompanyApplicationTokenGetByToken =
   })
 ;
 
+export const queryCompanyApplicationTokenDeleteById =
+  ({
+     id,
+   }) => ({
+    text: `
+      delete from
+        ${ table }
+      where
+        "id" = $1
+    `,
+    values: [
+      id,
+    ],
+  })
+;
+
 export const queryCompanyApplicationTokenGetAll =
   () => ({
     text: `

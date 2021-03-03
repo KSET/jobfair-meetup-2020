@@ -71,6 +71,38 @@ export const actions = {
     return data || [];
   },
 
+  async getCompanyApplicationsTokens() {
+    const { data } = await this.$api.$get(
+      "/companies/application/token/list",
+      {
+        progress: false,
+      },
+    ) || {};
+
+    return data || [];
+  },
+
+  async createCompanyApplicationsToken(context, { note }) {
+    return await this.$api.$post(
+      "/companies/application/token",
+      {
+        note,
+      },
+      {
+        progress: false,
+      },
+    ) || {};
+  },
+
+  async deleteCompanyApplicationsToken(context, { id }) {
+    return await this.$api.$delete(
+      `/companies/application/token/${ encodeURIComponent(id) }`,
+      {
+        progress: false,
+      },
+    ) || {};
+  },
+
   async getDataFromVat(context, { vat }) {
     const { data } = await this.$api.$post(
       "/companies/vat/info/any",
