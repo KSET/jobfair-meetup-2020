@@ -1,4 +1,7 @@
 import {
+  toSlug,
+} from "../../helpers/string";
+import {
   HttpStatus,
 } from "../helpers/http";
 import {
@@ -184,13 +187,7 @@ authRouter.put("/item/", async ({ body, authUser }) => {
     throw new ApiError("validation-failed", HttpStatus.Error.Forbidden, Object.fromEntries(errors));
   }
 
-  const sluggedTitle =
-    String(body.title)
-      .toLowerCase()
-      .replace(/\W/gi, "-")
-      .replace(/-+/gi, "-")
-  ;
-
+  const sluggedTitle = toSlug(body.title);
   const timeStamp = Date.now().toString(36);
 
   const newNews = {

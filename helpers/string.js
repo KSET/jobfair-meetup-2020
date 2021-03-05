@@ -41,3 +41,14 @@ export const capitalize =
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 ;
+
+export const toSlug =
+  (text) =>
+    String(text)
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^\w\s.-_/]/g, "")
+      .replace(/\W/gi, "-")
+      .replace(/-+/gi, "-")
+      .replace(/-*$/gi, "")
+;
