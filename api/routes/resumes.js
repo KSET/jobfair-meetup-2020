@@ -37,20 +37,16 @@ const router = new Router();
 const authRouter = AuthRouter.boundToRouter(router, {});
 
 export const fixResume = (resume) => {
+  const getName = ({ name }) => name;
+
   const fixComputerSkills =
     ({ computerSkills }) =>
-      mapArray(
-        computerSkills,
-        ({ name }) => name,
-      )
+      mapArray(getName)(computerSkills)
   ;
 
   const fixSkills =
     ({ skills }) =>
-      mapArray(
-        skills,
-        ({ name }) => name,
-      )
+      mapArray(getName)(skills)
   ;
 
   const fixResumeProps =

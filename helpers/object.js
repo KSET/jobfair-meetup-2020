@@ -95,7 +95,7 @@ export const keysFromCamelCaseToSnakeCase = (object) =>
 ;
 
 export const mapArray =
-  (array, fn) =>
+  (fn) => (array) =>
     Array.isArray(array)
     ? array.map(fn)
     : []
