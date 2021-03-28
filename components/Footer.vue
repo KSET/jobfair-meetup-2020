@@ -34,6 +34,8 @@
         <v-col
           cols="6"
           md="6"
+          order="3"
+          order-md="1"
         >
           <img
             :class="$style.jobfairLogo"
@@ -50,7 +52,27 @@
         <v-col
           cols="6"
           md="2"
-          offset-md="2"
+          order="1"
+          order-md="2"
+        >
+          <div>
+            <strong>
+              <translated-text trans-key="footer.qna.header" />
+            </strong>
+          </div>
+          <div>
+            <nuxt-link
+              :to="{ name: 'PageQnACompanyApplications' }"
+            >
+              <translated-text trans-key="footer.qna.companyApplications" />
+            </nuxt-link>
+          </div>
+        </v-col>
+        <v-col
+          cols="6"
+          md="2"
+          order="2"
+          order-md="3"
         >
           <div>
             <strong>
@@ -70,10 +92,8 @@
         <v-col
           cols="6"
           md="2"
-          offset="6"
-          offset-md="0"
-          order="3"
-          order-md="3"
+          order="4"
+          order-md="4"
         >
           <div>
             <strong>

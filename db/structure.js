@@ -331,6 +331,20 @@ create table if not exists company_applications_tokens
 
 create unique index if not exists company_applications_tokens_token_uindex
     on company_applications_tokens (token);
+
+
+create table if not exists qna
+(
+    id          serial                                not null
+        constraint qna_pk
+            primary key,
+    question    text                                  not null,
+    answer      text                                  not null,
+    category_id integer                               not null,
+    "order"     integer     default 0                 not null,
+    created_at  timestamptz default CURRENT_TIMESTAMP not null,
+    updated_at  timestamptz default CURRENT_TIMESTAMP not null
+);
 `;
 
 

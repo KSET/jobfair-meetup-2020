@@ -82,6 +82,11 @@ name: PageAdminPressIndex
             to: { name: "PageAdminProjectFriendsList" },
             icon: "mdi-hand-heart",
           },
+          {
+            name: "Q'n'A",
+            to: { name: "PageAdminQnAIndex" },
+            icon: "mdi-frequently-asked-questions",
+          },
         ];
       },
     },

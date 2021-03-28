@@ -21,6 +21,14 @@ export const camelToSnakeCase =
       .replace(/^_/, "")
 ;
 
+export const camelToKebabCase =
+  (string) =>
+    string
+      .replace(/([A-Z]+)/g, "-$1")
+      .toLowerCase()
+      .replace(/^-/, "")
+;
+
 /**
  * @param {*} maybeString
  * @return {boolean}

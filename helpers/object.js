@@ -52,6 +52,11 @@ export const withoutKeys = (keyList, object) => {
   return newObject;
 };
 
+export const objectWithoutKeys =
+  (...keyList) => (object) =>
+    withoutKeys(keyList.flat(), object)
+;
+
 export const deepMap = (fn, object) => {
   if (!isObject(object) || object instanceof Date) {
     return fn({ value: object }).value;
@@ -98,6 +103,18 @@ export const mapArray =
   (fn) => (array) =>
     Array.isArray(array)
     ? array.map(fn)
+    : []
+;
+
+export const reduceArray =
+  (initialValue) => (fn) => (array) =>
+    Array.isArray(array)
+    ? (
+      array.reduce(
+        fn,
+        isFunction(initialValue) ? initialValue() : initialValue,
+      )
+    )
     : []
 ;
 
