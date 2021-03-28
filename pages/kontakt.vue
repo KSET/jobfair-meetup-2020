@@ -119,6 +119,23 @@
                 <translated-text trans-key="contact.social.youtube" />
               </a>
             </div>
+
+            <div :class="$style.linkContainer">
+              <v-img
+                :class="$style.icon"
+                :src="require('@/assets/images/icons/contact-icon-linkedIn.svg?inline')"
+                aspect-ratio="1"
+                contain
+              />
+              <a
+                :class="$style.link"
+                :href="getSetting('LinkedIn URL')"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <translated-text trans-key="contact.social.linkedIn" />
+              </a>
+            </div>
           </div>
         </div>
       </v-col>
