@@ -398,10 +398,7 @@ name: PageAdminMediaPartnersList
             return alert(msg);
           }
 
-          const tmp = partner.order;
-
-          partner.order = other.order;
-          other.order = tmp;
+          await this.refreshPartners();
         } finally {
           partner.loading = false;
         }

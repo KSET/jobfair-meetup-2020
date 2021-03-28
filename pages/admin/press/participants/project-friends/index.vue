@@ -398,10 +398,7 @@ name: PageAdminProjectFriendsList
             return alert(msg);
           }
 
-          const tmp = friend.order;
-
-          friend.order = other.order;
-          other.order = tmp;
+          await this.refreshFriends();
         } finally {
           friend.loading = false;
         }
