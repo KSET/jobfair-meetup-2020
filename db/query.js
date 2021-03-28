@@ -7,9 +7,11 @@ export const cleanObjectValues = (
 ) => {
   const filter =
     (val) =>
-      allowNull
-      ? null !== val
-      : Boolean(val)
+      val !== undefined &&
+      (
+        allowNull ||
+        null !== val
+      )
   ;
 
   const snakeCase =
