@@ -116,7 +116,12 @@
                     </v-btn>
                   </div>
                 </v-col>
-                <v-col cols="12" v-text="answer" />
+
+                <v-col
+                  class="break-spaces"
+                  cols="12"
+                  v-text="answer"
+                />
               </v-row>
             </transition-group>
           </v-col>
@@ -334,5 +339,9 @@ name: PageAdminQnAIndex
     &-leave-active {
       position: absolute;
     }
+  }
+
+  .break-spaces {
+    white-space: break-spaces;
   }
 </style>

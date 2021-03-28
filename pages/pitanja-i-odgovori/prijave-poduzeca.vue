@@ -44,6 +44,7 @@
               v-text="item.question"
             />
             <p
+              :class="$style.answer"
               v-text="item.answer"
             />
           </v-col>
