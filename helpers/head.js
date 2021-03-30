@@ -21,15 +21,22 @@ const mappedContent = {
   },
 };
 
-const getMappedContent = (key, content) => mappedContent[key] ? mappedContent[key](content) : content;
-const getRenamedKey = (key) => renameMap[key] || key;
-const getKeyAliases = (key) => aliasMap[key] || [];
-const getKeyWithAliases = (key) => [ key, ...getKeyAliases(key) ];
-
-export const hid = ({ name, content }) =>
+const hid = ({ name, content }) =>
   name.startsWith("og:")
   ? ({ hid: name, property: name, content })
   : ({ hid: name, name, content })
+;
+
+const getMappedContent = (key, content) => mappedContent[key] ? mappedContent[key](content) : content;
+const getRenamedKey = (key) => renameMap[key] || key;
+const getKeyAliases = (key) => aliasMap[key] || [];
+const getKeyWithAliases =
+  (key, content) =>
+    [
+      key,
+      ...getKeyAliases(key),
+    ]
+      .map((name) => hid({ name, content }))
 ;
 
 export const generateMetadata =
@@ -46,12 +53,7 @@ export const generateMetadata =
       )
       .flatMap(
         ([ key, content ]) =>
-          getKeyWithAliases(key)
-            .map(
-              (name) =>
-                hid({ name, content })
-              ,
-            )
+          getKeyWithAliases(key, content)
         ,
       )
 ;
