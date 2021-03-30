@@ -173,17 +173,22 @@
           {
             name: "Instagram",
             href: this.getSetting("Instagram URL"),
-            src: require("@/assets/images/icons/instagram.png"),
+            src: require("@/assets/images/icons/footer/icon-ig.png"),
           },
           {
             name: "Facebook",
             href: this.getSetting("Facebook URL"),
-            src: require("@/assets/images/icons/facebook.png"),
+            src: require("@/assets/images/icons/footer/icon-fb.png"),
           },
           {
             name: "Youtube",
             href: this.getSetting("Youtube URL"),
-            src: require("@/assets/images/icons/youtube.png"),
+            src: require("@/assets/images/icons/footer/icon-yt.png"),
+          },
+          {
+            name: "LinkedIn",
+            href: this.getSetting("LinkedIn URL"),
+            src: require("@/assets/images/icons/footer/icon-ln.png"),
           },
         ];
       },
