@@ -201,7 +201,7 @@ name: PageAdminResumes
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
-    hid,
+    generateMetadata,
   } from "~/helpers/head";
 
   const getUrl = (query, param) => {
@@ -326,10 +326,15 @@ name: PageAdminResumes
     },
 
     head() {
+      const title = "Baza životopisa";
+
       return {
-        title: "Baza životopisa",
+        title,
         meta: [
-          hid({ name: "og:locale", content: "hr_HR" }),
+          ...generateMetadata({
+            locale: "hr_HR",
+            title,
+          }),
         ],
       };
     },

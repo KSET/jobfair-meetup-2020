@@ -212,7 +212,7 @@ name: PageCompanyResumes
   import CompanyMaxWidthContainer from "~/components/CompanyMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
   import {
-    hid,
+    generateMetadata,
   } from "~/helpers/head";
   import {
     getUrlWithQueryParam,
@@ -351,10 +351,15 @@ name: PageCompanyResumes
     },
 
     head() {
+      const title = "Baza životopisa";
+
       return {
-        title: "Baza životopisa",
+        title,
         meta: [
-          hid({ name: "og:locale", content: "hr_HR" }),
+          ...generateMetadata({
+            locale: "hr_HR",
+            title,
+          }),
         ],
       };
     },

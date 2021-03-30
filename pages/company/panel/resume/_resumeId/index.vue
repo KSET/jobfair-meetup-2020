@@ -95,7 +95,7 @@ name: PageCompanyResumeDetails
   import CompanyMaxWidthContainer from "~/components/CompanyMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
   import {
-    hid,
+    generateMetadata,
   } from "~/helpers/head";
 
   export default {
@@ -195,7 +195,10 @@ name: PageCompanyResumeDetails
       return {
         title,
         meta: [
-          hid({ name: "og:locale", content: "hr_HR" }),
+          ...generateMetadata({
+            locale: "hr_HR",
+            title,
+          }),
         ],
       };
     },
