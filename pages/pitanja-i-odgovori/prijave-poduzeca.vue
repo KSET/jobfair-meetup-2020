@@ -62,6 +62,9 @@ name: PageQnACompanyApplications
   import {
     mapGetters,
   } from "vuex";
+  import {
+    generateMetadata,
+  } from "../../helpers/head";
   import TranslatedText from "~/components/TranslatedText";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
@@ -95,6 +98,20 @@ name: PageQnACompanyApplications
 
     methods: {
       camelToKebabCase,
+    },
+
+    head() {
+      const title = "Pitanja za prijave poduzeća | Pitanja i Odgovori";
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+            locale: "hr",
+          }),
+        ],
+      };
     },
   };
 </script>
