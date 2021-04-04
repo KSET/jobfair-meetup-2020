@@ -32,7 +32,7 @@
     "@nuxtjs/sentry": "^4.3.5",
     "@sentry/node": "^5.24.2",
     "adm-zip": "^0.4.16",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "body-parser": "^1.19.0",
     "content-disposition": "^0.5.3",
     "cookie-parser": "^1.4.5",
