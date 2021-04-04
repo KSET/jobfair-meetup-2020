@@ -9,7 +9,7 @@ export const getters = {};
 export const mutations = {};
 
 export const actions = {
-  async nuxtServerInit({ dispatch }, context) {
+  async nuxtServerInit({ dispatch, getters }, context) {
     const nuxtServerInits =
       Object
         .keys(context.store._modules.root._children)
