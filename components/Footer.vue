@@ -48,6 +48,16 @@
           <div :class="$style.afterJobfairText">
             <translated-text trans-key="footer.legal.allRightsReserved" />
           </div>
+          <div
+            v-if="!showConsent"
+            :class="$style.afterJobfairText"
+          >
+            <translated-text
+              style="cursor: pointer;"
+              trans-key="footer.legal.cookiesReset"
+              @click.native.prevent="clearConsent"
+            />
+          </div>
         </v-col>
         <v-col
           cols="6"
@@ -121,19 +131,24 @@
         </v-col>
       </v-row>
     </v-container>
+
+    <cookie-consent />
   </v-footer>
 </template>
 
 <script>
   import {
+    mapActions,
     mapGetters,
   } from "vuex";
+  import CookieConsent from "./CookieConsent";
   import TranslatedText from "~/components/TranslatedText";
 
   export default {
     name: "AppFooter",
 
     components: {
+      CookieConsent,
       TranslatedText,
     },
 
@@ -141,6 +156,10 @@
       ...mapGetters({
         getSetting: "settings/getSetting",
       }),
+
+      ...mapGetters("cookieConsent", [
+        "showConsent",
+      ]),
 
       showLogos() {
         return "Index" === this.$route.name;
@@ -192,9 +211,13 @@
           },
         ];
       },
-
     },
 
+    methods: {
+      ...mapActions("cookieConsent", [
+        "clearConsent",
+      ]),
+    },
   };
 </script>
 

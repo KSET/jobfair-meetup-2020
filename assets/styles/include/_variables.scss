@@ -8,6 +8,13 @@ $fer-error: #f44336;
 $transition-timing-function: cubic-bezier(.4, 0, .2, 1);
 $transition-bounce-function: cubic-bezier(.35, 1.55, .65, 1);
 
+$breakpoints: (
+  xs: 600px,
+  sm: 960px,
+  md: 1264px,
+  lg: 1904px,
+) !default;
+
 $nav-height: 64px;
 
 $content-max-width: 1300px;
@@ -15,10 +22,4 @@ $content-max-width-mobile: 100vw;
 $company-max-width: 92.5vw;
 $company-max-width-mobile: 100vw;
 $page-max-width: 1905px;
-
-$breakpoints: (
-  xs: 600px,
-  sm: 960px,
-  md: 1264px,
-  lg: 1904px,
-) !default;
+$cookie-consent-max-width: map-get($breakpoints, sm);
