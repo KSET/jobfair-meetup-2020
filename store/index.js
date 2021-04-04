@@ -9,10 +9,18 @@ export const getters = {};
 export const mutations = {};
 
 export const actions = {
-  async nuxtServerInit({ dispatch, getters }) {
-    await dispatch("user/nuxtServerInit");
-    await dispatch("settings/nuxtServerInit");
-    await dispatch("translations/nuxtServerInit");
+  async nuxtServerInit({ dispatch }, context) {
+    const nuxtServerInits =
+      Object
+        .keys(context.store._modules.root._children)
+        .map((moduleName) => `${ moduleName }/nuxtServerInit`)
+        .filter((initFnName) => this._actions[initFnName])
+    ;
+
+    await Promise.all(
+      nuxtServerInits.map((initFnName) => dispatch(initFnName, context)),
+    );
+
     await dispatch("pages/fetchPages");
 
     const user = getters["user/getUser"];
