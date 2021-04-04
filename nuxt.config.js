@@ -20,6 +20,8 @@ const uid = new ShortUniqueId();
 
 const identNameMap = {};
 
+const isProd = "production" === process.env.NODE_ENV;
+
 export default {
   /*
    ** Headers of the page
@@ -81,6 +83,11 @@ export default {
       "@nuxtjs/google-analytics",
       {
         id: process.env.GOOGLE_ANALYTICS_KEY,
+        disabled: true,
+        debug: {
+          enabled: !isProd,
+          sendHitTask: isProd,
+        },
       },
     ],
   ],
@@ -214,7 +221,7 @@ export default {
 
             const className = identNameMap[parsedLocalIdentName];
 
-            if ("production" === process.env.NODE_ENV) {
+            if (isProd) {
               return className;
             } else {
               return `${ parsedLocalIdentName }__${ className }`;
