@@ -1,4 +1,3 @@
-import contentDisposition from "content-disposition";
 import {
   isGateGuardian,
 } from "../../helpers/auth";
@@ -31,6 +30,9 @@ import {
   pickKeys,
   pipe,
 } from "../../helpers/object";
+import {
+ sendCsv,
+} from "../helpers/csv";
 import {
   HttpStatus,
   internalRequest,
@@ -507,28 +509,14 @@ const csvEventsExport = (res, data, fileName = "Svi") => {
     row.scannedAt,
   ]));
 
-  const escapeCsvValue =
-    (str) =>
-      String(str)
-        .replace("\"", "\"\"")
-        .replace("\n", "\t")
-  ;
-
-  const encodeRow =
-    (entries) =>
-      `"${ entries.map(escapeCsvValue).join("\",\"") }"`
-  ;
-
-  res.set("Content-Type", "text/csv");
-  res.set("Content-Disposition", contentDisposition(`${ fileName } - ${ Date.now() } - sudionici.csv`));
-  res.set("Content-Transfer-Encoding", "binary");
-
-  res.write(encodeRow(headers));
-  for (const row of rows) {
-    res.write("\n");
-    res.write(encodeRow(row));
-  }
-  res.end();
+  sendCsv(
+    res,
+    {
+      fileName: `${ fileName } - ${ Date.now() } - sudionici.csv`,
+      headers,
+      rows,
+    },
+  );
 };
 
 const getResume =

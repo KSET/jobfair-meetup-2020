@@ -1,7 +1,9 @@
-import contentDisposition from "content-disposition";
 import {
   dotGet,
 } from "../../../helpers/data";
+import {
+ sendCsv,
+} from "../../helpers/csv";
 import {
   fixResume,
 } from "../resumes";
@@ -83,33 +85,19 @@ const csvResumesExport = (res, data, fileName = "Svi") => {
     ].map((val) => val || "");
   });
 
-  const escapeCsvValue =
-    (str) =>
-      String(str)
-        .replace("\"", "\"\"")
-        .replace("\n", "\t")
-  ;
-
-  const encodeRow =
-    (entries) =>
-      `"${ entries.map(escapeCsvValue).join("\",\"") }"`
-  ;
-
   const addZero = (n) => 9 >= n ? `0${ n }` : `${ n }`;
   const now = new Date();
   const datePart = [ now.getFullYear(), now.getMonth() + 1, now.getDate() ].map(addZero).join("-");
   const timePart = [ now.getHours(), now.getMinutes(), now.getSeconds() ].map(addZero).join("-");
-  const date = `${ datePart } ${ timePart }`;
 
-  res.set("Content-Type", "text/csv");
-  res.set("Content-Disposition", contentDisposition(`JobFair CV - ${ fileName } @ ${ date }.csv`));
-  res.set("Content-Transfer-Encoding", "binary");
-
-  res.write(encodeRow(headers));
-  for (const row of rows) {
-    res.write("\n");
-    res.write(encodeRow(row));
-  }
+  sendCsv(
+    res,
+    {
+      fileName: `JobFair CV - ${ fileName } @ ${ datePart } ${ timePart }.csv`,
+      headers,
+      rows,
+    },
+  );
 };
 
 authRouter.use((req, res, next) => {
