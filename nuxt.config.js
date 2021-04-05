@@ -142,11 +142,7 @@ export default {
    ** Vuetify options
    */
   vuetify: {
-    defaultAssets: {
-      font: {
-        family: "Raleway",
-      },
-    },
+    defaultAssets: false,
     theme: {
       light: true,
 

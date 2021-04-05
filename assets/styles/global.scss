@@ -1,6 +1,11 @@
 @import "./include/all";
-@import url("https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css");
-@import url("https://fonts.googleapis.com/css?family=Raleway:400,500,600,700,800,400italic&display=swap");
+@import "../../node_modules/@mdi/font/css/materialdesignicons.css";
+@import "../../node_modules/@fontsource/raleway/latin.css";
+@import "../../node_modules/@fontsource/raleway/latin-ext.css";
+@import "../../node_modules/@fontsource/raleway/latin-400-italic.css";
+@import "../../node_modules/@fontsource/raleway/latin-ext-400-italic.css";
+@import "../../node_modules/@fontsource/raleway/latin-700-italic.css";
+@import "../../node_modules/@fontsource/raleway/latin-ext-700-italic.css";
 
 ::selection {
   color: $fer-dark-blue !important;
