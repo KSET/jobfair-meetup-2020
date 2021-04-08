@@ -43,7 +43,7 @@ export default class CompanyApplicationService {
       "application/pdf": "pdf",
       "application/postscript": "ai",
     };
-  };
+  }
 
   static async areApplicationsEnabled() {
     const setting = await SettingsService.getValue("Company Applications Enabled", "no");

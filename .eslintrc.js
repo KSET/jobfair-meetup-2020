@@ -5,22 +5,25 @@ module.exports = {
     node: true,
   },
   parserOptions: {
-    parser: "@babel/eslint-parser",
+    parser: "@typescript-eslint/parser",
     requireConfigFile: false,
   },
   extends: [
+    "plugin:@typescript-eslint/recommended",
     "@nuxtjs",
     "plugin:nuxt/recommended",
   ],
   // add your custom rules here
   rules: {
+    "no-dupe-class-members": "off",
+    "@typescript-eslint/no-var-requires": "off",
     "vue/comment-directive": "off",
     "nuxt/no-cjs-in-config": "off",
     "space-before-function-paren": [
       "error", {
-        "anonymous": "never",
-        "named": "never",
-        "asyncArrow": "always",
+        anonymous: "never",
+        named: "never",
+        asyncArrow: "always",
       },
     ],
     "vue/html-indent": [
@@ -29,16 +32,16 @@ module.exports = {
     "vue/script-indent": [
       "error", 2,
       {
-        "baseIndent": 1,
-        "switchCase": 1,
+        baseIndent: 1,
+        switchCase: 1,
       },
     ],
-    "indent": "off",
+    indent: "off",
     "@typescript-eslint/indent": "off",
     "array-bracket-spacing": [ "error", "always" ],
     "arrow-parens": [ "error", "always" ],
     "arrow-spacing": "error",
-    "camelcase": [
+    camelcase: [
       "error",
       {
         ignoreDestructuring: true,
@@ -48,14 +51,14 @@ module.exports = {
     "comma-spacing": [
       "error",
       {
-        "before": false,
-        "after": true,
+        before: false,
+        after: true,
       },
     ],
     "comma-style": [ "error", "last" ],
     "computed-property-spacing": [ "error", "never" ],
     "dot-notation": "error",
-    "eqeqeq": [ "error", "always" ],
+    eqeqeq: [ "error", "always" ],
     "guard-for-in": "error",
     "linebreak-style": [ "error", "unix" ],
     "lines-between-class-members": [ "error", "always" ],
@@ -66,9 +69,9 @@ module.exports = {
     "no-multiple-empty-lines": [
       "error",
       {
-        "max": 2,
-        "maxEOF": 1,
-        "maxBOF": 1,
+        max: 2,
+        maxEOF: 1,
+        maxBOF: 1,
       },
     ],
     "no-console": "warn",
@@ -84,7 +87,7 @@ module.exports = {
     "no-useless-constructor": "error",
     "object-curly-newline": [
       "error", {
-        "ImportDeclaration": "always",
+        ImportDeclaration: "always",
       },
     ],
     "object-shorthand": [ "error", "always" ],
@@ -93,30 +96,30 @@ module.exports = {
     "prefer-destructuring": [
       "warn",
       {
-        "array": true,
-        "object": true,
+        array: true,
+        object: true,
       },
       {
-        "enforceForRenamedProperties": false,
+        enforceForRenamedProperties: false,
       },
     ],
     "prefer-numeric-literals": "error",
     "prefer-rest-params": "error",
     "prefer-spread": "warn",
     "prefer-template": "warn",
-    "quotes": [
+    quotes: [
       "error",
       "double",
       {
-        "avoidEscape": true,
+        avoidEscape: true,
       },
     ],
-    "semi": [ "error", "always" ],
+    semi: [ "error", "always" ],
     "space-before-blocks": [ "warn", "always" ],
     "space-infix-ops": "error",
     "template-curly-spacing": [ "error", "always" ],
     "template-tag-spacing": [ "error", "never" ],
     "wrap-iife": [ "error", "inside" ],
-    "yoda": [ "error", "always", { "exceptRange": true } ],
+    yoda: [ "error", "always", { exceptRange: true } ],
   },
 };
