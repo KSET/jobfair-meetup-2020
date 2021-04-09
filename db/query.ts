@@ -2,14 +2,25 @@ import _ from "lodash/fp";
 import {
   keysFromSnakeToCamelCase,
 } from "../helpers/object";
+import type {
+  Query,
+} from "./methods";
+
+interface CleanOptionsValues {
+  allowNull: boolean,
+  toSnakeCase: boolean,
+}
+
+type CleanOptions = Partial<CleanOptionsValues>;
+type URecord = Record<string, unknown>;
 
 export const cleanObjectValues = (
-  object,
+  object: URecord,
   {
     allowNull = false,
     toSnakeCase = false,
-  } = {},
-) => {
+  }: CleanOptions = {},
+): URecord => {
   const filter =
     (val) =>
       val !== undefined &&
@@ -19,46 +30,41 @@ export const cleanObjectValues = (
       )
   ;
 
-  const snakeCase =
-    (string) =>
-      string
-        .replace(/([A-Z]+)/g, "_$1")
-        .toLowerCase()
-        .replace(/^_/, "")
-  ;
-
   const fixCase =
     (arr) =>
       !toSnakeCase
       ? arr
-      : arr.map(([ key, value ]) => [ snakeCase(key), value ])
+      : arr.map(([ key, value ]) => [ _.snakeCase(key), value ])
   ;
 
-  const values =
-    Object
-      .entries(object)
-      .filter(([ _, value ]) => filter(value))
+  const format =
+    _.flow(
+      _.toPairs,
+      _.filter(([ , value ]) => filter(value)),
+      fixCase,
+      _.fromPairs,
+    )
   ;
 
-  return Object.fromEntries(fixCase(values));
+  return format(object);
 };
 
-export const generateSetters =
-  (item) =>
-    Object
-      .keys(item)
-      .map((key, i) => `"${ key }" = $${ i + 1 }`)
-      .join(", ")
+export const generateSetters: (item: URecord) => string =
+  _.flow(
+    _.keys,
+    _.map.convert({ cap: false })((key, i) => `"${ key }" = $${ i + 1 }`),
+    _.join(", "),
+  )
 ;
 
 export const generateValues =
-  (item) =>
+  (item: URecord): unknown[] =>
     Object
       .values(item)
 ;
 
 export const generateWhere =
-  (item, offset) =>
+  (item: URecord, offset: number): string =>
     Object
       .keys(item)
       .map((key, i) => `"${ key }" = $${ offset + i + 1 }`)
@@ -70,12 +76,15 @@ export const generateInsertQuery =
     {
       table,
       data,
+    }: {
+      table: string;
+      data: URecord,
     },
     {
       allowNull = false,
       toSnakeCase = true,
-    } = {},
-  ) => {
+    }: CleanOptions = {},
+  ): Query => {
     const item = cleanObjectValues(data, { allowNull, toSnakeCase });
 
     const $keys = Object.keys(item);
@@ -98,7 +107,7 @@ export const generateInsertQuery =
   }
 ;
 
-const filterData = (data, allowedKeys) => {
+const filterData = (data: URecord, allowedKeys: string[]): URecord => {
   const fixedData = keysFromSnakeToCamelCase(data);
 
   if (0 === allowedKeys.length) {
@@ -109,14 +118,17 @@ const filterData = (data, allowedKeys) => {
 };
 
 export const insertQuery =
-  (table) =>
+  (table: string) =>
     (
       {
         allowedKeys = [],
-        options,
+        options = {},
+      }: {
+        allowedKeys?: string[],
+        options?: CleanOptions,
       } = {},
     ) =>
-      (data) =>
+      (data: URecord): Query =>
         generateInsertQuery(
           {
             table,
@@ -132,12 +144,16 @@ export const generateUpdateQuery =
       table,
       data,
       where = {},
+    }: {
+      table: string;
+      data: URecord;
+      where: URecord;
     },
     {
       allowNull = false,
       toSnakeCase = true,
-    } = {},
-  ) => {
+    }: CleanOptions = {},
+  ): Query => {
     const item = cleanObjectValues(data, { allowNull, toSnakeCase });
 
     const setters = generateSetters(item);
@@ -166,18 +182,22 @@ export const generateUpdateQuery =
 ;
 
 export const updateQuery =
-  (table) =>
+  (table: string) =>
     (
       {
         allowedKeys = [],
         allowedWhereKeys = [],
         options,
+      }: {
+        allowedKeys?: string[];
+        allowedWhereKeys?: string[];
+        options?: CleanOptions;
       } = {},
     ) =>
       (
-        where,
-        data,
-      ) =>
+        where: URecord,
+        data: URecord,
+      ): Query =>
         generateUpdateQuery(
           {
             table,
