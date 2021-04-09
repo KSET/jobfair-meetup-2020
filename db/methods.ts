@@ -1,11 +1,16 @@
-const { Pool } = require("pg");
+import {
+  Pool,
+} from "pg";
 
 const pool = new Pool({
   connectionString: process.env.DB_URL,
 });
 
 export const query =
-  (text, params) => {
+  <T>(
+    text: string,
+    params?: unknown[],
+  ): T[] => {
     try {
       return pool
         .query(text, params)
@@ -18,6 +23,13 @@ export const query =
   }
 ;
 
+interface QueryByObject {
+  text: string;
+  values?: unknown[];
+}
+
+export type Query = QueryByObject | string;
+
 export class Client {
   #instance;
 
@@ -25,18 +37,11 @@ export class Client {
 
   #ended = false;
 
-  /**
-   * @returns {Promise<Client>}
-   */
-  static async connected() {
+  static async connected(): Promise<Client> {
     return await (new Client()).connect();
   }
 
-  /**
-   * @param args
-   * @returns {Promise<Array<Object>|null>}
-   */
-  static async queryOnce(...args) {
+  static async queryOnce<T>(...args: Query[]): Promise<T[] | null> {
     let client;
     try {
       client = await this.connected();
@@ -49,11 +54,7 @@ export class Client {
     }
   }
 
-  /**
-   * @param args
-   * @returns {Promise<Object|null>}
-   */
-  static async queryOneOnce(...args) {
+  static async queryOneOnce<T>(...args: Query[]): Promise<T | null> {
     let client;
     try {
       client = await this.connected();
@@ -66,26 +67,17 @@ export class Client {
     }
   }
 
-  /**
-   * @returns {Promise<Client>}
-   */
-  static async inTransaction() {
+  static async inTransaction(): Promise<Client> {
     const client = await Client.connected();
 
     return await client.startTransaction();
   }
 
-  /**
-   * @returns {boolean}
-   */
-  get #queryable() {
+  get isQueryable(): boolean {
     return this.#instance && !this.#ended;
   }
 
-  /**
-   * @returns {Promise<Client>}
-   */
-  async connect() {
+  async connect(): Promise<this> {
     if (!this.#instance) {
       this.#instance = await pool.connect();
     }
@@ -93,7 +85,7 @@ export class Client {
     return this;
   }
 
-  async startTransaction() {
+  async startTransaction(): Promise<this> {
     if (!this.#inTransaction) {
       await this.query("BEGIN");
 
@@ -103,12 +95,8 @@ export class Client {
     return this;
   }
 
-  /**
-   * @param args
-   * @returns {Promise<Array<Object>|null>}
-   */
-  async query(...args) {
-    if (!this.#queryable) {
+  async query<T>(...args: Query[]): Promise<T[] | null> {
+    if (!this.isQueryable) {
       return null;
     }
 
@@ -122,21 +110,17 @@ export class Client {
     }
   }
 
-  /**
-   * @param args
-   * @returns {Promise<Object|null>}
-   */
-  async queryOne(...args) {
-    const res = await this.query(...args);
+  async queryOne<T>(...args: Query[]): Promise<T | null> {
+    const res: T[] | null = await this.query(...args);
 
     if (!res) {
       return null;
     }
 
-    return res.pop();
+    return res.pop() || null;
   }
 
-  async commit(end = false) {
+  async commit(end = false): Promise<void> {
     await this.query("COMMIT");
 
     this.#inTransaction = false;
@@ -146,7 +130,7 @@ export class Client {
     }
   }
 
-  async rollback(end = false) {
+  async rollback(end = false): Promise<void> {
     await this.query("ROLLBACK");
 
     this.#inTransaction = false;
@@ -156,8 +140,8 @@ export class Client {
     }
   }
 
-  async end() {
-    if (!this.#queryable) {
+  async end(): Promise<void> {
+    if (!this.isQueryable) {
       return;
     }
 
@@ -167,5 +151,5 @@ export class Client {
 }
 
 export const getClient =
-  () => new Client()
+  (): Client => new Client()
 ;
