@@ -14,8 +14,6 @@ import {
   requireAuth,
 } from "./middleware";
 
-const ExpressRouter = express.Router;
-
 /**
  * @typedef {Object} SuccessResponse
  * @property {boolean} error - Whether an error occurred
@@ -193,12 +191,12 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
 });
 
 export const registerRoutesInFolder = (folder) => {
-  const router = new ExpressRouter();
+  const router = new express.Router();
 
   // Register all .js files in routes directory as express routes
   readdirSync(folder)
     // Only consider JS files
-    .filter((filename) => filename.endsWith(".js"))
+    .filter((filename) => filename.endsWith(".js") || filename.endsWith(".ts"))
     // Require files and register with express
     .forEach((fileName) => {
       // Add full path to filename
@@ -233,12 +231,14 @@ export const registerRoutesInFolder = (folder) => {
 export const registerRoutesInFolderJs =
   (jsFilePath) =>
     registerRoutesInFolder(
-      jsFilePath.replace(/.js$/i, ""),
+      jsFilePath
+        .replace(/\.(js|ts)$/i, "")
+      ,
     )
 ;
 
 export const registerFolderAsRoute = (baseDir, folderName) => {
-  const router = new ExpressRouter();
+  const router = express.Router();
 
   router.use(folderName, registerRoutesInFolder(joinPath(baseDir, folderName)));
 
@@ -252,7 +252,7 @@ export class Router {
   #router = null;
 
   constructor() {
-    this.#router = new ExpressRouter();
+    this.#router = express.Router();
   }
 
   /// //////// REQUEST METHODS START ///////////
