@@ -9,12 +9,12 @@
     "build": "nuxt-ts build",
     "start": "nuxt-ts start",
     "generate": "nuxt-ts generate",
-    "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore .",
+    "lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore",
     "stylelint": "stylelint --ignore-path .gitignore 'assets/**/*.{s?(a|c)ss,less,stylus}' '{components,layouts,pages}/**/*.vue'"
   },
   "lint-staged": {
-    "*.{js,vue}": "yarn lint",
-    "*.{css,vue}": "yarn stylelint"
+    "*.{js,ts,vue}": "npm run-script lint -- --quiet",
+    "*.{css,vue}": "npm run-script stylelint -- --quiet"
   },
   "husky": {
     "hooks": {
@@ -44,6 +44,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.3",
     "fuzzysearch": "^1.0.3",
+    "jose": "^3.11.3",
     "jsonwebtoken": "^8.5.1",
     "jsvat": "^2.5.0",
     "morgan": "^1.10.0",
