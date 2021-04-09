@@ -1,3 +1,8 @@
+import _ from "lodash/fp";
+import {
+  keysFromSnakeToCamelCase,
+} from "../helpers/object";
+
 export const cleanObjectValues = (
   object,
   {
@@ -93,6 +98,34 @@ export const generateInsertQuery =
   }
 ;
 
+const filterData = (data, allowedKeys) => {
+  const fixedData = keysFromSnakeToCamelCase(data);
+
+  if (0 === allowedKeys.length) {
+    return fixedData;
+  }
+
+  return _.pick(allowedKeys, fixedData);
+};
+
+export const insertQuery =
+  (table) =>
+    (
+      {
+        allowedKeys = [],
+        options,
+      } = {},
+    ) =>
+      (data) =>
+        generateInsertQuery(
+          {
+            table,
+            data: filterData(data, allowedKeys),
+          },
+          options,
+        )
+;
+
 export const generateUpdateQuery =
   (
     {
@@ -130,4 +163,27 @@ export const generateUpdateQuery =
       ],
     };
   }
+;
+
+export const updateQuery =
+  (table) =>
+    (
+      {
+        allowedKeys = [],
+        allowedWhereKeys = [],
+        options,
+      } = {},
+    ) =>
+      (
+        where,
+        data,
+      ) =>
+        generateUpdateQuery(
+          {
+            table,
+            data: filterData(data, allowedKeys),
+            where: filterData(where, allowedWhereKeys),
+          },
+          options,
+        )
 ;
