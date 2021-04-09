@@ -50,6 +50,7 @@ export const queryPressReleaseCreate =
     allowedKeys: [
       "title",
       "fileId",
+      "date",
     ],
   })
 ;
@@ -79,6 +80,7 @@ export const queryPressReleaseUpdateById =
       allowedKeys: [
         "title",
         "fileId",
+        "date",
       ],
     },
   )

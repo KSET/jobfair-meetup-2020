@@ -30,6 +30,7 @@ interface DbPressRelease {
   title: string;
   // eslint-disable-next-line camelcase
   file_id: number;
+  date: Date;
   // eslint-disable-next-line camelcase
   created_at: Date;
   // eslint-disable-next-line camelcase
@@ -40,6 +41,7 @@ interface DbPressRelease {
 export interface MutableFields {
   title: string;
   fileId: number;
+  date?: Date;
 }
 
 export interface PressRelease {
@@ -52,12 +54,11 @@ export interface PressRelease {
   updatedAt: Date;
 }
 
-const formatItem = ({ createdAt, fileId, ...r }: PressRelease): PressRelease => ({
+const formatItem = ({ date, fileId, ...r }: PressRelease): PressRelease => ({
   ...r,
-  createdAt,
   fileId,
   url: apiFilePath({ fileId }),
-  date: formatDate(createdAt),
+  date: formatDate(date),
 });
 
 const formatItems = _.flow(
@@ -123,16 +124,19 @@ export default class PressReleaseService {
     {
       title,
       fileId,
+      date,
     }: MutableFields,
   ): Promise<PressRelease> {
     validateMutable({
       title,
       fileId,
+      date,
     });
 
     const release = await Client.queryOneOnce<DbPressRelease>(queryPressReleaseCreate({
       title,
       fileId,
+      date,
     }));
 
     if (!release) {
@@ -153,11 +157,13 @@ export default class PressReleaseService {
     {
       title,
       fileId,
+      date,
     }: MutableFields,
   ): Promise<PressRelease> {
     validateMutable({
       title,
       fileId,
+      date,
     });
 
     const client = new Client();
@@ -185,6 +191,7 @@ export default class PressReleaseService {
         {
           title,
           fileId,
+          date,
         },
       ));
 

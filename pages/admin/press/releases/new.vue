@@ -21,6 +21,49 @@
 
           <v-row>
             <v-col cols="12">
+              <v-dialog
+                ref="dialog"
+                v-model="modal"
+                :return-value.sync="date"
+                persistent
+                width="290px"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                    v-model="date"
+                    v-bind="attrs"
+                    label="Picker in dialog"
+                    prepend-icon="mdi-calendar"
+                    readonly
+                    v-on="on"
+                  />
+                </template>
+                <v-date-picker
+                  v-model="date"
+                  scrollable
+                >
+                  <v-spacer />
+                  <v-btn
+                    color="primary"
+                    text
+                    @click="modal = false"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    text
+                    @click="$refs.dialog.save(date)"
+                  >
+                    OK
+                  </v-btn>
+                </v-date-picker>
+              </v-dialog>
+            </v-col>
+          </v-row>
+
+          <v-row>
+            <v-col cols="12">
               <v-file-input
                 v-model="file"
                 clearable
@@ -76,6 +119,9 @@ name: PageAdminPressReleaseCreate
     mapActions,
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
+  import {
+    formatDate,
+  } from "~/helpers/date";
 
   export default {
     name: "PageAdminPressReleaseCreate",
@@ -91,6 +137,7 @@ name: PageAdminPressReleaseCreate
         default: () => ({
           title: "",
           fileId: null,
+          date: new Date().toISOString(),
         }),
       },
     },
@@ -98,6 +145,8 @@ name: PageAdminPressReleaseCreate
     data() {
       return {
         title: this.$props.release.title,
+        date: formatDate(this.$props.release.date),
+        modal: false,
         file: null,
         fileId: this.$props.release.fileId,
         formValid: true,
@@ -165,6 +214,7 @@ name: PageAdminPressReleaseCreate
               id: this.id,
               title: this.title,
               fileId: this.fileId,
+              date: this.date,
             });
 
             if (error) {

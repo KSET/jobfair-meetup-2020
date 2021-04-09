@@ -483,4 +483,27 @@ export const versions = [
     select 1;
     `,
   },
+  {
+    name: "press-release-add-manual-date",
+    up: `
+    alter table
+      press_release
+    add
+      "date" date default CURRENT_TIMESTAMP not null
+    ;
+
+    update
+      press_release
+    set
+      "date" = created_at
+    ;
+    `,
+    down: `
+    alter table
+      press_release
+    drop column
+      "date"
+    ;
+    `,
+  },
 ];

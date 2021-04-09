@@ -25,11 +25,19 @@ authRouter.put("/", async ({ body }) => {
   const {
     title,
     fileId,
+    date: rawDate,
   } = body;
+
+  const date =
+    rawDate
+    ? new Date(rawDate)
+    : undefined
+  ;
 
   return await PressReleaseService.create({
     title,
     fileId,
+    date,
   });
 });
 
@@ -38,13 +46,21 @@ authRouter.patch("/:id", async ({ params, body }) => {
   const {
     title,
     fileId,
+    date: rawDate,
   } = body;
+
+  const date =
+    rawDate
+    ? new Date(rawDate)
+    : undefined
+  ;
 
   return await PressReleaseService.update(
     id,
     {
       title,
       fileId,
+      date,
     },
   );
 });

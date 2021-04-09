@@ -187,9 +187,6 @@ name: PagePress
   import JfPressKit from "~/components/press/JfPressKit";
   import TranslatedText from "~/components/TranslatedText";
   import {
-    formatDate,
-  } from "~/helpers/date";
-  import {
     generateMetadata,
   } from "~/helpers/head";
 
@@ -203,22 +200,20 @@ name: PagePress
     },
 
     async asyncData({ store }) {
-      const parseDates =
-        (list) =>
-          list
-            .map(
-              ({ created_at, ...item }) =>
-                ({
-                  ...item,
-                  date: formatDate(created_at),
-                }),
-            )
-      ;
+      const [
+        pressReleases,
+        galleryImages,
+        pressKitItems,
+      ] = await Promise.all([
+        store.dispatch("pressRelease/fetchAllPressReleases"),
+        store.dispatch("gallery/fetchAllItems"),
+        store.dispatch("pressKit/fetchAllItems"),
+      ]);
 
       return {
-        pressReleases: await store.dispatch("pressRelease/fetchAllPressReleases").then(parseDates),
-        galleryImages: await store.dispatch("gallery/fetchAllItems"),
-        pressKitItems: await store.dispatch("pressKit/fetchAllItems"),
+        pressReleases,
+        galleryImages,
+        pressKitItems,
       };
     },
 
