@@ -1,40 +1,34 @@
 import {
-  join as joinPath,
-} from "path";
-import {
-  pipe,
+  deepMap,
   keysFromSnakeToCamelCase,
   mapArray,
-  deepMap,
+  pipe,
   withoutKeys,
-} from "../../helpers/object";
+} from "../../../helpers/object";
 import {
   isString,
-} from "../../helpers/string";
+} from "../../../helpers/string";
 import {
-  HttpStatus,
-  internalRequest,
-} from "../helpers/http";
-import {
-  cachedFetcher,
-} from "../helpers/fetchCache";
-import {
-  resumesQuery,
   resumeQuery,
-} from "../graphql/queries";
+  resumesQuery,
+} from "../../graphql/queries";
 import {
   get,
   graphQlQuery,
-} from "../helpers/axios";
+} from "../../helpers/axios";
+import {
+  cachedFetcher,
+} from "../../helpers/fetchCache";
+import {
+  HttpStatus,
+  internalRequest,
+} from "../../helpers/http";
 import {
   ApiError,
   AuthRouter,
-  registerRoutesInFolder,
-  Router,
-} from "../helpers/route";
+} from "../../helpers/route";
 
-const router = new Router();
-const authRouter = AuthRouter.boundToRouter(router, {});
+const authRouter = new AuthRouter({});
 
 export const fixResume = (resume) => {
   const getName = ({ name }) => name;
@@ -165,7 +159,5 @@ authRouter.get("/info/:id", async ({ authHeader, params }) => {
 
   return fixResume(resume);
 });
-
-authRouter.use(registerRoutesInFolder(joinPath(__dirname, "resumes")));
 
 export default authRouter;

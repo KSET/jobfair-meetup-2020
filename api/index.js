@@ -1,7 +1,3 @@
-import {
-  join as joinPath,
-} from "path";
-
 import express from "express";
 import * as Sentry from "@sentry/node";
 import fileUpload from "express-fileupload";
@@ -21,7 +17,7 @@ import {
 import {
   apiRoute,
   ApiNotFoundError,
-  registerRoutesInFolder,
+  registerRoutesInFolderRecursive,
   error,
   ApiError,
 } from "./helpers/route";
@@ -42,7 +38,7 @@ Sentry.init({ dsn: process.env.SENTRY_DSN });
 // transaction/span/breadcrumb is attached to its own Hub instance
 app.use(Sentry.Handlers.requestHandler());
 
-const routes = registerRoutesInFolder(joinPath(__dirname, "routes"));
+const routes = registerRoutesInFolderRecursive(__dirname, "routes");
 
 app.set("x-powered-by", false);
 app.set("etag", false);

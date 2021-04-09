@@ -1,11 +1,21 @@
 import {
   readdirSync,
+  statSync,
 } from "fs";
 import {
   join as joinPath,
+  dirname,
 } from "path";
 import express from "express";
 import * as Sentry from "@sentry/node";
+import map from "lodash/fp/map";
+import groupBy from "lodash/fp/groupBy";
+import sortBy from "lodash/fp/sortBy";
+import reduce from "lodash/fp/reduce";
+import toPairs from "lodash/fp/toPairs";
+import initial from "lodash/fp/initial";
+import flow from "lodash/fp/flow";
+import flattenDeep from "lodash/fp/flattenDeep";
 import MobileNotificationService from "../services/mobile-notification-service";
 import {
   HttpStatus,
@@ -226,6 +236,82 @@ export const registerRoutesInFolder = (folder) => {
   ;
 
   return router;
+};
+
+export const registerRoutesInFolderRecursive = (...folderParts) => {
+  const folder = joinPath(...folderParts);
+
+  const isDirectory = (path) => statSync(path).isDirectory();
+  const isIndexFile = (path) => /(^|\/)index\.(js|ts)$/.test(path);
+  const pathToRoute = (path) => initial(path.split("/").pop().split(".")).join(".").replace(/^index$/, "");
+  const routeBasePath = (filePath) => dirname(filePath).substr(folder.length) || "/";
+  const absoluteRoute = (path) => joinPath(routeBasePath(path), pathToRoute(path));
+
+  const getListOfRoutesInFolder = (folder) => {
+    const withPath = (file) => joinPath(folder, file);
+
+    const folderEntries = map(withPath, readdirSync(folder));
+    const {
+      true: folders = [],
+      false: filesAll = [],
+    } = groupBy(isDirectory, folderEntries);
+    const {
+      true: index = [],
+      false: files = [],
+    } = groupBy(isIndexFile, filesAll);
+
+    const routeFiles = [
+      ...index,
+      ...files.sort(),
+    ];
+
+    return [
+      ...routeFiles,
+      folders.map(getListOfRoutesInFolder),
+    ];
+  };
+
+  const getHandler = (filePath) => {
+    const router = require(filePath).default;
+
+    if (router instanceof Router) {
+      return router.expose();
+    }
+
+    return router;
+  };
+
+  const assignPathToRouter =
+    (
+      router,
+      [
+        path,
+        files,
+      ],
+    ) => {
+      if (1 < files.length) {
+        throw new Error(`Duplicate routes: ${ files.join(" <~> ") }`);
+      }
+
+      const [ filePath ] = files;
+
+      const handler = getHandler(filePath);
+
+      router.use(path, handler);
+
+      return router;
+    };
+
+  const createRouterFor = flow(
+    getListOfRoutesInFolder,
+    flattenDeep,
+    groupBy(absoluteRoute),
+    toPairs,
+    sortBy("0"),
+    reduce(assignPathToRouter)(new express.Router()),
+  );
+
+  return createRouterFor(folder);
 };
 
 export const registerRoutesInFolderJs =
