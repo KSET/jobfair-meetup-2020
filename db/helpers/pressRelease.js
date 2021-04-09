@@ -1,3 +1,13 @@
+import {
+  insertQuery,
+  updateQuery,
+} from "../query";
+
+const table = "press_release";
+
+const insert = insertQuery(table);
+const update = updateQuery(table);
+
 export const queryPressReleaseGetAll =
   () => ({
     text: `
@@ -36,26 +46,10 @@ export const queryPressReleaseGetById =
 ;
 
 export const queryPressReleaseCreate =
-  ({
-     title,
-     fileId,
-   }) => ({
-    text: `
-      insert into press_release
-        (
-          "title",
-          "file_id"
-        )
-      values
-        (
-          $1,
-          $2
-        )
-      returning id
-    `,
-    values: [
-      title,
-      fileId,
+  insert({
+    allowedKeys: [
+      "title",
+      "fileId",
     ],
   })
 ;
@@ -77,43 +71,15 @@ export const queryPressReleaseDeleteById =
 ;
 
 export const queryPressReleaseUpdateById =
-  (
-    id,
+  update(
     {
-      title,
-      fileId,
-    },
-  ) => {
-    const pressRelease = {
-      title,
-      // eslint-disable-next-line camelcase
-      file_id: fileId,
-    };
-
-    const filteredPressRelease =
-      Object
-        .entries(pressRelease)
-        .filter(([ _, v ]) => v)
-    ;
-
-    const setters = filteredPressRelease.map(([ k ], i) => `${ k } = $${ i + 1 }`);
-    const values = filteredPressRelease.map(([ _, v ]) => v);
-
-    return {
-      text: `
-        update
-          press_release
-        set
-          ${ setters.join(", ") }
-        where
-          id = $${ setters.length + 1 }
-        returning
-          id
-      `,
-      values: [
-        ...values,
-        id,
+      allowedWhereKeys: [
+        "id",
       ],
-    };
-  }
+      allowedKeys: [
+        "title",
+        "fileId",
+      ],
+    },
+  )
 ;
