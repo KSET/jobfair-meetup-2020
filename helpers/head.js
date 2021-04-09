@@ -11,7 +11,7 @@ const renameMap = {
 };
 
 const mappedContent = {
-  "og:title": (title) => `${ title } | JobFair Meetup`,
+  "og:title": (title) => `${ title } | Job Fair Meetup`,
   "og:image": (imageUrl) => {
     if (!imageUrl.startsWith(process.env.BASE_URL)) {
       imageUrl = process.env.BASE_URL + imageUrl;

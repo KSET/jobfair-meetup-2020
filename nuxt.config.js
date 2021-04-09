@@ -27,7 +27,7 @@ export default {
    ** Headers of the page
    */
   head: {
-    titleTemplate: "%s | JobFair Meetup",
+    titleTemplate: "%s | Job Fair Meetup",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=0.86, maximum-scale=3.0, minimum-scale=0.86, minimal-ui" },
@@ -41,8 +41,8 @@ export default {
    */
   pwa: {
     meta: {
-      name: "JobFair Meetup",
-      description: "Ulovi karijeru dolaskom na JobFair Meetup!",
+      name: "Job Fair Meetup",
+      description: "Ulovi karijeru dolaskom na Job Fair Meetup!",
     },
   },
   /*

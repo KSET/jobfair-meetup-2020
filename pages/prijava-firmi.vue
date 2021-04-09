@@ -946,7 +946,7 @@ name: PagePrijavaFirmi
       meta: [
         ...generateMetadata({
           title: "Prijava poduzeća",
-          description: "Prijavite svoje poduzeće na ovogodišnji JobFair Meetup!",
+          description: "Prijavite svoje poduzeće na ovogodišnji Job Fair Meetup!",
         }),
       ],
     }),

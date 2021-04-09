@@ -130,7 +130,7 @@ name: PageBlogHome
       meta: [
         ...generateMetadata({
           title: "Blog - Home",
-          description: "JobFair Meetup Blog",
+          description: "Job Fair Meetup Blog",
         }),
       ],
     }),

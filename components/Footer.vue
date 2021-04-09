@@ -39,7 +39,7 @@
         >
           <img
             :class="$style.jobfairLogo"
-            alt="JobFair Meetup"
+            alt="Job Fair Meetup"
             src="../assets/images/logo/jobfair-mono.png"
           >
           <div :class="$style.afterJobfairText">

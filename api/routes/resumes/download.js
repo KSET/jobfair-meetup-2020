@@ -93,7 +93,7 @@ const csvResumesExport = (res, data, fileName = "Svi") => {
   sendCsv(
     res,
     {
-      fileName: `JobFair CV - ${ fileName } @ ${ datePart } ${ timePart }.csv`,
+      fileName: `Job Fair CV - ${ fileName } @ ${ datePart } ${ timePart }.csv`,
       headers,
       rows,
     },

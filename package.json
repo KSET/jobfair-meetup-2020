@@ -1,7 +1,7 @@
 {
   "name": "jobfair-meetup",
   "version": "1.0.0",
-  "description": "JobFair meetup site",
+  "description": "Job Fair Meetup site",
   "author": "Josip Igrec",
   "private": true,
   "scripts": {
