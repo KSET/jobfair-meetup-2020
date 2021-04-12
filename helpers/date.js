@@ -8,3 +8,13 @@ export const formatDate = (dateStr) => {
 
   return `${ day }.${ month }.${ year }.`;
 };
+
+export const parseDate = (formattedDate) => {
+  const [
+    day,
+    month,
+    year,
+  ] = formattedDate.split(".");
+
+  return new Date(`${ year }-${ month }-${ day }`);
+};

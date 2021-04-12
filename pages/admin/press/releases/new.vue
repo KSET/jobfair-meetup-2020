@@ -21,44 +21,34 @@
 
           <v-row>
             <v-col cols="12">
-              <v-dialog
-                ref="dialog"
+              <v-menu
+                ref="menu"
                 v-model="modal"
-                :return-value.sync="date"
-                persistent
-                width="290px"
+                :close-on-content-click="false"
+                max-width="290px"
+                min-width="auto"
+                offset-y
+                transition="scale-transition"
               >
                 <template v-slot:activator="{ on, attrs }">
                   <v-text-field
-                    v-model="date"
+                    v-model="dateFormatted"
                     v-bind="attrs"
-                    label="Picker in dialog"
+                    label="Datum"
+                    persistent-hint
                     prepend-icon="mdi-calendar"
                     readonly
                     v-on="on"
+                    @blur="date = parseDate(dateFormatted)"
                   />
                 </template>
                 <v-date-picker
                   v-model="date"
+                  no-title
                   scrollable
-                >
-                  <v-spacer />
-                  <v-btn
-                    color="primary"
-                    text
-                    @click="modal = false"
-                  >
-                    Cancel
-                  </v-btn>
-                  <v-btn
-                    color="primary"
-                    text
-                    @click="$refs.dialog.save(date)"
-                  >
-                    OK
-                  </v-btn>
-                </v-date-picker>
-              </v-dialog>
+                  @input="modal = false"
+                />
+              </v-menu>
             </v-col>
           </v-row>
 
@@ -121,6 +111,7 @@ name: PageAdminPressReleaseCreate
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
     formatDate,
+    parseDate,
   } from "~/helpers/date";
 
   export default {
@@ -142,10 +133,11 @@ name: PageAdminPressReleaseCreate
       },
     },
 
-    data() {
+    data(vm) {
       return {
         title: this.$props.release.title,
-        date: formatDate(this.$props.release.date),
+        date: this.$props.release.date,
+        dateFormatted: vm.formatDate(this.$props.release.date),
         modal: false,
         file: null,
         fileId: this.$props.release.fileId,
@@ -183,6 +175,12 @@ name: PageAdminPressReleaseCreate
         } else {
           return this.updatePressRelease;
         }
+      },
+    },
+
+    watch: {
+      date(val) {
+        this.dateFormatted = this.formatDate(this.date);
       },
     },
 
@@ -228,6 +226,22 @@ name: PageAdminPressReleaseCreate
         } finally {
           this.loading = false;
         }
+      },
+
+      formatDate(date) {
+        if (!date) {
+          return null;
+        }
+
+        return formatDate(date);
+      },
+
+      parseDate(formattedDate) {
+        if (!formattedDate) {
+          return null;
+        }
+
+        return parseDate(formattedDate).toISOString();
       },
     },
   };
