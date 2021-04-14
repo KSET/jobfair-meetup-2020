@@ -131,6 +131,7 @@
               </v-col>
             </v-row>
             <p
+              :class="$style.breakSpaces"
               v-text="eventObj.description"
             />
           </v-col>
@@ -221,6 +222,7 @@
           <translated-text trans-key="participants.event.aboutCompany" />
         </h2>
         <p
+          :class="$style.breakSpaces"
           v-text="eventObj.company.description"
         />
       </v-col>
@@ -374,6 +376,10 @@ name: PageSudioniciInfo
 
   .container {
     margin-top: 3em;
+
+    .breakSpaces {
+      white-space: break-spaces;
+    }
 
     .back {
       font-size: 1rem;
