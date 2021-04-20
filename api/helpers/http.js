@@ -421,7 +421,7 @@ export class HttpStatus {
 
 
 export const internalRequest = async (method, url, ...rest) => {
-  const baseUrl = `http://localhost:${ "development" === process.env.NODE_ENV ? "3000" : process.env.PORT }/api`;
+  const baseUrl = `http://localhost:${ process.env.PORT }/api`;
   const fetchUrl = `${ baseUrl }${ url }`;
 
   try {

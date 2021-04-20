@@ -3,7 +3,7 @@ import {
   HttpStatus,
 } from "../../helpers/http";
 import {
-  RoleNames,
+  Role,
 } from "../../helpers/permissions";
 import {
   ApiError,
@@ -21,7 +21,7 @@ router.get("/", async () => {
 });
 
 const authRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.ADMIN,
+  role: Role.admin,
 });
 
 authRouter.post("/", async (req) => {

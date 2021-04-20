@@ -7,7 +7,7 @@ import {
   AuthRouter,
 } from "../helpers/route";
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 import SettingsService from "../services/settings-service";
 
@@ -17,7 +17,7 @@ router.get("/list", async () => {
   return await SettingsService.list();
 });
 
-const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.ADMIN });
+const authRouter = AuthRouter.boundToRouter(router, { role: Role.admin });
 
 authRouter.post("/", async ({ body }) => {
   const { key, value } = body;

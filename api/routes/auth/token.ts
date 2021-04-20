@@ -10,7 +10,7 @@ import {
   refreshTokenMutation,
 } from "../../graphql/mutations";
 import {
-  RoleNames,
+  Role,
 } from "../../helpers/permissions";
 
 const router = new Router();
@@ -28,7 +28,7 @@ router.post("/refresh", async (req) => {
 });
 
 const authRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.BASE,
+  role: Role.base,
 });
 
 authRouter.getRaw("/jwt", (req, res) => {

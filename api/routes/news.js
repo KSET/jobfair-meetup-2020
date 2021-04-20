@@ -5,7 +5,7 @@ import {
   HttpStatus,
 } from "../helpers/http";
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 import {
   queryImageGetById,
@@ -147,7 +147,9 @@ router.get("/item/:slug", async ({ params }) => {
   return processNews(images)(rawNews);
 });
 
-const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: Role.admin,
+});
 
 authRouter.patch("/item/:slug", async ({ params, body }) => {
   const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));

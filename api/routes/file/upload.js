@@ -2,7 +2,7 @@ import {
  HttpStatus,
 } from "../../helpers/http";
 import {
- RoleNames,
+ Role,
 } from "../../helpers/permissions";
 import {
   ApiError,
@@ -10,7 +10,7 @@ import {
 } from "../../helpers/route";
 import FileService from "../../services/file-service";
 
-const authRouter = new AuthRouter({ role: RoleNames.MODERATOR });
+const authRouter = new AuthRouter({ role: Role.moderator });
 
 authRouter.post("/", async ({ files, authUser }) => {
   const { file } = files;

@@ -23,7 +23,7 @@ import {
   requireAuth,
 } from "../../helpers/middleware";
 import {
-  RoleNames,
+ Role,
 } from "../../helpers/permissions";
 import {
   ApiError,
@@ -134,7 +134,7 @@ router.post("//manual", requireAuth({ fullUserData: true }), requireGateGuardian
 });
 
 const moderatorRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.MODERATOR,
+  role: Role.admin,
 });
 
 moderatorRouter.get("//all", async () => {

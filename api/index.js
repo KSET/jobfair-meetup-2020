@@ -21,6 +21,7 @@ import {
   error,
   ApiError,
 } from "./helpers/route";
+import EmailService from "./services/email-service";
 import MobileNotificationService from "./services/mobile-notification-service";
 
 const fileUploadMiddleware = fileUpload({
@@ -31,6 +32,8 @@ const fileUploadMiddleware = fileUpload({
 });
 
 const app = express();
+
+app.set("trust proxy", true);
 
 Sentry.init({ dsn: process.env.SENTRY_DSN });
 
@@ -132,6 +135,11 @@ query(dbBase)
     } finally {
       await client.end();
     }
+  })
+  .then(async () => {
+    const result = await EmailService.verifyConnection();
+
+    console.log("|> EMAIL SERVICE:", result);
   })
 ;
 

@@ -162,7 +162,7 @@
       companyImageList() {
         const { companies = [] } = this.event;
 
-        return companies.map(({ info: company }) => ({
+        return companies.filter(({ info }) => info && info.images).map(({ info: company }) => ({
           src: getSrcWithWidth(company.images, 400),
           "lazy-src": dotGet(company, "images.small.url"),
         }));

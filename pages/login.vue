@@ -8,9 +8,6 @@
       <v-card-title>
         Prijava
       </v-card-title>
-      <v-card-subtitle>
-        Iskoristi Job Fair email i lozinku za prijavu (s <a :href="loginUrlHref" rel="noopener noreferrer" style="color: inherit;" target="_blank">{{ loginUrlName }}</a>)
-      </v-card-subtitle>
       <v-card-text>
         <v-form
           ref="form"
@@ -48,14 +45,13 @@
           >
             Zahtjev se još procesira...
           </span>
-          <a
+          <nuxt-link
             v-else
             class="font-weight-light ml-3 black--text"
-            href="https://jobfair.fer.unizg.hr/users/sign_up"
-            target="_blank"
+            :to="{ name: 'PageRegister' }"
           >
             Registriraj se
-          </a>
+          </nuxt-link>
         </transition>
 
         <v-btn
@@ -137,21 +133,7 @@ name: PageLogin
       ...mapGetters({
         user: "user/getUser",
         isModerator: "user/isModerator",
-        getSetting: "settings/getSetting",
       }),
-
-      loginUrlHref() {
-        const url = this.getSetting("GraphQL Endpoint") || process.env.JOBFAIR_GRAPHQL_ENDPOINT;
-        const parsedUrl = new URL(url);
-
-        return parsedUrl.origin;
-      },
-
-      loginUrlName() {
-        const parsedUrl = new URL(this.loginUrlHref);
-
-        return parsedUrl.hostname;
-      },
     },
 
     middleware({ store, redirect, route }) {
@@ -194,13 +176,13 @@ name: PageLogin
         this.showTimeError = false;
         this.timer = startTimer();
 
-        const success = await this.doLogin({ email, password });
+        const user = await this.doLogin({ email, password });
 
         clearTimeout(this.timer);
         this.showTimeError = false;
         this.isLoading = false;
 
-        if (!success) {
+        if (!user) {
           this.hasError = true;
           return;
         }

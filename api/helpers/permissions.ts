@@ -5,36 +5,41 @@ import map from "lodash/fp/map";
 
 const mapWithIndex = map.convert({ cap: false });
 
-export enum RoleNames {
-  BASE = "nobody",
-  STUDENT = "student",
-  ACCOUNT_MANAGER = "account_manager",
-  MODERATOR = "moderator",
-  ADMIN = "admin",
+// This is just a noop function to force the TS compiler to typecheck the enum
+const ensureEnumKeysSameAsValues = <T>(_kv: { [K in keyof T]: K }) => null;
+
+export enum Role {
+  base = "base",
+  company = "company",
+  student = "student",
+  moderator = "moderator",
+  admin = "admin",
 }
 
-const roleNameToPriority: Record<RoleNames, number> =
+ensureEnumKeysSameAsValues(Role);
+
+const roleNameToPriority: Record<Role, number> =
   flow(
     values,
-    mapWithIndex((value: RoleNames, i: number) => [ value, i ]),
+    mapWithIndex((value: Role, i: number) => [ value, i ]),
     fromPairs,
-  )(RoleNames)
+  )(Role)
 ;
 
 export const hasPermission =
   (
-    minimumRoleName: RoleNames,
-    currentRoleName: RoleNames,
+    minimumRoleName: Role,
+    currentRoleName: Role,
   ): boolean =>
     roleNameToPriority[minimumRoleName] <= roleNameToPriority[currentRoleName]
 ;
 
 const isAtLeast =
-  (role: RoleNames) =>
-    (roleName: RoleNames) =>
+  (role: Role) =>
+    (roleName: Role) =>
       hasPermission(role, roleName)
 ;
 
-export const isAdmin = isAtLeast(RoleNames.ADMIN);
-export const isModerator = isAtLeast(RoleNames.MODERATOR);
-export const isStudent = isAtLeast(RoleNames.BASE);
+export const isAdmin = isAtLeast(Role.admin);
+export const isModerator = isAtLeast(Role.moderator);
+export const isStudent = isAtLeast(Role.student);

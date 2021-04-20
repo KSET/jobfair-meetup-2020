@@ -87,6 +87,36 @@ export const mutations = {
 };
 
 export const actions = {
+  async refreshUser({ dispatch }) {
+    await dispatch(
+      "user/fetchCurrentUser",
+      null,
+      {
+        root: true,
+      },
+    );
+  },
+
+  async submitResume({ dispatch }, data) {
+    const result = await this.$api.$post("/resumes/resume", data);
+
+    if (!result?.error) {
+      await dispatch("refreshUser");
+    }
+
+    return result;
+  },
+
+  async deleteResume({ dispatch }) {
+    const { data, error = true } = await this.$api.$delete("/resumes/resume");
+
+    if (!error) {
+      await dispatch("refreshUser");
+    }
+
+    return data;
+  },
+
   async fetchResumes() {
     const { data } = await this.$api.$get("/resumes/list");
 

@@ -345,8 +345,168 @@ create table if not exists qna
     created_at  timestamptz default CURRENT_TIMESTAMP not null,
     updated_at  timestamptz default CURRENT_TIMESTAMP not null
 );
-`;
 
+
+create table if not exists users
+(
+    id         serial                                                        not null
+        constraint users_pk
+            primary key,
+    uid        varchar(31)                                                   not null,
+    email      varchar(511)                                                  not null,
+    password   varchar(511)                                                  not null,
+    name       varchar(511)                                                  not null,
+    phone      varchar(127)                                                  not null,
+    role       varchar(127)             default 'student'::character varying not null,
+    created_at timestamp with time zone default CURRENT_TIMESTAMP            not null,
+    updated_at timestamp with time zone default CURRENT_TIMESTAMP            not null
+);
+
+create index if not exists users_email_index
+    on users (email);
+
+create unique index if not exists users_email_uindex
+    on users (email);
+
+create unique index if not exists users_uid_uindex
+    on users (uid);
+
+
+create table if not exists users_log
+(
+    id        serial                                             not null
+        constraint users_log_pk
+            primary key,
+
+    user_uid  varchar(127)                                       not null
+        constraint users_log_users_uid_fk
+            references users (uid)
+            on delete cascade,
+    event     varchar(127)                                       not null,
+    data      jsonb,
+    timestamp timestamp with time zone default CURRENT_TIMESTAMP not null
+);
+
+create index if not exists users_log_event_index
+    on users_log (event);
+
+create index if not exists users_log_user_uid_index
+    on users_log (user_uid);
+
+
+create table if not exists resumes
+(
+    id             serial                                                 not null
+        constraint resumes_pk
+            primary key,
+    uid            varchar(31)                                            not null,
+    user_uid       varchar(127)                                           not null
+        constraint resumes_users_uid_fk
+            references users (uid)
+            on delete cascade,
+    city           varchar(255)             default ''::character varying not null,
+    birthday       varchar(63)              default ''::character varying not null,
+    linkedin_url   varchar(255)             default ''::character varying not null,
+    github_url     varchar(255)             default ''::character varying not null,
+    suggestion     text                     default ''::text              not null,
+    resume_file_id integer
+        constraint resumes_files_id_fk
+            references files,
+    created_at     timestamp with time zone default CURRENT_TIMESTAMP     not null,
+    updated_at     timestamp with time zone default CURRENT_TIMESTAMP     not null
+);
+
+create unique index if not exists resumes_uid_uindex
+    on resumes (uid);
+
+create unique index if not exists resumes_user_uid_uindex
+    on resumes (user_uid);
+
+
+create table if not exists resumes_educations
+(
+    resume_id integer
+        constraint resumes_educations_resumes_id_fk
+            references resumes
+            on delete cascade,
+    name      varchar(511) default ''::character varying not null,
+    year      varchar(127) default ''::character varying not null,
+    module    varchar(255) default ''::character varying not null
+);
+
+create index if not exists resumes_educations_resume_id_index
+    on resumes_educations (resume_id);
+
+
+create table if not exists resumes_work_experiences
+(
+    resume_id        integer
+        constraint resumes_work_experiences_resumes_id_fk
+            references resumes
+            on delete cascade,
+    company          varchar(255) default ''::character varying not null,
+    years            varchar(127) default ''::character varying not null,
+    description      varchar(511) default ''::character varying not null,
+    current_employer boolean      default false                 not null
+);
+
+create index if not exists resumes_work_experiences_resume_id_index
+    on resumes_work_experiences (resume_id);
+
+
+create table if not exists resumes_skills
+(
+    resume_id integer                                    not null
+        constraint resumes_skills_resumes_id_fk
+            references resumes
+            on delete cascade,
+    name      varchar(511) default ''::character varying not null
+);
+
+create index if not exists resumes_skills_resume_id_index
+    on resumes_skills (resume_id);
+
+
+create table if not exists resumes_languages
+(
+    resume_id   integer                                    not null
+        constraint resumes_languages_resumes_id_fk
+            references resumes
+            on delete cascade,
+    name        varchar(511) default ''::character varying not null,
+    skill_level varchar(15)  default ''::character varying not null
+);
+
+create index if not exists resumes_languages_resume_id_index
+    on resumes_languages (resume_id);
+
+
+create table if not exists resumes_awards
+(
+    resume_id integer                                    not null
+        constraint resumes_awards_resumes_id_fk
+            references resumes
+            on delete cascade,
+    title     varchar(511) default ''::character varying not null,
+    year      varchar(127) default ''::character varying not null
+);
+
+create index if not exists resumes_awards_resume_id_index
+    on resumes_awards (resume_id);
+
+
+create table if not exists resumes_computer_skills
+(
+    resume_id integer                                    not null
+        constraint resumes_computer_skills_resumes_id_fk
+            references resumes
+            on delete cascade,
+    name      varchar(511) default ''::character varying not null
+);
+
+create index if not exists resumes_computer_skills_resume_id_index
+    on resumes_computer_skills (resume_id);
+`;
 
 export const versions = [
   {

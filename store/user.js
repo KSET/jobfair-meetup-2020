@@ -7,15 +7,10 @@ import {
 import {
   isGateGuardian,
 } from "~/helpers/auth";
-import {
- dotGet,
-} from "~/helpers/data";
 
 export const state = () => (
   {
     user: null,
-    token: null,
-    refreshToken: null,
   }
 );
 
@@ -35,12 +30,8 @@ export const getters = {
     return null;
   },
 
-  getToken({ token }) {
-    return token;
-  },
-
-  getRefreshToken({ refreshToken }) {
-    return refreshToken;
+  getResume(store) {
+    return store.user.resume;
   },
 
   isModerator({ user }) {
@@ -64,11 +55,11 @@ export const getters = {
   },
 
   hasCv({ user }) {
-    return Boolean(dotGet(user, "uid", null));
+    return Boolean(user?.resume?.uid);
   },
 
   hasCompany({ user }) {
-    return Boolean(dotGet(user, "companies.length", 0));
+    return Boolean(user?.companies?.length || 0);
   },
 };
 
@@ -76,59 +67,12 @@ export const mutations = {
   SET_USER(state, user) {
     Vue.set(state, "user", user);
   },
-
-  SET_TOKEN(state, token) {
-    Vue.set(state, "token", token);
-  },
-
-  SET_REFRESH_TOKEN(state, refreshToken) {
-    Vue.set(state, "refreshToken", refreshToken);
-  },
 };
 
 export const actions = {
-  // eslint-disable-next-line camelcase
-  setJfToken({ commit }, { token, refresh_token = null, refreshToken = null } = {}) {
-    // eslint-disable-next-line camelcase
-    refreshToken = refresh_token || refreshToken;
-
-    commit("SET_TOKEN", token);
-    commit("SET_REFRESH_TOKEN", refreshToken);
-
-    this.$cookies.set(
-      process.env.JOBFAIR_COOKIE_NAME,
-      JSON.stringify({
-        token,
-        refreshToken,
-      }),
-    );
-  },
-
-  getJfToken() {
-    const cookieValue = this.$cookies.get(
-      process.env.JOBFAIR_COOKIE_NAME,
-      {
-        parseJSON: true,
-      },
-    );
-
-    return cookieValue || {};
-  },
-
-  async fetchCurrentUser({ commit, dispatch }) {
-    const {
-      token,
-    } = await dispatch("getJfToken");
-
+  async fetchCurrentUser({ commit }) {
     try {
-      const { data } = await this.$api.$get(
-        "/auth/user",
-        {
-          headers: {
-            Authorization: `jwt ${ token }`,
-          },
-        },
-      );
+      const { data } = await this.$api.$get("/auth/user");
 
       commit("SET_USER", data);
 
@@ -140,9 +84,9 @@ export const actions = {
     }
   },
 
-  async doLogin({ commit, dispatch }, { email, password }) {
+  async doLogin({ commit }, { email, password }) {
     try {
-      const { data = {} } = await this.$api.$post(
+      const { data = null } = await this.$api.$post(
         "/auth/login",
         {
           email,
@@ -150,8 +94,7 @@ export const actions = {
         },
       );
 
-      await commit("SET_USER", data.user);
-      await dispatch("setJfToken", data);
+      await commit("SET_USER", data);
 
       return data;
     } catch (e) {
@@ -159,54 +102,15 @@ export const actions = {
     }
   },
 
-  async doRefreshToken({ commit, dispatch }, { token: t, refreshToken: r } = {}) {
-    const { token: tb, refreshToken: rb } = await dispatch("getJfToken");
-    const token = t || tb;
-    const refreshToken = r || rb;
-
-    try {
-      const { data = {} } = await this.$api.$post(
-        "/auth/token/refresh",
-        {
-          token,
-          refreshToken,
-        },
-      );
-
-      commit("SET_USER", data.user);
-      await dispatch("setJfToken", {
-        token: data.token,
-        refreshToken,
-      });
-
-      return data;
-    } catch (e) {
-      commit("SET_USER", null);
-      await dispatch("setJfToken", {
-        token: null,
-        refreshToken: null,
-      });
-
-      return null;
-    }
+  async doLogout({ commit }) {
+    await commit("SET_USER", null);
   },
 
-  async doLogout({ commit, dispatch }) {
-    await dispatch("setJfToken", {});
-    commit("SET_USER", null);
+  async doRegister(_context, data) {
+    return await this.$api.$post("/auth/register", data);
   },
 
   async nuxtServerInit({ dispatch }) {
-    const {
-      token,
-      refreshToken,
-    } = await dispatch("getJfToken");
-
-    if (token && refreshToken) {
-      const userData = await dispatch("fetchCurrentUser");
-      if (!userData) {
-        await dispatch("doRefreshToken");
-      }
-    }
+    await dispatch("fetchCurrentUser");
   },
 };

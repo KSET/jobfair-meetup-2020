@@ -1,7 +1,7 @@
 import Vue from "vue";
 import {
   hasPermission,
-  RoleNames,
+  Role,
 } from "~/api/helpers/permissions";
 
 export const state = () => (
@@ -23,7 +23,7 @@ export const mutations = {
 };
 
 export const actions = {
-  async fetchPages({ commit, rootGetters }, { userRole = RoleNames.ADMIN } = {}) {
+  async fetchPages({ commit, rootGetters }, { userRole = Role.admin } = {}) {
     const { data: rawData } = await this.$api.$get("/pages/admin");
 
     const getSetting = rootGetters["settings/getSetting"];

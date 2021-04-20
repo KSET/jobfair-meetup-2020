@@ -1,9 +1,9 @@
-export default function({ $axios, isDev, $sentry, store, req }, inject) {
+export default function({ $axios, $sentry, store, req }, inject) {
   const api = $axios.create({});
 
   const baseUrl =
     process.server
-    ? `http://localhost:${ isDev ? "3000" : process.env.PORT }`
+    ? `http://localhost:${ process.env.PORT }`
     : ""
   ;
 
