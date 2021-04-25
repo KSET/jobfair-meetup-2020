@@ -56,10 +56,11 @@
 
     <v-dialog
       v-model="dialog"
+      :class="$style.noticeDialog"
       max-width="700"
     >
       <v-card>
-        <v-card-title class="headline">
+        <v-card-title class="headline" :class="$style.headline">
           Pravila o kolačićima za Job Fair Meetup
         </v-card-title>
 
@@ -260,6 +261,13 @@
   @import "assets/styles/include/all";
 
   $breakpoint: sm;
+
+  :global(.v-application) {
+
+    .headline {
+      font-family: $font-stack !important;
+    }
+  }
 
   .container {
     position: fixed;
