@@ -154,6 +154,8 @@ router.post("/status", requireCv, async ({ body, authUser }) => {
       }
     }
 
+    participants.online = 0;
+
     if (eventReservation) {
       // eslint-disable-next-line no-bitwise
       const statusAdded = (eventReservation.status ^ status) & status;

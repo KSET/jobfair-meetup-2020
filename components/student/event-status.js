@@ -12,6 +12,10 @@ export const EventStatus = Object.freeze({
     value: 2 ** (i++),
     filter: ({ type }) => "talk" === type,
   },
+  online: {
+    value: 2 ** (i++),
+    filter: ({ type }) => "workshop" !== type,
+  },
 });
 
 /**

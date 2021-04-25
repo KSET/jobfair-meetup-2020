@@ -151,7 +151,7 @@
                             />
 
                             <v-expand-x-transition>
-                              <span v-if="!event.userStatus.includes(eventType)" class="ml-1">
+                              <span v-if="eventType !== 'online' && !event.userStatus.includes(eventType)" class="ml-1">
                                 <span :class="$style.parentheses">
                                   <span v-text="getEventTypeFreeSlots(event, eventType)" />
                                   <translated-text :trans-key="`studentPanel.event.slots.free`" />
@@ -459,10 +459,18 @@ name: PageStudentIndex
       },
 
       getEventTypeFreeSlots(event, eventType) {
+        if ("online" === eventType) {
+          return Infinity;
+        }
+
         return Math.max(0, event.maxParticipants - event.participants[eventType]);
       },
 
       isEventTypeFull(event, eventType) {
+        if ("online" === eventType) {
+          return false;
+        }
+
         return 0 >= this.getEventTypeFreeSlots(event, eventType);
       },
 
