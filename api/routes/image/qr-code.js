@@ -51,7 +51,7 @@ router.getRaw("/for-uid/:uid.svg", async (req, res) => {
     res.set("Cache-Control", `public, max-age=${ cacheFor }, s-maxage=${ cacheFor }, immutable`);
     res.set("Content-Type", "image/svg+xml");
     res.set("Connection", "close");
-    res.write(
+    res.send(
       qrCode
         .replace(
           "</svg>",
