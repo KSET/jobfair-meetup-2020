@@ -15,6 +15,12 @@ export const limitLength =
       array.slice(0, length)
 ;
 
+/**
+ * @param {any} object
+ * @param {string} key
+ * @param {any} defaultValue
+ * @returns {any}
+ */
 export const dotGet =
   (object, key, defaultValue = "") => {
     const keys = key.split(".");

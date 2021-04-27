@@ -52,13 +52,18 @@ export async function post(url, data = undefined, config = {}) {
 }
 
 /**
- * @param {string} query
- * @param {string} [operationName]
- * @param {object} [variables]
+ * @typedef {Object} QueryParams
+ * @property {string} query
+ * @property {string} [operationName]
+ * @property {Object} [variables]
+ */
+
+/**
+ * @param {QueryParams} params
  * @param {string} [token]
  * @returns {Promise<object>}
  */
-export async function graphQlQuery({ query, operationName, variables }, token = null) {
+export async function graphQlQuery({ query, operationName, variables }, token = "") {
   const config =
     token
     ? {
