@@ -15,16 +15,43 @@ import {
 import {
   getSetting,
 } from "../helpers/settings";
+import type {
+  Company as GraphQlCompany,
+  Image,
+  Industry,
+} from "../graphql/types";
 import CompanyEventsService from "./company-events-service";
+import type {
+  Event,
+} from "./company-events-service";
 import {
   ServiceError,
 } from "./error-service";
+
+export interface Company {
+  id: string;
+  name: string;
+  legalName: string;
+  brandName: string;
+  description: string;
+  image: Image["large"]["url"];
+  thumbnail: string;
+  homepageUrl: string;
+  address: string;
+  cover: Image | null;
+  industry: Industry;
+  images: Image | null;
+}
+
+interface CompanyWithEvents extends Company {
+  events: Event[];
+}
 
 export class CompanyError extends ServiceError {
 }
 
 export default class CompanyService {
-  static async fetchListAll() {
+  static async fetchListAll(): Promise<Company[]> {
     const { companies } = await graphQlQuery(participantsQuery());
 
     if (!companies) {
@@ -34,8 +61,8 @@ export default class CompanyService {
     return companies.map(this.fixCompany);
   }
 
-  static async fetchIndustries() {
-    const { industries } = await graphQlQuery(industriesQuery());
+  static async fetchIndustries(): Promise<Industry[]> {
+    const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery());
 
     if (!industries) {
       return [];
@@ -44,8 +71,8 @@ export default class CompanyService {
     return industries.sort((a, b) => Number(a.id) - Number(b.id));
   }
 
-  static async fetchInfo(id) {
-    const { companies, ...rawEvents } = await CompanyEventsService.listAll() || {};
+  static async fetchInfo(id: number): Promise<CompanyWithEvents> {
+    const { companies, ...rawEvents } = await CompanyEventsService.listAll();
 
     const company = companies.find(({ id: i }) => String(i) === String(id));
 
@@ -97,7 +124,7 @@ export default class CompanyService {
     return { ...company, events };
   }
 
-  static async fetchInfoFromVat(vat) {
+  static async fetchInfoFromVat(vat: string): Promise<Company> {
     const graphQlUrl = await getSetting(
       "GraphQL Endpoint",
       process.env.JOBFAIR_GRAPHQL_ENDPOINT,
@@ -121,7 +148,7 @@ export default class CompanyService {
     return this.fixCompany(company);
   }
 
-  static fixCompany(company) {
+  static fixCompany(company: GraphQlCompany): Company {
     const {
       name,
       brandName,

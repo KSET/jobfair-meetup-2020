@@ -1,6 +1,19 @@
 import {
+  User,
+} from "../../api/graphql/types";
+import {
+  Query,
+} from "../methods";
+import {
   generateInsertQuery,
 } from "../query";
+
+interface Data {
+  userId: User["id"];
+  eventId: number;
+  eventType: string;
+  scannerId: User["id"];
+}
 
 export const queryEventLogEntriesGetByUserAndEvent =
   (
@@ -8,8 +21,8 @@ export const queryEventLogEntriesGetByUserAndEvent =
       userId,
       eventId,
       eventType,
-    },
-  ) => ({
+    }: Pick<Data, "userId" | "eventId" | "eventType">,
+  ): Query => ({
     text: `
       select
         *
@@ -33,8 +46,8 @@ export const queryEventLogEntriesGetByEvent =
     {
       eventId,
       eventType,
-    },
-  ) => ({
+    }: Pick<Data, "eventId" | "eventType">,
+  ): Query => ({
     text: `
       select
         *
@@ -55,7 +68,7 @@ export const queryEventLogEntriesGetByEvent =
 ;
 
 export const queryEventLogEntriesGetAll =
-  () => ({
+  (): Query => ({
     text: `
       select
         *
@@ -76,16 +89,14 @@ export const queryEventLogEntriesCreate =
       eventId,
       eventType,
       scannerId,
-      scannedAt,
-    },
-  ) => generateInsertQuery({
+    }: Pick<Data, "userId" | "eventId" | "eventType" | "scannerId">,
+  ): Query => generateInsertQuery({
     table: "event_log_entries",
     data: {
       userId,
       eventId,
       eventType,
       scannerId,
-      scannedAt,
     },
   })
 ;

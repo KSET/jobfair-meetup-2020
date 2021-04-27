@@ -1,30 +1,62 @@
+import type {
+  CamelCasedPropertiesDeep,
+} from "type-fest";
 import {
   keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
   participantEventsQuery,
 } from "../graphql/queries";
+import type {
+  Company as GraphQlCompany,
+  Workshop as GraphQlWorkshop,
+  Presentation as GraphQlPresentation,
+} from "../graphql/types";
 import {
   graphQlQuery,
 } from "../helpers/axios";
 import {
   HttpStatus,
-  internalRequest,
 } from "../helpers/http";
-import CompanyService from "./company-service";
+import PanelsService, {
+  PanelWithInfo,
+} from "./panels-service";
+import CompanyService, {
+  Company,
+} from "./company-service";
 import {
   ServiceError,
 } from "./error-service";
 
-const typeTransformer = (type) => {
+type Workshop = CamelCasedPropertiesDeep<GraphQlWorkshop>;
+type Presentation = CamelCasedPropertiesDeep<GraphQlPresentation>
+
+interface CompanyId {
+  company: {
+    id: string;
+  };
+}
+
+export type Event = PanelWithInfo | (Presentation & CompanyId) | (Workshop & CompanyId);
+
+export interface Events {
+  companies: Company[];
+  panels: PanelWithInfo[];
+  presentations: (Presentation & CompanyId)[];
+  workshops: (Workshop & CompanyId)[]
+}
+
+const typeTransformer = (type: string): keyof Events => {
   switch (type) {
     case "presentation":
     case "talk":
       return "presentations";
     case "workshop":
       return "workshops";
+    case "panel":
+      return "panels";
     default:
-      return `${ type }s`;
+      return "panels";
   }
 };
 
@@ -32,12 +64,18 @@ export class CompanyEventsError extends ServiceError {
 }
 
 export default class CompanyEventsServices {
-  static async listAll() {
-    const { companies, ...eventList } = await graphQlQuery(participantEventsQuery());
+  cacheForMs: number = 15 * 1000;
 
-    const { data: panels } = await internalRequest("get", "/panels/list/with-info");
+  static async listAll(): Promise<Events> {
+    const [
+      { companies, ...eventList },
+      panels,
+    ] = await Promise.all([
+      graphQlQuery(participantEventsQuery()),
+      PanelsService.listWithInfo(),
+    ]);
 
-    const events = {
+    const events: Omit<Events, "companies"> = {
       panels,
       ...eventList,
     };
@@ -45,10 +83,10 @@ export default class CompanyEventsServices {
     return keysFromSnakeToCamelCase({
       companies: companies.map(CompanyService.fixCompany),
       ...events,
-    });
+    } as Events);
   }
 
-  static async listNotPassed() {
+  static async listNotPassed(): Promise<Events> {
     const { companies, ...events } = await this.listAll();
 
     const oneHourAgo = new Date();
@@ -91,8 +129,8 @@ export default class CompanyEventsServices {
     };
   }
 
-  static async listPanelsForCompany(id) {
-    const { data: panel } = await internalRequest("get", `/panels/full-info/${ id }`);
+  static async listPanelsForCompany(id: string | number): Promise<PanelWithInfo> {
+    const panel = await PanelsService.fullInfo(id);
 
     return {
       ...panel,
@@ -100,13 +138,12 @@ export default class CompanyEventsServices {
     };
   }
 
-  static async listEventsForCompany(id, type) {
+  static async listEventsForCompany(id: string | number, type: string): Promise<Event & { company: Company }> {
     const transformedType = typeTransformer(type);
 
-    const {
-      companies,
-      [transformedType]: objList,
-    } = await graphQlQuery(participantEventsQuery());
+    const data = await graphQlQuery(participantEventsQuery());
+    const { companies }: { companies: GraphQlCompany[] } = data;
+    const objList: Event[] = data[transformedType];
 
     if (!objList) {
       throw new CompanyEventsError(
@@ -122,9 +159,15 @@ export default class CompanyEventsServices {
       throw new CompanyEventsError("Event nije pronađen");
     }
 
+    const company = companies.find(({ id }) => id === obj.company.id);
+
+    if (!company) {
+      throw new CompanyEventsError("Event nije pronađen");
+    }
+
     return keysFromSnakeToCamelCase({
       ...obj,
-      company: CompanyService.fixCompany(companies.find(({ id }) => id === obj.company.id)),
+      company: CompanyService.fixCompany(company),
     });
   }
 }
