@@ -1,3 +1,7 @@
+import type {
+  CamelCasedPropertiesDeep,
+  SnakeCasedPropertiesDeep,
+} from "type-fest";
 import {
   camelToSnakeCase,
   isString,
@@ -8,19 +12,19 @@ import {
 } from "./data";
 
 export const isObject =
-  (maybeObject) =>
+  (maybeObject: unknown): maybeObject is Record<string, unknown> =>
     "object" === typeof maybeObject &&
     null !== maybeObject
 ;
 
 export const isFunction =
-  (functionToCheck) =>
-    functionToCheck &&
+  (functionToCheck: unknown): functionToCheck is ((...args: unknown[]) => unknown) =>
+    Boolean(functionToCheck) &&
     "[object Function]" === {}.toString.call(functionToCheck)
 ;
 
-export const pickKeys = (keyList, object) => {
-  const newObject = {};
+export const pickKeys = <T>(keyList: (keyof T)[], object: T): Partial<T> => {
+  const newObject: Partial<T> = {};
   const get = dotGet.bind(null, object);
 
   for (const key of keyList) {
@@ -30,10 +34,11 @@ export const pickKeys = (keyList, object) => {
   return newObject;
 };
 
-export const pickKeysFn = (pickKeyFn, object) => {
-  const newObject = {};
+export const pickKeysFn = <T>(pickKeyFn: ((key: keyof T) => boolean), object: T): Partial<T> => {
+  const newObject: Partial<T> = {};
+  const keys = Object.keys(object) as (keyof T)[];
 
-  for (const key of Object.keys(object)) {
+  for (const key of keys) {
     if (pickKeyFn(key)) {
       newObject[key] = object[key];
     }
@@ -42,7 +47,7 @@ export const pickKeysFn = (pickKeyFn, object) => {
   return newObject;
 };
 
-export const withoutKeys = (keyList, object) => {
+export const withoutKeys = <T>(keyList: (keyof T)[], object: T): Partial<T> => {
   const newObject = Object.assign({}, object);
 
   for (const key of keyList) {
@@ -53,19 +58,19 @@ export const withoutKeys = (keyList, object) => {
 };
 
 export const objectWithoutKeys =
-  (...keyList) => (object) =>
+  <T>(...keyList: (keyof T)[][]) => (object: T) =>
     withoutKeys(keyList.flat(), object)
 ;
 
-export const deepMap = (fn, object) => {
+export const deepMap = <T, R>(fn: (({ key, value }: ({ key?: unknown, value?: unknown })) => ({ key: unknown; value: unknown })), object: T): R => {
   if (!isObject(object) || object instanceof Date) {
-    return fn({ value: object }).value;
+    return fn({ value: object }).value as R;
   }
 
   const boundMap = deepMap.bind(null, fn);
 
   if (Array.isArray(object)) {
-    return object.map(boundMap);
+    return object.map(boundMap) as unknown as R;
   }
 
   return Object.fromEntries(
@@ -79,7 +84,7 @@ export const deepMap = (fn, object) => {
   );
 };
 
-export const keysFromSnakeToCamelCase = (object) =>
+export const keysFromSnakeToCamelCase = <T>(object: T): CamelCasedPropertiesDeep<T> =>
   deepMap(
     ({ key, value }) => ({
       key: isString(key) ? snakeToCamelCase(key) : key,
@@ -89,7 +94,7 @@ export const keysFromSnakeToCamelCase = (object) =>
   )
 ;
 
-export const keysFromCamelCaseToSnakeCase = (object) =>
+export const keysFromCamelCaseToSnakeCase = <T>(object: T): SnakeCasedPropertiesDeep<T> =>
   deepMap(
     ({ key, value }) => ({
       key: isString(key) ? camelToSnakeCase(key) : key,
@@ -100,14 +105,14 @@ export const keysFromCamelCaseToSnakeCase = (object) =>
 ;
 
 export const mapArray =
-  (fn) => (array) =>
+  <P, Q>(fn: (item: P, index?: number, array?: P[]) => Q) => (array: P[]): Q[] =>
     Array.isArray(array)
     ? array.map(fn)
     : []
 ;
 
 export const reduceArray =
-  (initialValue) => (fn) => (array) =>
+  <T, R>(initialValue: R | (() => R)) => (fn: (acc: R, value: T, i?: number, arr?: T[]) => R) => (array: T[]): R =>
     Array.isArray(array)
     ? (
       array.reduce(
@@ -115,7 +120,7 @@ export const reduceArray =
         isFunction(initialValue) ? initialValue() : initialValue,
       )
     )
-    : []
+    : [] as unknown as R
 ;
 
 export const pipe = (...functions) =>
