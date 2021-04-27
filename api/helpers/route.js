@@ -17,6 +17,9 @@ import toPairs from "lodash/fp/toPairs";
 import initial from "lodash/fp/initial";
 import flow from "lodash/fp/flow";
 import flattenDeep from "lodash/fp/flattenDeep";
+import {
+  ServiceError,
+} from "../services/error-service";
 import MobileNotificationService from "../services/mobile-notification-service";
 import {
   HttpStatus,
@@ -107,6 +110,18 @@ export class ApiError extends Error {
     this.statusCode = statusCode || HttpStatus.Error.Client.ImATeapot;
     this.data = data;
   }
+
+  /**
+   * @param {ServiceError} e
+   * @returns {ApiError}
+   */
+  static fromService(e) {
+    return new this(
+      e.message,
+      e.statusCode,
+      e.data,
+    );
+  }
 }
 
 export class ApiNotFoundError extends ApiError {
@@ -133,7 +148,13 @@ export const rawRoute = (fn) => asyncWrapper(async (req, res, next) => {
     } else {
       return res.end();
     }
-  } catch (e) {
+  } catch (err) {
+    const e =
+      (err instanceof ServiceError)
+      ? ApiError.fromService(err)
+      : err
+    ;
+
     if (e.statusCode) {
       res.status(e.statusCode);
     } else {
@@ -169,7 +190,13 @@ export const apiRoute = (fn) => asyncWrapper(async (req, res, next) => {
     const result = await fn(req, res, next);
 
     return res.json(success(result));
-  } catch (e) {
+  } catch (err) {
+    const e =
+      (err instanceof ServiceError)
+      ? ApiError.fromService(err)
+      : err
+    ;
+
     if (e.statusCode) {
       res.status(e.statusCode);
     } else {
