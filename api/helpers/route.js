@@ -5,6 +5,7 @@ import {
 import {
   join as joinPath,
   dirname,
+  basename,
 } from "path";
 import express from "express";
 import * as Sentry from "@sentry/node";
@@ -251,6 +252,7 @@ export const registerRoutesInFolderRecursive = (...folderParts) => {
   const pathToRoute = (path) => initial(path.split("/").pop().split(".")).join(".").replace(/^index$/, "");
   const routeBasePath = (filePath) => dirname(filePath).substr(folder.length) || "/";
   const absoluteRoute = (path) => joinPath(routeBasePath(path), pathToRoute(path));
+  const shouldSkip = (path) => !basename(path).startsWith("_");
 
   const getListOfRoutesInFolder = (folder) => {
     const withPath = (file) => joinPath(folder, file);
@@ -267,7 +269,7 @@ export const registerRoutesInFolderRecursive = (...folderParts) => {
 
     const routeFiles = [
       ...index,
-      ...files.sort(),
+      ...files.filter(shouldSkip).sort(),
     ];
 
     return [
