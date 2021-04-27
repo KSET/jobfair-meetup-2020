@@ -64,7 +64,7 @@ export const generateValues =
 ;
 
 export const generateWhere =
-  (item: URecord, offset: number): string =>
+  (item: URecord, offset = 0): string =>
     Object
       .keys(item)
       .map((key, i) => `"${ key }" = $${ offset + i + 1 }`)
@@ -114,11 +114,11 @@ const filterData = (data: URecord, allowedKeys: string[]): URecord => {
     return fixedData;
   }
 
-  return _.pick(allowedKeys, fixedData);
+  return _.pick(allowedKeys.map(_.camelCase), fixedData);
 };
 
 export const insertQuery =
-  (table: string) =>
+  <D>(table: string) =>
     (
       {
         allowedKeys = [],
@@ -128,11 +128,11 @@ export const insertQuery =
         options?: CleanOptions,
       } = {},
     ) =>
-      (data: URecord): Query =>
+      (data: D): Query =>
         generateInsertQuery(
           {
             table,
-            data: filterData(data, allowedKeys),
+            data: filterData(data as unknown as URecord, allowedKeys),
           },
           options,
         )
@@ -182,7 +182,7 @@ export const generateUpdateQuery =
 ;
 
 export const updateQuery =
-  (table: string) =>
+  <D>(table: string) =>
     (
       {
         allowedKeys = [],
@@ -196,14 +196,82 @@ export const updateQuery =
     ) =>
       (
         where: URecord,
-        data: URecord,
+        data: D,
       ): Query =>
         generateUpdateQuery(
           {
             table,
-            data: filterData(data, allowedKeys),
+            data: filterData(data as unknown as URecord, allowedKeys),
             where: filterData(where, allowedWhereKeys),
           },
           options,
         )
+;
+
+interface SelectOptions {
+  table: string;
+  keys?: string[] | null,
+  where?: URecord;
+}
+
+export const generateSelectQuery =
+  (
+    {
+      keys = null,
+      table,
+      where = {},
+    }: SelectOptions,
+    {
+      allowNull = false,
+      toSnakeCase = true,
+    }: CleanOptions = {},
+  ): Query => {
+    const whereItem = cleanObjectValues(where, { allowNull, toSnakeCase });
+    const whereSetters = generateWhere(whereItem);
+    const whereValues = generateValues(whereItem);
+    const keyItems = keys?.map((key) => `${ String(key).replaceAll("\"", "") }`);
+
+    return {
+      text: `
+      select
+        ${ keyItems || "*" }
+      from
+        ${ table }
+      ${ whereSetters ? "where" : "" }
+        ${ whereSetters }
+    `.replace(/\s+/gi, " ").trim(),
+      values: [
+        ...whereValues,
+      ],
+    };
+  }
+;
+
+export const generateDeleteQuery =
+  (
+    {
+      table,
+      where,
+    }: SelectOptions,
+    {
+      allowNull = false,
+      toSnakeCase = true,
+    }: CleanOptions = {},
+  ): Query => {
+    const whereItem = cleanObjectValues(where || {}, { allowNull, toSnakeCase });
+    const whereSetters = generateWhere(whereItem);
+    const whereValues = generateValues(whereItem);
+
+    return {
+      text: `
+      delete from
+        ${ table }
+      where
+        ${ whereSetters }
+    `.replace(/\s+/gi, " ").trim(),
+      values: [
+        ...whereValues,
+      ],
+    };
+  }
 ;
