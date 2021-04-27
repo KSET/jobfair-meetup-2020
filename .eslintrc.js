@@ -19,6 +19,18 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
+    "no-lone-blocks": "off",
+    "no-redeclare": "off",
+    "@typescript-eslint/no-redeclare": [ "error" ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        args: "after-used",
+        argsIgnorePattern: "^_",
+        caughtErrors: "none",
+      },
+    ],
     "lodash-fp/prefer-constant": "warn",
     "no-dupe-class-members": "off",
     "@typescript-eslint/no-var-requires": "off",

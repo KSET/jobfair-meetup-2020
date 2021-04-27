@@ -37,21 +37,21 @@ export const actions = {
     return data;
   },
 
-  async updateNewsItem({ commit, state }, { slug, news }) {
+  async updateNewsItem(_context, { slug, news }) {
     return await this.$api.$patch(
       `/news/item/${ slug }`,
       news,
     ).catch((e) => e);
   },
 
-  async createNewsItem({ commit, state }, { news }) {
+  async createNewsItem(_context, { news }) {
     return await this.$api.$put(
       "/news/item/",
       news,
     ).catch((e) => e);
   },
 
-  async deleteNewsItem({ commit, state }, { slug }) {
+  async deleteNewsItem(_context, { slug }) {
     return await this.$api.$delete(
       `/news/item/${ slug }`,
     ).catch((e) => e);

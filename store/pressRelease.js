@@ -40,21 +40,21 @@ export const actions = {
     return pressRelease;
   },
 
-  async createPressRelease({ commit }, data) {
+  async createPressRelease(_context, data) {
     return await this.$api.$put(
       "/press-release",
       data,
     );
   },
 
-  async updatePressRelease({ commit }, data) {
+  async updatePressRelease(_context, data) {
     return await this.$api.$patch(
       `/press-release/${ data.id }`,
       data,
     );
   },
 
-  deletePressRelease({ commit }, { id }) {
+  deletePressRelease(_context, { id }) {
     return this.$api.$delete(
       `/press-release/${ id }`,
     );

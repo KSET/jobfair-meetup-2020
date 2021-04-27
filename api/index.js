@@ -135,7 +135,7 @@ query(dbBase)
   })
 ;
 
-app.use((err, req, res, next) => {
+app.use((err, req, res, _next) => {
   const status = 500;
 
   const errorData = error({
