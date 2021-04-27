@@ -5,9 +5,6 @@ import {
  sendCsv,
 } from "../../helpers/csv";
 import {
-  fixResume,
-} from "../resumes";
-import {
   resumesFullDataQuery,
 } from "../../graphql/queries";
 import {
@@ -23,6 +20,9 @@ import {
 import {
   cachedFetcher,
 } from "../../helpers/fetchCache";
+import {
+ fixResume,
+} from "../../services/resume-service";
 
 const authRouter = new AuthRouter({ fullUserData: true });
 

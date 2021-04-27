@@ -1,12 +1,13 @@
+const zeroPad = (n) => String(n).padStart(2, "0");
+
 export const formatDate = (dateStr) => {
-  const zeroPad = (n) => 9 < n ? String(n) : `0${ n }`;
   const date = new Date(dateStr);
 
   const year = date.getFullYear();
-  const month = zeroPad(date.getMonth() + 1);
-  const day = zeroPad(date.getDate());
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
 
-  return `${ day }.${ month }.${ year }.`;
+  return `${ day }. ${ month }. ${ year }.`;
 };
 
 export const parseDate = (formattedDate) => {
@@ -14,7 +15,7 @@ export const parseDate = (formattedDate) => {
     day,
     month,
     year,
-  ] = formattedDate.split(".");
+  ] = formattedDate.split(".").map(Number).map(zeroPad);
 
   return new Date(`${ year }-${ month }-${ day }`);
 };
