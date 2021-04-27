@@ -229,6 +229,28 @@ name: PageAdminEventsIndex
     "Participants",
   ];
 
+  const userIdsFromEvents =
+    (events) =>
+      new Set(
+        events
+          .flatMap(({ participants }) => Object.values(participants))
+          .flat()
+        ,
+      )
+        .keys()
+  ;
+
+  const filterCurrentUsers =
+    (events, users) =>
+      Object.fromEntries(
+        Array
+          .from(userIdsFromEvents(events))
+          .map((id) => [ id, users[id] ])
+          .filter(([ , user ]) => user)
+        ,
+      )
+  ;
+
   export default {
     name: "PageAdminEventsIndex",
 
@@ -262,7 +284,7 @@ name: PageAdminEventsIndex
 
       return {
         rawEvents: events,
-        users,
+        users: filterCurrentUsers(events, users),
 
         filterType: null,
         filterValue: "",
@@ -380,7 +402,7 @@ name: PageAdminEventsIndex
           )
         ;
 
-        this.$set(this, "users", users);
+        this.$set(this, "users", filterCurrentUsers(this.rawEvents, users));
 
         for (const event of this.events) {
           this.$set(event, "participants", getParticipants(event));
