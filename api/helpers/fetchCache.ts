@@ -1,33 +1,59 @@
 import {
+  Opaque,
+} from "type-fest";
+import {
   AtomicBool,
 } from "./atomic";
 
-export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") => {
-  const getBaseData = () => ({
+export type CacheKey = Opaque<string, "CacheKey">;
+
+type Promised<T> = Promise<T> | T;
+export type FetchFn<T> = (...args: unknown[]) => Promised<T>;
+export type KeyFn = (...args: unknown[]) => CacheKey;
+
+interface ICache<T> {
+  time: number;
+  data: T | null;
+  fetching: Readonly<AtomicBool>;
+}
+
+export const cachedFetcher = <T>(
+  timeoutMs: number,
+  fetchFn: FetchFn<T>,
+  cacheKeyFn: KeyFn = () => "default" as CacheKey,
+): (...args: unknown[]) => Promise<T> => {
+  type Cache = ICache<T>;
+
+  const getBaseData = (): Cache => ({
     time: 0,
     data: null,
     fetching: new AtomicBool(),
   });
 
-  const cache = {};
+  const cache: Record<CacheKey, Cache> = {};
 
-  const cacheSet = (cacheKey, key, value) => {
+  function cacheSet(cacheKey: CacheKey, key: "time", value: number): void;
+  function cacheSet(cacheKey: CacheKey, key: "data", value: T): void;
+  function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
       cache[cacheKey] = getBaseData();
     }
 
     cache[cacheKey][key] = value;
-  };
+  }
 
-  const cacheGet = (cacheKey, key) => {
+  function cacheGet(cacheKey: CacheKey, key: "time"): number;
+  function cacheGet(cacheKey: CacheKey, key: "data"): T;
+  function cacheGet(cacheKey: CacheKey, key: "fetching"): AtomicBool;
+  function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
       cache[cacheKey] = getBaseData();
     }
 
     return cache[cacheKey][key];
-  };
+  }
 
-  const timeMs = () => {
+  const timeMs = (): number => {
     const hrTime = process.hrtime();
 
     return hrTime[0] * 1000 + hrTime[1] / 1000000;
@@ -35,21 +61,21 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  const setData = (key, data) => {
+  const setData = (key: CacheKey, data: T): void => {
     cacheSet(key, "data", data);
     cacheSet(key, "time", timeMs());
   };
 
-  const setFetching = (key, fetching) => {
+  const setFetching = (key: CacheKey, fetching: boolean): void => {
     cacheGet(key, "fetching").value = fetching;
   };
 
   const isFetching =
-    (key) =>
+    (key: CacheKey): boolean =>
       cacheGet(key, "fetching").value
   ;
 
-  const testAndSetFetching = (key, ifItIs, thenSetTo) => {
+  const testAndSetFetching = (key: CacheKey, ifItIs: boolean, thenSetTo: boolean): boolean => {
     const oldValue = cacheGet(key, "fetching").testAndSet(ifItIs, thenSetTo);
     const newValue = isFetching(key);
 
@@ -62,7 +88,7 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
     }
   };
 
-  const waitForFetchingToBe = async (key, fetching) => {
+  const waitForFetchingToBe = async (key: CacheKey, fetching: boolean): Promise<boolean> => {
     while (isFetching(key) !== fetching) {
       await sleep(10);
     }
@@ -71,22 +97,22 @@ export const cachedFetcher = (timeoutMs, fetchFn, cacheKeyFn = () => "default") 
   };
 
   const hasData =
-    (key) =>
+    (key: CacheKey): boolean =>
       Boolean(getData(key))
   ;
 
   const getData =
-    (key) =>
+    (key: CacheKey): T =>
       cacheGet(key, "data")
   ;
 
   const hasFreshCache =
-    (key) =>
+    (key: CacheKey): boolean =>
       hasData(key) &&
       (timeMs() - timeoutMs) <= cacheGet(key, "time")
   ;
 
-  return async (...args) => {
+  return async (...args: unknown[]): Promise<T> => {
     const key = cacheKeyFn(...args);
     // console.log("CACHE GET", key);
 
