@@ -6662,11 +6662,6 @@ jiti@^0.1.11:
   resolved "https://registry.yarnpkg.com/jiti/-/jiti-0.1.12.tgz#ffe4a09266d739b77721170fb73115c50b680330"
   integrity sha512-rWtqsaABBGNzTzfQkfP7DUvE9KGEIQUd6s0nITw5rDW1L9OwwtBQ5dz9hMq4YrMZqrSJr8ArrMvZ1mV1/7S3Fg==
 
-jose@^3.11.3:
-  version "3.11.3"
-  resolved "https://registry.yarnpkg.com/jose/-/jose-3.11.3.tgz#0c3fc2f5593947a0a7bdafbebc5fc7563a0133c3"
-  integrity sha512-sv7p3Yz4tX8msWtCkty9hzlhyrM6nI4iIbX6R8g/idBmWgBMvqYQRsmBL4RwFQUXY0j3ARqvMp+EmG5rDgXlhg==
-
 joycon@^2.1.2:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/joycon/-/joycon-2.2.5.tgz#8d4cf4cbb2544d7b7583c216fcdfec19f6be1615"
