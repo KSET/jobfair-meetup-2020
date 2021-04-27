@@ -230,7 +230,8 @@ name: PagePress
 
     methods: {
       thumbSrc(item) {
-        const { default: _, ...imageObj } = item;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { default: _default, ...imageObj } = item;
         const images =
           Object
             .entries(imageObj)

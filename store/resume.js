@@ -58,7 +58,7 @@ export const getters = {
       basicInfo,
       education: {
         headers: [ "Obrazovna institucija", "Usmjerenje", "Godina završetka" ],
-        values: resume.educations.map(({ awardedTitle, module, name, year }) => [ name, module, year ]),
+        values: resume.educations.map(({ awardedTitle: _awardedTitle, module, name, year }) => [ name, module, year ]),
       },
       projects: {
         headers: [ "Tvrtka / projekt", "Pozicija", "Trajanje" ],

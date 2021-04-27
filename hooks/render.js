@@ -5,7 +5,7 @@ import {
   query,
 } from "../db/methods";
 
-export default (nuxtConfig) => ({
+export default (_nuxtConfig) => ({
 
   async routeDone(_url, _result, { nuxt }) {
     if (!nuxt.state) {

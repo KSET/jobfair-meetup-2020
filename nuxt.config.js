@@ -181,7 +181,7 @@ export default {
       cssModules: {
         modules: {
           localIdentName: "[path][name]__[local]",
-          getLocalIdent({ resource, ...loaderContext }, localIdentName, localName, options) {
+          getLocalIdent({ resource: _resource, ...loaderContext }, localIdentName, localName, options) {
             if (!options.context) {
               // eslint-disable-next-line no-param-reassign
               options.context = loaderContext.rootContext;

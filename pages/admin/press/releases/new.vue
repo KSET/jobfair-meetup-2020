@@ -179,7 +179,7 @@ name: PageAdminPressReleaseCreate
     },
 
     watch: {
-      date(val) {
+      date() {
         this.dateFormatted = this.formatDate(this.date);
       },
     },

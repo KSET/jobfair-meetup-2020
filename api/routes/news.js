@@ -58,7 +58,7 @@ const processNews =
 
       const newsImages = Object.fromEntries(
         imageList.map(
-          ({ name, imageId, ...image }) =>
+          ({ name, imageId: _imageId, ...image }) =>
             [ name, image ]
           ,
         ),

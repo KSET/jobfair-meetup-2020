@@ -18,6 +18,27 @@
               :basic-info="basicInfo"
             />
           </v-col>
+
+          <v-col cols="12">
+            <v-btn
+              block
+              color="secondary"
+              :href="hasCv ? 'https://jobfair.fer.unizg.hr/hr/studenti/zivotopis' : 'https://jobfair.fer.unizg.hr/hr/zivotopisi/novo' "
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <v-icon>{{ hasCv ? "mdi-pencil-box-outline" : "mdi-file-account" }}</v-icon>
+              &nbsp;
+              <translated-text
+                v-if="hasCv"
+                trans-key="studentPanel.resume.edit"
+              />
+              <translated-text
+                v-else
+                trans-key="studentPanel.resume.submit"
+              />
+            </v-btn>
+          </v-col>
         </v-row>
 
         <v-row v-if="hasCv">
@@ -85,8 +106,8 @@
                     :key="filter.name"
 
                     :class="$style.filterContainer"
-                    cols="auto"
                     class="d-flex px-0"
+                    cols="auto"
                   >
                     <v-btn
                       :class="{
@@ -190,9 +211,9 @@
       v-model="snackbar"
       bottom
       color="error"
+      elevation="8"
       style="padding-bottom: 0;"
       timeout="-1"
-      elevation="8"
     >
       {{ errorText }}
 

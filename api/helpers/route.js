@@ -72,9 +72,14 @@ export const success =
 ;
 
 /**
- * @param {number} status
- * @param {string} reason
- * @param {*} data
+ * @typedef {Object} ErrorParams
+ * @property {number} status - Whether an error occurred
+ * @property {string} reason - The response status code (200 - OK, everything else - error)
+ * @property {*} [data] - Any response data
+ */
+
+/**
+ * @param {ErrorParams} params
  * @returns {ErrorResponse}
  */
 export const error =
