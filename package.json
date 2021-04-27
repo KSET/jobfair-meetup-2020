@@ -45,7 +45,6 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.3",
     "fuzzysearch": "^1.0.3",
-    "jose": "^3.11.3",
     "jsonwebtoken": "^8.5.1",
     "jsvat": "^2.5.0",
     "lodash": "^4.17.21",
