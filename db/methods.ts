@@ -1,3 +1,6 @@
+import type {
+  PoolClient,
+} from "pg";
 import {
   Pool,
 } from "pg";
@@ -7,14 +10,14 @@ const pool = new Pool({
 });
 
 export const query =
-  <T>(
+  async <T>(
     text: string,
     params?: unknown[],
-  ): T[] => {
+  ): Promise<T[]> => {
     try {
-      return pool
-        .query(text, params)
-        .then(({ rows }) => rows || []);
+      const result = await pool.query<T>(text, params);
+
+      return result.rows || [];
     } catch (e) {
       console.log("|> QUERY ERROR", e);
 
@@ -31,7 +34,7 @@ interface QueryByObject {
 export type Query = QueryByObject | string;
 
 export class Client {
-  #instance;
+  #instance: PoolClient;
 
   #inTransaction = false;
 
@@ -42,35 +45,49 @@ export class Client {
   }
 
   static async queryOnce<T>(...args: Query[]): Promise<T[] | null> {
-    let client;
-    try {
-      client = await this.connected();
-
-      return await client.query(...args);
-    } finally {
-      if (client) {
-        await client.end();
-      }
-    }
+    return await this.once(
+      (client) =>
+        client.query<T>(...args)
+      ,
+    );
   }
 
   static async queryOneOnce<T>(...args: Query[]): Promise<T | null> {
-    let client;
-    try {
-      client = await this.connected();
+    const rows = await this.queryOnce<T>(...args);
 
-      return await client.queryOne(...args);
-    } finally {
-      if (client) {
-        await client.end();
-      }
-    }
+    return rows?.pop() || null;
   }
 
   static async inTransaction(): Promise<Client> {
     const client = await Client.connected();
 
     return await client.startTransaction();
+  }
+
+  static async transaction<T>(fn: (client: Client) => Promise<T>): Promise<T> {
+    return await this.once<T>(async (client) => {
+      try {
+        await client.startTransaction();
+        const result = await fn(client);
+        await client.commit();
+
+        return result;
+      } catch (e) {
+        await client.rollback();
+        throw e;
+      }
+    });
+  }
+
+  static async once<T>(fn: (client: Client) => Promise<T>): Promise<T> {
+    const client = new Client();
+    try {
+      await client.connect();
+
+      return await fn(client);
+    } finally {
+      client.end();
+    }
   }
 
   get isQueryable(): boolean {
@@ -86,6 +103,8 @@ export class Client {
   }
 
   async startTransaction(): Promise<this> {
+    await this.connect();
+
     if (!this.#inTransaction) {
       await this.query("BEGIN");
 
@@ -101,7 +120,8 @@ export class Client {
     }
 
     try {
-      const { rows } = await this.#instance.query(...args);
+      const [ first, ...rest ] = args as any[];
+      const { rows } = await this.#instance.query<T>(first, ...rest);
 
       return rows;
     } catch (e) {
@@ -126,7 +146,7 @@ export class Client {
     this.#inTransaction = false;
 
     if (end) {
-      await this.end();
+      this.end();
     }
   }
 
@@ -136,16 +156,16 @@ export class Client {
     this.#inTransaction = false;
 
     if (end) {
-      await this.end();
+      this.end();
     }
   }
 
-  async end(): Promise<void> {
+  end(): void {
     if (!this.isQueryable) {
       return;
     }
 
-    await this.#instance.release();
+    this.#instance.release();
     this.#ended = true;
   }
 }
