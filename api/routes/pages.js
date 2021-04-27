@@ -1,5 +1,5 @@
 import {
- RoleNames,
+  Role,
 } from "../helpers/permissions";
 import {
   AuthRouter,
@@ -37,7 +37,9 @@ router.get("/list", () => {
   ];
 });
 
-const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: Role.moderator,
+});
 
 authRouter.get("/admin", () => {
   return [
@@ -62,7 +64,10 @@ authRouter.get("/admin", () => {
       to: { name: "PageAdminConfigurationIndex" },
       icon: "mdi-cog",
     },
-  ].map(({ requiredRole = RoleNames.MODERATOR, ...entry }) => ({ ...entry, requiredRole }));
+  ].map(({
+           requiredRole = Role.moderator,
+           ...entry
+         }) => ({ ...entry, requiredRole }));
 });
 
 export default authRouter;

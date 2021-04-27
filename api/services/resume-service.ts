@@ -1,155 +1,177 @@
 import type {
-  CamelCasedPropertiesDeep,
-} from "type-fest";
+  UploadedFile,
+} from "express-fileupload";
+import _ from "lodash/fp";
 import {
-  deepMap,
+  customAlphabet,
+} from "nanoid/async";
+import {
+  queryResumesCreate,
+  queryResumesSectionCreateByResumeId,
+  queryResumesSectionDeleteByResumeId,
+  queryResumesSectionGetByResumeId,
+  queryResumesUpdate,
+  queryResumesGetAll,
+  ResumeData,
+  ResumeCreateData,
+  queryResumesDeleteByUserUid,
+  queryResumesGetBy,
+} from "../../db/helpers/resumes";
+import {
+  Client,
+} from "../../db/methods";
+import {
   keysFromSnakeToCamelCase,
-  mapArray,
-  pipe,
 } from "../../helpers/object";
-import {
-  isString,
-} from "../../helpers/string";
-import {
-  resumeQuery,
-  resumesQuery,
-} from "../graphql/queries";
 import type {
-  BasicResume as GraphQlBasicResume,
-  Resume as GraphQlResume,
-  ResumeInfo as GraphQlResumeInfo,
-  ResumeAward as GraphQlAward,
-  ResumeEducation as GraphQlEducation,
-  ResumeLanguage as GraphQlLanguage,
-  ResumeWorkExperience as GraphQlWorkExperience,
-} from "../graphql/types";
-import {
-  graphQlQuery,
-} from "../helpers/axios";
-import {
-  cachedFetcher,
-  CacheKey,
-} from "../helpers/fetchCache";
-import {
-  HttpStatus,
-} from "../helpers/http";
+  Resume as DbResume,
+} from "../../db/helpers/resumes";
 import {
   ServiceError,
 } from "./error-service";
+import FileService from "./file-service";
+import UserService, {
+  User,
+} from "./user-service";
 
-export interface BasicResumeInfo extends CamelCasedPropertiesDeep<GraphQlBasicResume> {
-  fullName: string;
+export interface Award {
+  title: string;
+  year: string;
 }
 
-export interface ResumeSections {
-  awards: CamelCasedPropertiesDeep<GraphQlAward>[];
-  computerSkills: string[];
-  educations: CamelCasedPropertiesDeep<GraphQlEducation>[];
-  languages: CamelCasedPropertiesDeep<GraphQlLanguage>[];
-  skills: string[];
-  workExperiences: CamelCasedPropertiesDeep<GraphQlWorkExperience>[];
+export type ComputerSkill = string;
+
+export interface Education {
+  name: string;
+  year: string;
+  module: string;
+}
+
+type LanguageSkillLevel =
+  "A1" |
+  "A2" |
+  "B1" |
+  "B2" |
+  "C1" |
+  "C2"
+  ;
+
+export interface Language {
+  name: string;
+  skillLevel: LanguageSkillLevel;
+}
+
+export type Skill = string;
+
+export interface WorkExperience {
+  company: string;
+  years: string;
+  description: string;
+  currentEmployer: boolean;
+}
+
+interface BasicResumeInfo {
+  uid: string;
+  fullName: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ResumeInfo extends BasicResumeInfo {
+  city: string;
+  birthday: string;
+  linkedinUrl: string;
+  githubUrl: string;
+  suggestion: string;
+  resumeFileId: number;
+}
+
+interface ResumeSections {
+  awards: Award[];
+  computerSkills: ComputerSkill[];
+  educations: Education[];
+  languages: Language[];
+  skills: Skill[];
+  workExperiences: WorkExperience[];
 }
 
 export type Resume =
-  CamelCasedPropertiesDeep<GraphQlResumeInfo>
-  & BasicResumeInfo
+  ResumeInfo
   & Partial<ResumeSections>
   ;
 
-export function fixResume(resume: GraphQlResume): Resume;
-export function fixResume(resume: GraphQlBasicResume): BasicResumeInfo;
-export function fixResume(resume: unknown): unknown {
-  const getName = ({ name }) => name;
+const nanoid = customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  31,
+);
 
-  const fixComputerSkills =
-    ({ computerSkills }) =>
-      mapArray(getName)(computerSkills)
-  ;
+const formatSections = (sections: unknown[]): Partial<ResumeSections> => {
+  const getName = ({ name }: { name: string }): string => name;
 
-  const fixSkills =
-    ({ skills }) =>
-      mapArray(getName)(skills)
-  ;
+  const sectionFormatter = (section: keyof ResumeSections) => {
+    switch (section) {
+      case "skills":
+        return getName;
+      case "computerSkills":
+        return getName;
+    }
 
-  const fixResumeProps =
-    (resume) =>
-      Object.assign(resume, {
-        computerSkills: fixComputerSkills(resume),
-        skills: fixSkills(resume),
-      })
-  ;
+    return (section) => section;
+  };
 
-  const trimValues =
-    (resume) =>
-      deepMap(
-        ({ key, value }) => ({
-          key,
-          value: isString(value) ? String(value).trim() : value,
-        }),
-        resume,
+  const formatSection =
+    (section: keyof ResumeSections) =>
+      _.flow(
+        _.omit([ "resumeId" ]),
+        sectionFormatter(section),
       )
   ;
 
-  const addFullName =
-    (resume) =>
-      Object.assign(resume, {
-        fullName: `${ resume.firstName } ${ resume.lastName }`,
-      });
+  const format =
+    ([
+       section,
+       entries,
+     ]) => ([
+      section,
+      entries.map(formatSection(section)),
+    ])
+  ;
 
-  const fixResumes = pipe(
-    trimValues,
+  return _.flow(
     keysFromSnakeToCamelCase,
-    fixResumeProps,
-    addFullName,
-  );
+    _.map(format),
+    _.fromPairs,
+  )(sections);
+};
 
-  return fixResumes(resume);
-}
-
-const gdprDate = new Date("2018-05-25T00:00:00Z");
-const afterGdpr =
-  ({ updatedAt }) =>
-    new Date(updatedAt) >= gdprDate
-;
-
-const cacheTimeoutMs = 10 * 1000;
-const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
-  cachedFetcher<BasicResumeInfo[]>(
-    cacheTimeoutMs,
-    async (authHeader: string): Promise<BasicResumeInfo[]> => {
-      const {
-        resumes,
-      }: {
-        resumes: GraphQlBasicResume[];
-      } = await graphQlQuery(resumesQuery(), authHeader);
-
-      if (!resumes) {
-        return [];
-      }
-
-      return resumes.map(fixResume).filter(afterGdpr);
-    },
+const resumeBasicKeys: (keyof BasicResumeInfo)[] = [
+  "uid",
+  "email",
+  "fullName",
+  "createdAt",
+  "updatedAt",
+];
+const formatBaseResume: (resume: DbResume) => BasicResumeInfo =
+  _.flow(
+    keysFromSnakeToCamelCase,
+    _.pick(resumeBasicKeys),
   )
 ;
 
-
-const fetchByIdCached: (authHeader: string, id: Resume["id"]) => Promise<Resume | null> =
-  cachedFetcher<Resume | null>(
-    cacheTimeoutMs,
-    async (authHeader: string, id: Resume["id"]) => {
-      const {
-        resume,
-      }: {
-        resume: GraphQlResume | null,
-      } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
-
-      if (!resume) {
-        return null;
-      }
-
-      return fixResume(resume);
-    },
-    (_: string, id: Resume["id"]) => id as CacheKey,
+const resumeKeys: (keyof Resume)[] = [
+  ...resumeBasicKeys,
+  "city",
+  "birthday",
+  "linkedinUrl",
+  "githubUrl",
+  "suggestion",
+  "resumeFileId",
+];
+const formatResume: (resume: DbResume) => ResumeInfo =
+  _.flow(
+    keysFromSnakeToCamelCase,
+    _.pick(resumeKeys),
   )
 ;
 
@@ -157,37 +179,144 @@ export class ResumeServiceError extends ServiceError {
 }
 
 export default class ResumeService {
-  static async list(authHeader: string): Promise<BasicResumeInfo[]> {
-    return await fetchListCached(authHeader);
+  static async submit(userUid: User["uid"], data: ResumeData, resumeFile: UploadedFile | undefined): Promise<Resume> {
+    const resumeSectionTransformer = {
+      workExperiences: (e: Record<string, string>) => ({
+        ...e,
+        currentEmployer: "false" !== e.currentEmployer,
+      }),
+    };
+
+    return await Client.transaction<Resume>(async (client) => {
+      const user = await UserService.fullInfoBy("uid", userUid);
+
+      if (!user) {
+        throw new ResumeServiceError(
+          "Nešto je pošlo po krivu. Molimo probajte ponovno.",
+        );
+      }
+
+      if (resumeFile) {
+        const file = await FileService.upload(resumeFile, user.id);
+
+        data.resumeFileId = file.id;
+      }
+      const resume = await this._insertOrUpdateResume(client, userUid, data);
+
+      if (!resume) {
+        throw new ResumeServiceError(
+          "Nešto je pošlo po krivu. Molimo probajte ponovno.",
+        );
+      }
+
+      const resumeId = resume.id;
+
+      await Promise.all(
+        Object
+          .values(queryResumesSectionDeleteByResumeId)
+          .map((queryDeleteSectionByResumeId) => client.query(queryDeleteSectionByResumeId(resumeId))),
+      );
+
+      const createPromises: Promise<unknown>[] = [];
+
+      for (const [ section, queryCreateSection ] of Object.entries(queryResumesSectionCreateByResumeId)) {
+        if (!(section in data)) {
+          continue;
+        }
+
+        const transformer =
+          section in resumeSectionTransformer
+          ? resumeSectionTransformer[section]
+          : (a: unknown) => a
+        ;
+
+        for (const sectionData of data[section]) {
+          createPromises.push(client.query(queryCreateSection(transformer({
+            ...sectionData,
+            resumeId,
+          }))));
+        }
+      }
+
+      await Promise.all(createPromises);
+
+      return await this._infoBy(client, "userUid", userUid) as Resume;
+    });
   }
 
-  static async byUid(authHeader: string, uid: Resume["uid"]): Promise<BasicResumeInfo> {
-    const resumes = await this.list(authHeader);
+  static async list(): Promise<ResumeInfo[]> {
+    const resumes = await Client.queryOnce<DbResume[]>(queryResumesGetAll());
 
-    const resume = resumes.find((r) => r.uid === uid);
-
-    if (!resume) {
-      throw new ResumeServiceError(
-        "Resume not found",
-        null,
-        HttpStatus.Error.Client.NotFound,
-      );
-    }
-
-    return resume;
+    return _.map(formatBaseResume, resumes) || [];
   }
 
-  static async byId(authHeader: string, id: Resume["id"]): Promise<Resume> {
-    const resume = await fetchByIdCached(authHeader, id);
+  static async info(userUid: User["uid"]): Promise<Resume | null> {
+    return await this.infoBy("userUid", userUid);
+  }
+
+  static async infoBy(key: keyof DbResume, value: unknown): Promise<Resume | null> {
+    return await Client.once((client) => this._infoBy(client, key, value));
+  }
+
+  static async baseInfoBy(key: keyof DbResume, value: unknown): Promise<ResumeInfo | null> {
+    const resume = await Client.queryOneOnce<DbResume>(queryResumesGetBy({ [key]: value }));
 
     if (!resume) {
-      throw new ResumeServiceError(
-        "Resume not found",
-        null,
-        HttpStatus.Error.Client.NotFound,
-      );
+      return null;
     }
 
-    return resume;
+    return formatResume(resume);
+  }
+
+  static async delete(userId: User["uid"]): Promise<void> {
+    await Client.queryOnce(queryResumesDeleteByUserUid(userId));
+  }
+
+  static async _infoBy(client: Client, key: keyof DbResume, value: unknown): Promise<Resume | null> {
+    const resume = await client.queryOne<DbResume>(queryResumesGetBy({ [key]: value }));
+
+    if (!resume) {
+      return null;
+    }
+
+    const sectionsQueries =
+      Object
+        .entries(queryResumesSectionGetByResumeId)
+        .map(async ([ section, querySelectSectionByResumeId ]) => [
+          section,
+          await client.query(querySelectSectionByResumeId(resume.id)),
+        ])
+    ;
+
+    const sections = await Promise.all(sectionsQueries);
+
+    return {
+      ...formatResume(resume),
+      ...formatSections(sections),
+    };
+  }
+
+  static async _insertOrUpdateResume(client: Client, userUid: User["uid"], data: ResumeData): Promise<DbResume | null> {
+    const oldResume = await client.queryOne<DbResume>(queryResumesGetBy({ userUid }));
+
+    if (oldResume) {
+      return await client.queryOne<DbResume>(queryResumesUpdate(
+        {
+          id: oldResume.id,
+        },
+        {
+          ...data,
+          updatedAt: new Date(),
+        },
+      ));
+    } else {
+      const createData: ResumeCreateData = {
+        ...data,
+        userUid,
+        uid: await nanoid(),
+      };
+
+      return await client.queryOne<DbResume>(queryResumesCreate(createData));
+    }
   }
 }

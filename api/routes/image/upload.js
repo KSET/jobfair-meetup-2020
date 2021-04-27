@@ -2,13 +2,13 @@ import {
   AuthRouter,
 } from "../../helpers/route";
 import {
-  RoleNames,
+  Role,
 } from "../../helpers/permissions";
 import ImageService, {
   ImageUploadError,
 } from "../../services/image-service";
 
-const router = new AuthRouter({ role: RoleNames.MODERATOR });
+const router = new AuthRouter({ role: Role.moderator });
 
 router.postRaw("/", async ({ files, authUser }, res) => {
   try {

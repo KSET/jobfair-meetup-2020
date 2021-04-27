@@ -1,5 +1,5 @@
 import {
- HttpStatus,
+  HttpStatus,
 } from "../helpers/http";
 import {
   apiFilePath,
@@ -26,7 +26,7 @@ import {
   AuthRouter,
 } from "../helpers/route";
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 
 const router = new Router();
@@ -66,7 +66,9 @@ router.get("/list", async () => {
   );
 });
 
-const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: Role.moderator,
+});
 
 authRouter.post("/", async ({ body }) => {
   const { id, order, title, description, imageId } = body;

@@ -3,7 +3,7 @@ import {
   AuthRouter,
 } from "../helpers/route";
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 import PressReleaseService from "../services/press-release-service";
 
@@ -19,7 +19,9 @@ router.get("/release/:id", async ({ params }) => {
   return await PressReleaseService.info(id);
 });
 
-const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
+const authRouter = AuthRouter.boundToRouter(router, {
+  role: Role.moderator,
+});
 
 authRouter.put("/", async ({ body }) => {
   const {

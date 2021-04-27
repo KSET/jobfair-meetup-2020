@@ -8,9 +8,10 @@ import {
   error,
 } from "../../helpers/route";
 
+
 export const requireCv =
   ({ authUser }, res, next) => {
-    if (authUser?.uid) {
+    if (authUser?.resume) {
       return next();
     }
 

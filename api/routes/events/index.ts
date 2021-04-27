@@ -17,7 +17,7 @@ import {
   internalRequest,
 } from "../../helpers/http";
 import {
-  RoleNames,
+  Role,
 } from "../../helpers/permissions";
 import {
   AuthRouter,
@@ -30,7 +30,7 @@ import {
 } from "./_helpers";
 
 const router = new AuthRouter({
-  role: RoleNames.BASE,
+  role: Role.base,
 });
 
 router.get("/mine", requireCv, async ({ authUser }) => {
@@ -56,7 +56,7 @@ router.get("/mine", requireCv, async ({ authUser }) => {
 
 
 const moderatorRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.MODERATOR,
+  role: Role.admin,
 });
 
 const timeoutMs = 1.5 * 1000;

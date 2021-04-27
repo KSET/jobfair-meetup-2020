@@ -43,7 +43,7 @@ name: PageAdminEventIndex
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
-    RoleNames,
+    Role,
   } from "~/api/helpers/permissions";
 
   export default {
@@ -68,13 +68,13 @@ name: PageAdminEventIndex
         {
           name: "Panel",
           to: { name: "PageAdminPanelsIndex" },
-          requiredRole: RoleNames.ADMIN,
+          requiredRole: Role.admin,
           icon: "mdi-human-queue",
         },
         {
           name: "Company Applications",
           to: { name: "PageAdminCompanyApplicationsList" },
-          requiredRole: RoleNames.ADMIN,
+          requiredRole: Role.admin,
           icon: "mdi-text-box-multiple-outline",
         },
       ],

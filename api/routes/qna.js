@@ -1,5 +1,5 @@
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 import {
   AuthRouter,
@@ -14,7 +14,7 @@ router.get("/company-applications", async () => {
 });
 
 const authRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.ADMIN,
+  role: Role.admin,
 });
 
 authRouter.post("/", async (req) => {

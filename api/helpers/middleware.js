@@ -7,7 +7,7 @@ import {
 } from "./token";
 import {
   hasPermission,
-  RoleNames,
+  Role,
 } from "./permissions";
 import {
   error,
@@ -49,7 +49,7 @@ export const injectAuthData =
 export const requireAuth =
   ({
      fullUserData = false,
-     role = RoleNames.BASE,
+     role = Role.base,
    } = {}) =>
     async (req, res, next) => {
       await injectAuthData({ fullUserData })(req);

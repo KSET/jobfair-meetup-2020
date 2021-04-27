@@ -37,7 +37,7 @@ import {
   zipLocation,
 } from "../helpers/pressKit";
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 import {
   ApiError,
@@ -97,7 +97,7 @@ router.getRaw("/press-kit.zip", (req, res) => {
 });
 
 const authRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.MODERATOR,
+  role: Role.moderator,
 });
 
 authRouter.post("/", async ({ body }) => {

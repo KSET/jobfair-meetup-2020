@@ -17,7 +17,7 @@ import {
   HttpStatus,
 } from "../helpers/http";
 import {
-  RoleNames,
+  Role,
 } from "../helpers/permissions";
 import {
   ApiError,
@@ -332,7 +332,7 @@ router.post("/vat/info/any", async ({ body }) => {
 });
 
 const authRouter = AuthRouter.boundToRouter(router, {
-  role: RoleNames.ADMIN,
+  role: Role.admin,
 });
 
 authRouter.get("/application/list/all", async () => {

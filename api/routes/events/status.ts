@@ -22,6 +22,7 @@ import CompanyEventsService from "../../services/company-events-service";
 import type {
   Event,
 } from "../../services/company-events-service";
+import UserService from "../../services/user-service";
 import {
   requireCv,
 } from "./_helpers";
@@ -45,7 +46,19 @@ router.post("/", async ({ body, authUser }) => {
     throw new ApiError("Data missing", HttpStatus.Error.Client.UnprocessableEntity);
   }
 
-  const eventInfo = await CompanyEventsService.listAll();
+  const [
+    eventInfo,
+    user,
+  ] = await Promise.all([
+    CompanyEventsService.listAll(),
+    UserService.fullInfoBy("uid", authUser.uid),
+  ]);
+
+  if (!user) {
+    throw new ApiError(
+      "Something went wrong. Please try again",
+    );
+  }
 
   let events: Event[] = [];
   switch (eventType) {
@@ -70,7 +83,7 @@ router.post("/", async ({ body, authUser }) => {
   }
 
   const key = {
-    userId: authUser.id,
+    userId: user.id,
     eventId: id,
     eventType,
     status,

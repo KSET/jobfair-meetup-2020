@@ -43,7 +43,7 @@ name: PageAdminConfigurationIndex
 <script>
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
-    RoleNames,
+    Role,
   } from "~/api/helpers/permissions";
 
   export default {
@@ -60,13 +60,13 @@ name: PageAdminConfigurationIndex
         {
           name: "Translations",
           to: { name: "PageAdminTranslationsList" },
-          requiredRole: RoleNames.ADMIN,
+          requiredRole: Role.admin,
           icon: "mdi-transcribe",
         },
         {
           name: "Settings",
           to: { name: "PageAdminSettingsList" },
-          requiredRole: RoleNames.ADMIN,
+          requiredRole: Role.admin,
           icon: "mdi-cog",
         },
       ],

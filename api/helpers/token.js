@@ -1,23 +1,7 @@
 import {
   verify,
 } from "jsonwebtoken";
-import {
- keysFromSnakeToCamelCase,
-} from "../../helpers/object";
-import {
-  basicUserQuery,
-  currentUserQuery,
-} from "../graphql/queries";
-import CompanyService from "../services/company-service";
-import {
-  getSetting,
-} from "./settings";
-import {
-  graphQlQuery,
-} from "./axios";
-import {
- internalRequest,
-} from "./http";
+import UserService from "../services/user-service";
 
 export const extractAuthorizationToken = (req) => {
   const header = req.get("Authorization");
@@ -54,14 +38,14 @@ export const verifiedJwt =
     },
   ) =>
     new Promise(
-      (resolve, reject) =>
+      (resolve) =>
         verify(
           token,
           secret,
           options,
           (err, data) => {
             if (err) {
-              reject(err);
+              resolve(null);
             } else {
               resolve(data);
             }
@@ -70,7 +54,9 @@ export const verifiedJwt =
     )
 ;
 
-export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
+export const getJwtSecret = () => `jobfair-meetup-secret-${ process.env.JWT_SECRET || "very secret :)" }`;
+
+export const fetchAuthenticatedUser = async (reqOrToken, _fullUser = false) => {
   const auth =
     "string" === typeof reqOrToken
     ? reqOrToken
@@ -81,51 +67,18 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
     return null;
   }
 
-  try {
-    // Should be a string of format `jwt $AUTH_TOKEN`
-    const token = auth.substr("jwt ".length);
-    const secret = await getSetting("JWT Secret", process.env.JWT_SECRET);
+  // Should be a string of format `jwt $AUTH_TOKEN`
+  const token = auth.substr("jwt ".length);
+  const secret = getJwtSecret();
 
-    const data = await verifiedJwt({
-      token,
-      secret,
-    });
+  const jwtData = await verifiedJwt({
+    token,
+    secret,
+  });
 
-    if (!("role" in data)) {
-      return null;
-    }
-
-    if (false === fullUser) {
-      return data;
-    }
-  } catch (e) {
-    console.log("Failed local JWT verification:", e.message);
-  }
-
-  try {
-    const { current_user: rawUser } = await graphQlQuery(
-      fullUser ? currentUserQuery() : basicUserQuery(),
-      auth,
-    );
-
-    const user = keysFromSnakeToCamelCase({
-      uid: rawUser.resume && rawUser.resume.uid,
-      ...rawUser,
-    });
-
-    delete user.resume;
-
-    const { companies = [] } = user;
-
-    if (companies) {
-      const { data: rawParticipants = [] } = await internalRequest("get", "/companies/participants");
-      const participantIds = new Set(rawParticipants.map(({ id }) => id));
-
-      user.companies = companies.filter(({ id }) => participantIds.has(id)).map(CompanyService.fixCompany);
-    }
-
-    return user;
-  } catch (e) {
+  if (!jwtData?.uid) {
     return null;
   }
+
+  return await UserService.infoBy("uid", jwtData.uid);
 };

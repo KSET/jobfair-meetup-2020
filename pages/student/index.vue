@@ -21,14 +21,11 @@
 
           <v-col cols="12">
             <v-btn
+              :to="{ name: 'PageStudentResumeHome' }"
               block
               color="secondary"
-              :href="hasCv ? 'https://jobfair.fer.unizg.hr/hr/studenti/zivotopis' : 'https://jobfair.fer.unizg.hr/hr/zivotopisi/novo' "
-              rel="noopener noreferrer"
-              target="_blank"
             >
-              <v-icon>{{ hasCv ? "mdi-pencil-box-outline" : "mdi-file-account" }}</v-icon>
-              &nbsp;
+              <v-icon>{{ hasCv ? "mdi-pencil" : "mdi-file-account" }}</v-icon>
               <translated-text
                 v-if="hasCv"
                 trans-key="studentPanel.resume.edit"
@@ -36,6 +33,19 @@
               <translated-text
                 v-else
                 trans-key="studentPanel.resume.submit"
+              />
+            </v-btn>
+          </v-col>
+
+          <v-col v-if="hasCv" cols="12">
+            <v-btn
+              block
+              color="error"
+              @click="handleDeleteResume"
+            >
+              <v-icon>mdi-trash-can</v-icon>
+              <translated-text
+                trans-key="studentPanel.resume.delete"
               />
             </v-btn>
           </v-col>
@@ -343,8 +353,6 @@ name: PageStudentIndex
         basicInfo,
         rawEvents: events,
 
-        hasCv: user.uid,
-
         filterType: null,
         filterValue: "",
         searchFields: [
@@ -363,6 +371,7 @@ name: PageStudentIndex
     computed: {
       ...mapGetters({
         user: "user/getUser",
+        hasCv: "user/hasCv",
       }),
 
       qrImageSrc() {
@@ -413,18 +422,22 @@ name: PageStudentIndex
       },
     },
 
+    watch: {
+      hasCv(has) {
+        clearInterval(this.fetchInterval);
+
+        if (has) {
+          this.fetchInterval = this.createParticipantsRefresher();
+        }
+      },
+    },
+
     mounted() {
       if (!this.hasCv) {
         return;
       }
 
-      this.fetchInterval = setInterval(async () => {
-        const participants = await this.fetchEventsParticipants();
-
-        for (const event of this.events) {
-          this.$set(event, "participants", getEventParticipants(participants, event) || noParticipants());
-        }
-      }, 8000 + 4000 * Math.random());
+      this.fetchInterval = this.createParticipantsRefresher();
     },
 
     beforeDestroy() {
@@ -436,7 +449,22 @@ name: PageStudentIndex
         doMarkEventStatus: "events/markEventStatus",
         fetchEventParticipants: "events/fetchEventParticipants",
         fetchEventsParticipants: "events/fetchEventsParticipants",
+        deleteResume: "resume/deleteResume",
       }),
+
+      createParticipantsRefresher() {
+        const timeout = 8000 + 4000 * Math.random();
+
+        const refresh = async () => {
+          const participants = await this.fetchEventsParticipants();
+
+          for (const event of this.events) {
+            this.$set(event, "participants", getEventParticipants(participants, event) || noParticipants());
+          }
+        };
+
+        return setInterval(refresh, timeout);
+      },
 
       async captureSelection(event, selected) {
         event.loading = true;
@@ -533,6 +561,14 @@ name: PageStudentIndex
             ,
           )
         );
+      },
+
+      async handleDeleteResume() {
+        if (!window.confirm("Izbrisati CV?")) {
+          return;
+        }
+
+        await this.deleteResume();
       },
     },
 
