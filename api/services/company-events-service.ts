@@ -1,3 +1,4 @@
+import _ from "lodash/fp";
 import type {
   CamelCasedPropertiesDeep,
 } from "type-fest";
@@ -29,6 +30,7 @@ import {
   ServiceError,
 } from "./error-service";
 import PanelsService, {
+  Panel,
   PanelWithInfo,
 } from "./panels-service";
 
@@ -49,6 +51,22 @@ export interface Events {
   presentations: (Presentation & CompanyId)[];
   workshops: (Workshop & CompanyId)[]
 }
+
+type CompanyWithoutId = Omit<Company, "id">;
+
+export interface PresentationWithInfo extends Presentation {
+  type: EventType.talk;
+  company: CompanyWithoutId;
+}
+
+export interface WorkshopWithInfo extends Omit<Workshop, "name"> {
+  type: EventType.workshop;
+  title: Workshop["name"]
+  topic: "Workshop";
+  company: CompanyWithoutId;
+}
+
+export type FixedEvent = Omit<PresentationWithInfo | WorkshopWithInfo | PanelWithInfo, "occuresAt"> & { date: Date };
 
 const typeTransformer = (type: string): keyof Events => {
   switch (type) {
@@ -173,5 +191,87 @@ export default class CompanyEventsServices {
       ...obj,
       company: CompanyService.fixCompany(company),
     });
+  }
+
+  static Format(data: Events): FixedEvent[] {
+    const {
+      companies: rawCompanies,
+      presentations: rawPresentations = [],
+      workshops: rawWorkshops = [],
+      panels: rawPanels = [],
+    } = data;
+
+    if (!rawCompanies || !rawPresentations || !rawWorkshops) {
+      return [];
+    }
+
+    const companies: Record<Company["id"], Company> =
+      Object.fromEntries(
+        rawCompanies
+          .map((c) => [ c.id, c ]),
+      )
+    ;
+
+    const presentations: PresentationWithInfo[] =
+      rawPresentations
+        .map(
+          ({ company, ...rest }) => ({
+            ...rest,
+            company: companies[company.id],
+            type: EventType.talk,
+          }),
+        )
+    ;
+
+    const workshops: WorkshopWithInfo[] =
+      rawWorkshops
+        .map(
+          ({ company, name, ...rest }) => ({
+            ...rest,
+            company: companies[company.id],
+            type: EventType.workshop,
+            title: name,
+            topic: "Workshop",
+          }),
+        )
+    ;
+
+    const fixPanel: (panel: PanelWithInfo) => PanelWithInfo =
+      _.flow(
+        ({ companies: rawCompanies, ...panel }: Panel): Omit<PanelWithInfo, "company"> => ({
+          ...panel,
+          companies: rawCompanies.map(({ companyId, ...rest }) => ({
+            info: companies[companyId],
+            ...rest,
+          })) as unknown as PanelWithInfo["companies"],
+          type: EventType.panel,
+          location: "KSET",
+          occuresAt: panel.date,
+        }),
+        (panel: Omit<PanelWithInfo, "company">): PanelWithInfo => ({
+          ...panel,
+          company: panel.companies[0].info,
+        }),
+      )
+    ;
+    const panels = rawPanels.map((panel) => fixPanel(panel));
+
+    return (
+      [
+        ...presentations,
+        ...workshops,
+        ...panels,
+      ]
+        .map(
+          <T extends { occuresAt: string | Date }>({ occuresAt, ...rest }: T): Omit<T, "occuresAt"> & { date: Date } =>
+            ({ ...rest, date: new Date(occuresAt) })
+          ,
+        )
+        .sort(
+          (a, b) =>
+            Number(b.date) - Number(a.date)
+          ,
+        )
+    );
   }
 }
