@@ -234,7 +234,7 @@ export default class PanelsService {
 
       await client.queryOne(queryReservationsDeleteByEventId({
         eventType: "panel",
-        eventId: id,
+        eventId: Number(id),
       }));
 
       await client.commit();

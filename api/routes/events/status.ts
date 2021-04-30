@@ -2,11 +2,18 @@ import {
   eventListFromStatus,
   hasParticipantCapacityFor,
 } from "../../../components/student/event-status";
+import type {
+  EventType,
+} from "../../../components/student/event-status";
 import {
   queryReservationsCountVisitorsForEvent,
   queryReservationsCreate,
   queryReservationsGetByEventAndUserId,
   queryReservationsUpdateStatusByEventIdAndUserId,
+} from "../../../db/helpers/reservations";
+import type {
+  EventReservation,
+  EventReservationCount,
 } from "../../../db/helpers/reservations";
 import {
   Client,
@@ -39,7 +46,7 @@ router.post("/", async ({ body, authUser }) => {
 
   const id = String(rawId);
   const status = Number(rawStatus);
-  const eventType = String(rawEventType);
+  const eventType = String(rawEventType) as EventType;
 
   if (!id || isNaN(status) || !eventType) {
     throw new ApiError("Data missing", HttpStatus.Error.Client.UnprocessableEntity);
@@ -71,16 +78,25 @@ router.post("/", async ({ body, authUser }) => {
 
   const key = {
     userId: authUser.id,
-    eventId: id,
+    eventId: Number(id),
     eventType,
     status,
   };
 
   return await Client.transaction(async (client) => {
-    const eventReservation = await client.queryOne(queryReservationsGetByEventAndUserId(key)) as any;
-    const rawParticipants = await client.query(queryReservationsCountVisitorsForEvent(key)) as any[];
-    const participants = {};
+    const [
+      eventReservation,
+      rawParticipants,
+    ] = await Promise.all([
+      client.queryOne<EventReservation>(queryReservationsGetByEventAndUserId(key)),
+      client.query<EventReservationCount>(queryReservationsCountVisitorsForEvent(key)),
+    ]);
 
+    if (!rawParticipants) {
+      throw new ApiError("Could not fetch participants");
+    }
+
+    const participants = {};
     for (const { status, count } of rawParticipants) {
       for (const selected of eventListFromStatus(status)) {
         if (!(selected in participants)) {
