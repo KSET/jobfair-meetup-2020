@@ -109,7 +109,7 @@ const fetchParticipantsCached: () => Promise<EventsWithoutPanels> =
 export class CompanyEventsError extends ServiceError {
 }
 
-export default class CompanyEventsServices {
+export default class CompanyEventsService {
   static async listAll(): Promise<Events> {
     const [
       participants,
