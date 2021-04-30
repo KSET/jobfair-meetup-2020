@@ -1,6 +1,7 @@
 import {
   eventListFromStatus,
   EventStatus,
+  EventType,
 } from "../../../components/student/event-status";
 import {
   queryReservationsCountVisitorsByEvent,
@@ -64,11 +65,11 @@ router.get("/is-participant/networking/-1/:userId(\\d+)", requireAuth({ fullUser
   const eq = (a, b) => String(a) === String(b);
   const getEvent = ({ eventType, eventId }) => {
     switch (eventType) {
-      case "panel":
+      case EventType.panel:
         return panels.find(({ id }) => eq(id, eventId));
-      case "workshop":
+      case EventType.workshop:
         return workshops.find(({ id }) => eq(id, eventId));
-      case "talk":
+      case EventType.talk:
         return presentations.find(({ id }) => eq(id, eventId));
       default:
         return null;
@@ -92,7 +93,7 @@ router.get("/is-participant/networking/-1/:userId(\\d+)", requireAuth({ fullUser
       continue;
     }
 
-    const isTalk = "talk" === reservation.eventType;
+    const isTalk = EventType.talk === reservation.eventType;
     if (!isTalk) {
       return true;
     }

@@ -17,7 +17,7 @@ interface EventStatusEntry {
   filter: ({ type }: Event) => boolean;
 }
 
-type EventStatusType = Record<string, EventStatusEntry>;
+export type EventStatusType = Record<string, EventStatusEntry>;
 
 let i = 0;
 export const EventStatus: Readonly<EventStatusType> = Object.freeze({
@@ -82,10 +82,10 @@ export const eventListFromStatus =
 
 export const getParticipantCapacityFor = (eventType: EventType): number => {
   switch (eventType) {
-    case "workshop":
+    case EventType.workshop:
       return 15;
-    case "talk":
-    case "panel":
+    case EventType.talk:
+    case EventType.panel:
       return 50;
     default:
       return 0;

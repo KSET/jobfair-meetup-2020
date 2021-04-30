@@ -1,19 +1,17 @@
 import {
   eventListFromStatus,
+  EventType,
   hasParticipantCapacityFor,
 } from "../../../components/student/event-status";
 import type {
-  EventType,
-} from "../../../components/student/event-status";
+  EventReservation,
+  EventReservationCount,
+} from "../../../db/helpers/reservations";
 import {
   queryReservationsCountVisitorsForEvent,
   queryReservationsCreate,
   queryReservationsGetByEventAndUserId,
   queryReservationsUpdateStatusByEventIdAndUserId,
-} from "../../../db/helpers/reservations";
-import type {
-  EventReservation,
-  EventReservationCount,
 } from "../../../db/helpers/reservations";
 import {
   Client,
@@ -25,10 +23,10 @@ import {
   ApiError,
   Router,
 } from "../../helpers/route";
-import CompanyEventsService from "../../services/company-events-service";
 import type {
   Event,
 } from "../../services/company-events-service";
+import CompanyEventsService from "../../services/company-events-service";
 import {
   requireCv,
 } from "./_helpers";
@@ -56,13 +54,13 @@ router.post("/", async ({ body, authUser }) => {
 
   let events: Event[] = [];
   switch (eventType) {
-    case "workshop":
+    case EventType.workshop:
       events = eventInfo.workshops;
       break;
-    case "talk":
+    case EventType.talk:
       events = eventInfo.presentations;
       break;
-    case "panel":
+    case EventType.panel:
       events = eventInfo.panels;
       break;
   }

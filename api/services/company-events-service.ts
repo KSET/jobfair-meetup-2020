@@ -2,6 +2,9 @@ import type {
   CamelCasedPropertiesDeep,
 } from "type-fest";
 import {
+  EventType,
+} from "../../components/student/event-status";
+import {
   keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
@@ -9,8 +12,8 @@ import {
 } from "../graphql/queries";
 import type {
   Company as GraphQlCompany,
-  Workshop as GraphQlWorkshop,
   Presentation as GraphQlPresentation,
+  Workshop as GraphQlWorkshop,
 } from "../graphql/types";
 import {
   graphQlQuery,
@@ -18,15 +21,16 @@ import {
 import {
   HttpStatus,
 } from "../helpers/http";
-import PanelsService, {
-  PanelWithInfo,
-} from "./panels-service";
-import CompanyService, {
+import type {
   Company,
 } from "./company-service";
+import CompanyService from "./company-service";
 import {
   ServiceError,
 } from "./error-service";
+import PanelsService, {
+  PanelWithInfo,
+} from "./panels-service";
 
 type Workshop = CamelCasedPropertiesDeep<GraphQlWorkshop>;
 type Presentation = CamelCasedPropertiesDeep<GraphQlPresentation>
@@ -49,11 +53,11 @@ export interface Events {
 const typeTransformer = (type: string): keyof Events => {
   switch (type) {
     case "presentation":
-    case "talk":
+    case EventType.talk:
       return "presentations";
-    case "workshop":
+    case EventType.workshop:
       return "workshops";
-    case "panel":
+    case EventType.panel:
       return "panels";
     default:
       return "panels";

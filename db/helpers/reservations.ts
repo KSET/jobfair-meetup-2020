@@ -1,4 +1,10 @@
+import type {
+  User,
+} from "../../api/graphql/types";
 import {
+  EventType,
+} from "../../components/student/event-status";
+import type {
   Query,
 } from "../methods";
 
@@ -6,9 +12,9 @@ import {
 export interface EventReservation {
   id: number;
   event_id: number;
-  event_type: string;
+  event_type: EventType;
   status: number;
-  user_id: number;
+  user_id: User["id"];
   created_at: string;
   updated_at: string;
 }
