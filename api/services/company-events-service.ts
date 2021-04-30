@@ -12,10 +12,10 @@ import {
   participantEventsQuery,
 } from "../graphql/queries";
 import type {
-  Company as GraphQlCompany,
   Presentation as GraphQlPresentation,
   Workshop as GraphQlWorkshop,
   Participants as GraphQlParticipants,
+  Participant as GraphQlParticipant,
 } from "../graphql/types";
 import {
   graphQlQuery,
@@ -40,20 +40,14 @@ import PanelsService, {
 
 type Workshop = CamelCasedPropertiesDeep<GraphQlWorkshop>;
 type Presentation = CamelCasedPropertiesDeep<GraphQlPresentation>
+type Participants = CamelCasedPropertiesDeep<GraphQlParticipants>;
+type Participant = CamelCasedPropertiesDeep<GraphQlParticipant>;
 
-interface CompanyId {
-  company: {
-    id: string;
-  };
-}
+export type Event = Participant | PanelWithInfo;
 
-export type Event = PanelWithInfo | (Presentation & CompanyId) | (Workshop & CompanyId);
-
-export interface Events {
+export interface Events extends Omit<Participants, "companies"> {
   companies: Company[];
   panels: PanelWithInfo[];
-  presentations: (Presentation & CompanyId)[];
-  workshops: (Workshop & CompanyId)[]
 }
 
 type EventsWithoutPanels = Omit<Events, "panels">;
@@ -74,17 +68,15 @@ export interface WorkshopWithInfo extends Omit<Workshop, "name"> {
 
 export type FixedEvent = Omit<PresentationWithInfo | WorkshopWithInfo | PanelWithInfo, "occuresAt"> & { date: Date };
 
-const typeTransformer = (type: string): keyof Events => {
+const typeTransformer = (type: string): keyof Omit<Participants, "companies"> | null => {
   switch (type) {
     case "presentation":
     case EventType.talk:
       return "presentations";
     case EventType.workshop:
       return "workshops";
-    case EventType.panel:
-      return "panels";
     default:
-      return "panels";
+      return null;
   }
 };
 
@@ -177,22 +169,30 @@ export default class CompanyEventsService {
     };
   }
 
-  static async listEventsForCompany(id: string | number, type: string): Promise<Event & { company: Company }> {
+  static async listEventsForCompany(id: string | number, type: string): Promise<Participant & { company: Company }> {
     const transformedType = typeTransformer(type);
 
-    const data = await graphQlQuery(participantEventsQuery());
-    const { companies }: { companies: GraphQlCompany[] } = data;
-    const objList: Event[] = data[transformedType];
-
-    if (!objList) {
+    if (!transformedType) {
       throw new CompanyEventsError(
-        `Nepoznat tip eventa: ${ transformedType }`,
+        `Nepoznat tip eventa: ${ type }`,
         null,
         HttpStatus.Error.Client.Forbidden,
       );
     }
 
-    const obj = objList.find(({ id: i }) => Number(i) === Number(id));
+    const data = await fetchParticipantsCached();
+    const { companies, ...events } = data;
+    const objList: Participant[] = events[transformedType];
+
+    if (!objList) {
+      throw new CompanyEventsError(
+        `Nepoznat tip eventa: ${ type }`,
+        null,
+        HttpStatus.Error.Client.Forbidden,
+      );
+    }
+
+    const obj = objList.find(({ id: i }) => String(i) === String(id));
 
     if (!obj) {
       throw new CompanyEventsError("Event nije pronađen");
@@ -204,10 +204,10 @@ export default class CompanyEventsService {
       throw new CompanyEventsError("Event nije pronađen");
     }
 
-    return keysFromSnakeToCamelCase({
+    return {
       ...obj,
-      company: CompanyService.fixCompany(company),
-    });
+      company,
+    };
   }
 
   static Format(data: Events): FixedEvent[] {

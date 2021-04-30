@@ -71,7 +71,7 @@ router.post("/application/submit", async (req) => {
     qs.parse(
       Object
         .entries(body)
-        .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(value) }`)
+        .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(String(value)) }`)
         .join("&")
       ,
     )
@@ -109,7 +109,7 @@ router.post("/application/submit", async (req) => {
     const label = path.reduce((acc, a) => acc[a], formLabels);
 
     for (const [ validation, validate ] of Object.entries(validations)) {
-      const isValid = validate(field);
+      const isValid = (validate as any)(field);
 
       if (!isValid) {
         throw new ApiError(
@@ -135,7 +135,7 @@ router.post("/application/submit", async (req) => {
       continue;
     }
 
-    for (const [ fieldName, validations ] of Object.entries(validationObject)) {
+    for (const [ fieldName, validations ] of Object.entries(validationObject as any)) {
       validateField(validations, "parts")(part, fieldName);
     }
   }
@@ -182,8 +182,8 @@ router.post("/application/submit", async (req) => {
       Sentry.captureException(
         e,
         {
-          req,
-        },
+          extra: req,
+        } as any,
       );
 
       throw new ApiError(
@@ -238,7 +238,7 @@ router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => 
   return params.id;
 }));
 
-router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+router.get("/events/:type/:id", async ({ params }) => {
   const { type, id } = params;
 
   if (!type || !id) {
@@ -256,11 +256,7 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
 
     throw e;
   }
-}, ({ params }) => {
-  const { type, id } = params;
-
-  return `${ type }::${ id }`;
-}));
+});
 
 router.get("/info/:id", async ({ params }) => {
   const { id } = params;

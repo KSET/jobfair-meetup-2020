@@ -79,6 +79,8 @@ export interface Participants {
   workshops: (Workshop & CompanyId)[]
 }
 
+export type Participant = (Presentation & CompanyId) | (Workshop & CompanyId);
+
 export interface ResumeAward {
   title: string;
   year: string;
