@@ -222,13 +222,13 @@ router.get("/industries", cachedFetcher(cacheForMs, async () => {
   return await CompanyService.fetchIndustries();
 }));
 
-router.get("/events/all", cachedFetcher(cacheForMs, async () => {
+router.get("/events/all", async () => {
   return await CompanyEventsService.listAll();
-}));
+});
 
-router.get("/events", cachedFetcher(cacheForMs, async () => {
+router.get("/events", async () => {
   return await CompanyEventsService.listNotPassed();
-}));
+});
 
 router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => {
   const { id } = params;
@@ -262,7 +262,7 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
   return `${ type }::${ id }`;
 }));
 
-router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+router.get("/info/:id", async ({ params }) => {
   const { id } = params;
 
   try {
@@ -274,9 +274,7 @@ router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
 
     throw e;
   }
-}, ({ params }) => {
-  return params.id;
-}));
+});
 
 router.post("/vat/check", async ({ body }) => {
   const { vat } = body;

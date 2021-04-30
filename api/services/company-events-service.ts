@@ -15,10 +15,14 @@ import type {
   Company as GraphQlCompany,
   Presentation as GraphQlPresentation,
   Workshop as GraphQlWorkshop,
+  Participants as GraphQlParticipants,
 } from "../graphql/types";
 import {
   graphQlQuery,
 } from "../helpers/axios";
+import {
+  cachedFetcher,
+} from "../helpers/fetchCache";
 import {
   HttpStatus,
 } from "../helpers/http";
@@ -52,6 +56,8 @@ export interface Events {
   workshops: (Workshop & CompanyId)[]
 }
 
+type EventsWithoutPanels = Omit<Events, "panels">;
+
 type CompanyWithoutId = Omit<Company, "id">;
 
 export interface PresentationWithInfo extends Presentation {
@@ -82,30 +88,41 @@ const typeTransformer = (type: string): keyof Events => {
   }
 };
 
+const cacheTimeoutMs = 15 * 1000;
+const fetchParticipantsCached: () => Promise<EventsWithoutPanels> =
+  cachedFetcher<EventsWithoutPanels>(
+    cacheTimeoutMs,
+    async (): Promise<EventsWithoutPanels> => {
+      const {
+        companies,
+        ...eventList
+      }: GraphQlParticipants = await graphQlQuery(participantEventsQuery());
+
+      return keysFromSnakeToCamelCase({
+        companies: companies.map(CompanyService.fixCompany),
+        ...eventList,
+      });
+    },
+  )
+;
+
 export class CompanyEventsError extends ServiceError {
 }
 
 export default class CompanyEventsServices {
-  cacheForMs: number = 15 * 1000;
-
   static async listAll(): Promise<Events> {
     const [
-      { companies, ...eventList },
+      participants,
       panels,
     ] = await Promise.all([
-      graphQlQuery(participantEventsQuery()),
+      fetchParticipantsCached(),
       PanelsService.listWithInfo(),
     ]);
 
-    const events: Omit<Events, "companies"> = {
+    return {
+      ...participants,
       panels,
-      ...eventList,
     };
-
-    return keysFromSnakeToCamelCase({
-      companies: companies.map(CompanyService.fixCompany),
-      ...events,
-    } as Events);
   }
 
   static async listNotPassed(): Promise<Events> {
