@@ -66,6 +66,8 @@ export interface Workshop {
   name: string;
   description: string;
   occures_at: string;
+  leader_biography: string;
+  student_requirements: string;
   location: string | null;
 }
 

@@ -131,6 +131,8 @@ export const workshopData = {
     "name",
     "description",
     "occures_at",
+    "leader_biography",
+    "student_requirements",
     // "finishes_at",
     "location",
   ),

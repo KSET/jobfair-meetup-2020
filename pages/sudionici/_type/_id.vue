@@ -163,6 +163,34 @@
             </div>
           </v-col>
 
+          <v-col
+            v-if="eventObj.leaderBiography"
+            cols="12"
+          >
+            <h2 :class="$style.about">
+              <translated-text trans-key="participants.event.aboutWorkshopLeader" />
+            </h2>
+
+            <p
+              :class="$style.breakSpaces"
+              v-text="eventObj.leaderBiography"
+            />
+          </v-col>
+
+          <v-col
+            v-if="eventObj.studentRequirements"
+            cols="12"
+          >
+            <h2 :class="$style.about">
+              <translated-text trans-key="participants.event.studentRequirements" />
+            </h2>
+
+            <p
+              :class="$style.breakSpaces"
+              v-text="eventObj.studentRequirements"
+            />
+          </v-col>
+
           <v-col v-if="isPanel" cols="12">
             <h2 :class="$style.about">
               <translated-text trans-key="participants.event.aboutPanelists" />
