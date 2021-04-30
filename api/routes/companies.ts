@@ -11,6 +11,9 @@ import {
   withoutKeys,
 } from "../../helpers/object";
 import {
+  sendCsv,
+} from "../helpers/csv";
+import {
   cachedFetcher,
 } from "../helpers/fetchCache";
 import {
@@ -35,6 +38,7 @@ import CompanyService, {
 import {
   ServiceError,
 } from "../services/error-service";
+import EventReservationsService from "../services/event-reservations-service";
 import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
 
@@ -350,5 +354,51 @@ authRouter.get("/application/token/list", async () => {
   return await CompanyApplicationTokenService.listApplicationTokens();
 });
 
+authRouter.get("/event-info/:eventType/reservations", async ({ authHeader, params }) => {
+  return await EventReservationsService.listFormattedFor(authHeader, params.eventType);
+});
+
+authRouter.getRaw("/event-info/:eventType/reservations.csv", async ({ authHeader, params }, res) => {
+  const events = await EventReservationsService.listFormattedFor(authHeader, params.eventType);
+
+  const headers = [
+    "Workshop name",
+    "Company name",
+    "Participant name and email",
+  ];
+
+  const rows =
+    events
+      .map(
+        (
+          {
+            title,
+            company,
+            users,
+          },
+        ) =>
+          users.map(
+            ({ name, email }) =>
+              [
+                title,
+                company,
+                `${ name } <${ email }>`,
+              ]
+            ,
+          )
+        ,
+      )
+      .flat()
+  ;
+
+  return sendCsv(
+    res,
+    {
+      fileName: `${ params.eventType }-reservations.csv`,
+      headers,
+      rows,
+    },
+  );
+});
 
 export default authRouter;

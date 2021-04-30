@@ -1,9 +1,9 @@
 import _ from "lodash/fp";
 import type {
- CamelCasedPropertiesDeep,
+  CamelCasedPropertiesDeep,
 } from "type-fest";
 import type {
- EventStatusType,
+  EventStatusType,
 } from "../../components/student/event-status";
 import {
   eventListFromStatus,
@@ -18,22 +18,23 @@ import {
   queryReservationsListUserIdsByEvent,
 } from "../../db/helpers/reservations";
 import {
- Client,
+  Client,
 } from "../../db/methods";
 import {
- keysFromSnakeToCamelCase,
+  keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import type {
- User,
+  User,
 } from "../graphql/types";
+import CompanyEventsService from "./company-events-service";
 import type {
   FixedEvent,
 } from "./company-events-service";
 import {
- ServiceError,
+  ServiceError,
 } from "./error-service";
 import type {
- BasicResumeInfo,
+  BasicResumeInfo,
 } from "./resume-service";
 import ResumeService from "./resume-service";
 
@@ -53,6 +54,7 @@ export interface FormattedEvent {
   id: FixedEvent["id"];
   title: FixedEvent["title"];
   company: FixedEvent["company"]["name"];
+  date: Date;
   users: {
     name: BasicResumeInfo["fullName"];
     email: BasicResumeInfo["email"];
@@ -164,5 +166,58 @@ export default class EventReservationsService {
           {} as Record<EventType, Omit<Event, "eventType">[]>,
         )
     );
+  }
+
+  static async listFormattedFor(authHeader: string, type: EventType): Promise<FormattedEvent[]> {
+    const [
+      rawCompanyEvents,
+      eventParticipants,
+    ] = await Promise.all([
+      CompanyEventsService.listAll(),
+      EventReservationsService.listAll(authHeader),
+    ]);
+
+    const companyEvents = CompanyEventsService.Format(rawCompanyEvents);
+
+    const {
+      events: {
+        [type]: eventsRaw,
+      },
+      users: resumes,
+    } = eventParticipants;
+
+    const workshopIdToData: Record<FixedEvent["id"], FixedEvent> =
+      _.flow(
+        _.filter((c: FixedEvent) => c.type === type),
+        _.map((c: FixedEvent) => [ c.id, c ]),
+        _.fromPairs,
+      )(companyEvents)
+    ;
+
+    const formatEvents =
+      _.flow(
+        _.toPairs,
+        _.filter(([ eventId ]) => workshopIdToData[eventId]),
+        _.map(([ eventId, { event: userIdsEvent, online: userIdsOnline } ]: [ FixedEvent["id"], { event: BasicResumeInfo["userId"][], online: BasicResumeInfo["userId"][] } ]) => ({
+          id: eventId,
+          title: workshopIdToData[eventId]?.title,
+          company: workshopIdToData[eventId]?.company?.name,
+          date: workshopIdToData[eventId]?.date,
+          users:
+            _.flow(
+              _.map(
+                (id: BasicResumeInfo["userId"]) => ({
+                  name: resumes[id]?.fullName,
+                  email: resumes[id]?.email,
+                }),
+              ),
+              _.compact,
+            )([ ...userIdsEvent, ...userIdsOnline ]),
+        })),
+        _.sortBy("date"),
+      )
+    ;
+
+    return formatEvents(eventsRaw);
   }
 }
