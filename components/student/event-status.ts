@@ -1,20 +1,37 @@
+const ensureEnumKeysSameAsValues = <T>(_kv: { [K in keyof T]: K }) => null;
+
+export enum EventType {
+  workshop = "workshop",
+  talk = "talk",
+  panel = "panel",
+}
+
+ensureEnumKeysSameAsValues(EventType);
+
+export interface Event {
+  type: EventType
+}
+
+interface EventStatusEntry {
+  value: number;
+  filter: ({ type }: Event) => boolean;
+}
+
+type EventStatusType = Record<string, EventStatusEntry>;
+
 let i = 0;
-/**
- * @readonly
- * @enum{Number}
- */
-export const EventStatus = Object.freeze({
+export const EventStatus: Readonly<EventStatusType> = Object.freeze({
   event: {
     value: 2 ** (i++),
     filter: () => true,
   },
   networking: {
     value: 2 ** (i++),
-    filter: ({ type }) => "talk" === type,
+    filter: ({ type }) => EventType.talk === type,
   },
   online: {
     value: 2 ** (i++),
-    filter: ({ type }) => "workshop" !== type,
+    filter: ({ type }) => EventType.workshop !== type,
   },
 });
 
@@ -23,7 +40,7 @@ export const EventStatus = Object.freeze({
  * @return {string[]}
  */
 export const eventStatusForEvent =
-  (event) =>
+  (event: Event): string[] =>
     Object
       .entries(EventStatus)
       .filter(
@@ -43,7 +60,7 @@ export const eventStatusForEvent =
  * @return {number}
  */
 export const statusFromEventList =
-  (eventList) =>
+  (eventList: (keyof EventStatusType)[]): number =>
     eventList
       .map((s) => EventStatus[s].value)
       // eslint-disable-next-line no-bitwise
@@ -55,7 +72,7 @@ export const statusFromEventList =
  * @return {string[]}
  */
 export const eventListFromStatus =
-  (status) =>
+  (status: number): (keyof EventStatusType)[] =>
     Object
       .entries(EventStatus)
       // eslint-disable-next-line no-bitwise
@@ -63,7 +80,7 @@ export const eventListFromStatus =
       .map(([ key ]) => key)
 ;
 
-export const getParticipantCapacityFor = (eventType) => {
+export const getParticipantCapacityFor = (eventType: EventType): number => {
   switch (eventType) {
     case "workshop":
       return 15;
@@ -80,7 +97,7 @@ export const getParticipantCapacityFor = (eventType) => {
  * @param {number} currentParticipants
  * @return {boolean}
  */
-export const hasParticipantCapacityFor = (eventType, currentParticipants = 0) => {
+export const hasParticipantCapacityFor = (eventType: EventType, currentParticipants = 0): boolean => {
   const maxParticipants = getParticipantCapacityFor(eventType);
 
   return currentParticipants < maxParticipants;
