@@ -31,6 +31,17 @@
           </v-icon>
           Pristupnici eventima
         </v-btn>
+
+        <v-btn
+          class="ml-3"
+          color="secondary"
+          :to="{ name: 'PageAdminEventsWorkshopEmails' }"
+        >
+          <v-icon left>
+            mdi-email-multiple
+          </v-icon>
+          Workshop emailovi
+        </v-btn>
       </v-col>
     </v-row>
 
