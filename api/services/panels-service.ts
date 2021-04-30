@@ -1,5 +1,8 @@
 import _ from "lodash/fp";
 import {
+  EventType,
+} from "../../components/student/event-status";
+import {
   queryPanelsCreate,
   queryPanelsDeleteById,
   queryPanelsGetAll,
@@ -7,27 +10,27 @@ import {
   queryPanelsUpdateById,
 } from "../../db/helpers/panels";
 import {
+  queryReservationsDeleteByEventId,
+} from "../../db/helpers/reservations";
+import {
   Client,
 } from "../../db/methods";
 import {
   keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
+  cachedFetcher,
+} from "../helpers/fetchCache";
+import {
   HttpStatus,
 } from "../helpers/http";
 import {
   ApiError,
 } from "../helpers/route";
-import {
-  queryReservationsDeleteByEventId,
-} from "../../db/helpers/reservations";
-import {
-  cachedFetcher,
-} from "../helpers/fetchCache";
-import CompanyService from "./company-service";
 import type {
   Company,
 } from "./company-service";
+import CompanyService from "./company-service";
 
 type ID = number | string;
 
@@ -64,8 +67,8 @@ export interface PanelWithInfo {
   occuresAt: string;
   date: string;
   companies: CompanyInfo[];
-  type: "panel";
-  location: string;
+  type: EventType.panel;
+  location: "KSET";
   company: Company;
 }
 
@@ -91,7 +94,7 @@ const addInfo =
           info: companyList[companyId],
           ...rest,
         })),
-        type: "panel",
+        type: EventType.panel,
         location: "KSET",
       }),
       (panel) => ({
@@ -233,8 +236,8 @@ export default class PanelsService {
       }
 
       await client.queryOne(queryReservationsDeleteByEventId({
-        eventType: "panel",
-        eventId: id,
+        eventType: EventType.panel,
+        eventId: Number(id),
       }));
 
       await client.commit();

@@ -1,8 +1,52 @@
+import type {
+  User,
+} from "../../api/graphql/types";
+import {
+  EventType,
+} from "../../components/student/event-status";
+import type {
+  Query,
+} from "../methods";
+
+/* eslint-disable camelcase */
+export interface EventReservation {
+  id: number;
+  event_id: number;
+  event_type: EventType;
+  status: number;
+  user_id: User["id"];
+  created_at: string;
+  updated_at: string;
+}
+
+type EventReservationInfo = Pick<EventReservation, "event_id" | "event_type" | "status">;
+
+export type EventReservationCount =
+  EventReservationInfo
+  & { count: number; }
+  ;
+
+export type EventReservationGroup =
+  EventReservationInfo
+  & { user_ids: string } // user_id.join(',')
+  ;
+
+/* eslint-enable camelcase */
+
+export interface Data {
+  eventType: EventReservation["event_type"];
+  eventId: EventReservation["event_id"];
+  userId: EventReservation["user_id"];
+  status: EventReservation["status"];
+}
+
 export const queryReservationsGetByEventId =
-  ({
-     eventType,
-     eventId,
-   }) => ({
+  (
+    {
+      eventType,
+      eventId,
+    }: Pick<Data, "eventType" | "eventId">,
+  ): Query => ({
     text: `
       select
         *
@@ -21,7 +65,7 @@ export const queryReservationsGetByEventId =
 ;
 
 export const queryReservationsCountVisitorsByEvent =
-  () => ({
+  (): Query => ({
     text: `
       select
         event_id, event_type, status, count(status)
@@ -37,7 +81,7 @@ export const queryReservationsCountVisitorsByEvent =
 ;
 
 export const queryReservationsListUserIdsByEvent =
-  () => ({
+  (): Query => ({
     text: `
       select
           event_id
@@ -58,10 +102,12 @@ export const queryReservationsListUserIdsByEvent =
 ;
 
 export const queryReservationsCountVisitorsForEvent =
-  ({
-     eventType,
-     eventId,
-   }) => ({
+  (
+    {
+      eventType,
+      eventId,
+    }: Pick<Data, "eventType" | "eventId">,
+  ): Query => ({
     text: `
       select
         event_id, event_type, status, count(status)
@@ -82,9 +128,11 @@ export const queryReservationsCountVisitorsForEvent =
 ;
 
 export const queryReservationsGetByUserId =
-  ({
-     userId,
-   }) => ({
+  (
+    {
+      userId,
+    }: Pick<Data, "userId">,
+  ): Query => ({
     text: `
       select
         *
@@ -101,11 +149,13 @@ export const queryReservationsGetByUserId =
 ;
 
 export const queryReservationsGetByEventAndUserId =
-  ({
-     eventId,
-     eventType,
-     userId,
-   }) => ({
+  (
+    {
+      eventId,
+      eventType,
+      userId,
+    }: Pick<Data, "eventType" | "eventId" | "userId">,
+  ): Query => ({
     text: `
       select
         *
@@ -125,12 +175,14 @@ export const queryReservationsGetByEventAndUserId =
 ;
 
 export const queryReservationsCreate =
-  ({
-     eventId,
-     eventType,
-     userId,
-     status,
-   }) => {
+  (
+    {
+      eventId,
+      eventType,
+      userId,
+      status,
+    }: Pick<Data, "eventType" | "eventId" | "userId" | "status">,
+  ): Query => {
     const row = {
       status,
       // eslint-disable-next-line camelcase
@@ -173,11 +225,11 @@ export const queryReservationsUpdateStatusByEventIdAndUserId =
       eventId,
       eventType,
       userId,
-    },
+    }: Pick<Data, "eventType" | "eventId" | "userId">,
     {
       status,
-    },
-  ) => ({
+    }: Pick<Data, "status">,
+  ): Query => ({
     text: `
       update
         event_reservations
@@ -202,10 +254,12 @@ export const queryReservationsUpdateStatusByEventIdAndUserId =
 ;
 
 export const queryReservationsDeleteByEventId =
-  ({
-     eventType,
-     eventId,
-   }) => ({
+  (
+    {
+      eventType,
+      eventId,
+    }: Pick<Data, "eventType" | "eventId">,
+  ): Query => ({
     text: `
       delete from
         event_reservations

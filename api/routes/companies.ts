@@ -11,6 +11,9 @@ import {
   withoutKeys,
 } from "../../helpers/object";
 import {
+  sendCsv,
+} from "../helpers/csv";
+import {
   cachedFetcher,
 } from "../helpers/fetchCache";
 import {
@@ -35,6 +38,7 @@ import CompanyService, {
 import {
   ServiceError,
 } from "../services/error-service";
+import EventReservationsService from "../services/event-reservations-service";
 import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
 
@@ -71,7 +75,7 @@ router.post("/application/submit", async (req) => {
     qs.parse(
       Object
         .entries(body)
-        .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(value) }`)
+        .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(String(value)) }`)
         .join("&")
       ,
     )
@@ -109,7 +113,7 @@ router.post("/application/submit", async (req) => {
     const label = path.reduce((acc, a) => acc[a], formLabels);
 
     for (const [ validation, validate ] of Object.entries(validations)) {
-      const isValid = validate(field);
+      const isValid = (validate as any)(field);
 
       if (!isValid) {
         throw new ApiError(
@@ -135,7 +139,7 @@ router.post("/application/submit", async (req) => {
       continue;
     }
 
-    for (const [ fieldName, validations ] of Object.entries(validationObject)) {
+    for (const [ fieldName, validations ] of Object.entries(validationObject as any)) {
       validateField(validations, "parts")(part, fieldName);
     }
   }
@@ -182,8 +186,8 @@ router.post("/application/submit", async (req) => {
       Sentry.captureException(
         e,
         {
-          req,
-        },
+          extra: req,
+        } as any,
       );
 
       throw new ApiError(
@@ -222,13 +226,13 @@ router.get("/industries", cachedFetcher(cacheForMs, async () => {
   return await CompanyService.fetchIndustries();
 }));
 
-router.get("/events/all", cachedFetcher(cacheForMs, async () => {
+router.get("/events/all", async () => {
   return await CompanyEventsService.listAll();
-}));
+});
 
-router.get("/events", cachedFetcher(cacheForMs, async () => {
+router.get("/events", async () => {
   return await CompanyEventsService.listNotPassed();
-}));
+});
 
 router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => {
   const { id } = params;
@@ -238,7 +242,7 @@ router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => 
   return params.id;
 }));
 
-router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+router.get("/events/:type/:id", async ({ params }) => {
   const { type, id } = params;
 
   if (!type || !id) {
@@ -256,13 +260,9 @@ router.get("/events/:type/:id", cachedFetcher(cacheForMs, async ({ params }) => 
 
     throw e;
   }
-}, ({ params }) => {
-  const { type, id } = params;
+});
 
-  return `${ type }::${ id }`;
-}));
-
-router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+router.get("/info/:id", async ({ params }) => {
   const { id } = params;
 
   try {
@@ -274,9 +274,7 @@ router.get("/info/:id", cachedFetcher(cacheForMs, async ({ params }) => {
 
     throw e;
   }
-}, ({ params }) => {
-  return params.id;
-}));
+});
 
 router.post("/vat/check", async ({ body }) => {
   const { vat } = body;
@@ -356,5 +354,51 @@ authRouter.get("/application/token/list", async () => {
   return await CompanyApplicationTokenService.listApplicationTokens();
 });
 
+authRouter.get("/event-info/:eventType/reservations", async ({ authHeader, params }) => {
+  return await EventReservationsService.listFormattedFor(authHeader, params.eventType);
+});
+
+authRouter.getRaw("/event-info/:eventType/reservations.csv", async ({ authHeader, params }, res) => {
+  const events = await EventReservationsService.listFormattedFor(authHeader, params.eventType);
+
+  const headers = [
+    "Workshop name",
+    "Company name",
+    "Participant name and email",
+  ];
+
+  const rows =
+    events
+      .map(
+        (
+          {
+            title,
+            company,
+            users,
+          },
+        ) =>
+          users.map(
+            ({ name, email }) =>
+              [
+                title,
+                company,
+                `${ name } <${ email }>`,
+              ]
+            ,
+          )
+        ,
+      )
+      .flat()
+  ;
+
+  return sendCsv(
+    res,
+    {
+      fileName: `${ params.eventType }-reservations.csv`,
+      headers,
+      rows,
+    },
+  );
+});
 
 export default authRouter;

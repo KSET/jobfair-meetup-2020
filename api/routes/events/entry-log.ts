@@ -1,4 +1,7 @@
 import {
+ EventType,
+} from "../../../components/student/event-status";
+import {
   queryEventLogEntriesCreate,
   queryEventLogEntriesGetAll,
   queryEventLogEntriesGetByEvent,
@@ -279,14 +282,14 @@ moderatorRouter.getRaw("//export/all.csv", async ({ authHeader }, res) => {
     internalRequest("get", "/resumes/list", auth),
   ]);
 
-  const typeTransformer = (key) => {
+  const typeTransformer = (key: string): EventType => {
     switch (key) {
       case "presentations":
-        return "talk";
+        return EventType.talk;
       case "workshops":
-        return "workshop";
+        return EventType.workshop;
       default:
-        return key.replace(/s$/, "");
+        return key.replace(/s$/, "") as EventType;
     }
   };
 

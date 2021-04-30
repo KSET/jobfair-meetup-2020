@@ -148,4 +148,10 @@ export const actions = {
 
     return fixParticipantEvents(data);
   },
+
+  async fetchEventReservationsFor(_context, { type }) {
+    const { data } = await this.$api.$get(`/companies/event-info/${ type }/reservations`).catch((e) => e);
+
+    return data;
+  },
 };

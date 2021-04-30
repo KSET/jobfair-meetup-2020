@@ -31,6 +31,17 @@
           </v-icon>
           Pristupnici eventima
         </v-btn>
+
+        <v-btn
+          class="ml-3"
+          color="secondary"
+          :to="{ name: 'PageAdminEventsWorkshopEmails' }"
+        >
+          <v-icon left>
+            mdi-email-multiple
+          </v-icon>
+          Workshop emailovi
+        </v-btn>
       </v-col>
     </v-row>
 
@@ -199,6 +210,7 @@ name: PageAdminEventsIndex
   import {
     EventStatus,
     eventStatusForEvent,
+    EventType,
     getParticipantCapacityFor,
   } from "~/components/student/event-status";
   import TranslatedText from "~/components/TranslatedText";
@@ -376,15 +388,15 @@ name: PageAdminEventsIndex
           },
           {
             name: "participants.filter.workshops",
-            value: "workshop",
+            value: EventType.workshop,
           },
           {
             name: "participants.filter.panels",
-            value: "panel",
+            value: EventType.panel,
           },
           {
             name: "participants.filter.talks",
-            value: "talk",
+            value: EventType.talk,
           },
         ];
       },

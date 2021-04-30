@@ -69,6 +69,18 @@ export interface Workshop {
   location: string | null;
 }
 
+interface CompanyId {
+  company: Pick<Company, "id">;
+}
+
+export interface Participants {
+  companies: Company[];
+  presentations: (Presentation & CompanyId)[]
+  workshops: (Workshop & CompanyId)[]
+}
+
+export type Participant = (Presentation & CompanyId) | (Workshop & CompanyId);
+
 export interface ResumeAward {
   title: string;
   year: string;
