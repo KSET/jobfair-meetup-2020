@@ -5,7 +5,7 @@ import {
   promisify,
 } from "util";
 import {
- UploadedFile,
+  UploadedFile,
 } from "express-fileupload";
 import type {
   CamelCasedPropertiesDeep,
@@ -105,9 +105,9 @@ export default class ImageService {
     })) as DbImageVariation;
   }
 
-  static async upload(file: UploadedFile, uploaderId: User["id"]): Promise<Record<string, ImageInfo>> {
+  static async upload(file: UploadedFile, uploaderId: User["id"], dbClient: Client | null = null): Promise<Record<string, ImageInfo>> {
     const files: Record<string, ImageInfo> = {};
-    const client = await Client.inTransaction();
+    const client = await Client.extend(dbClient);
 
     const uploadGif = async ({ file, imageId, extension }) => {
       const filePath = this.GetUploadPath({ imageId, name: "default", extension });
@@ -244,9 +244,13 @@ export default class ImageService {
         await uploadHandler({ file, imageSizes, imageId, extension: ext }),
       );
 
-      await client.commit();
+      if (!dbClient) {
+        await client.commit();
+      }
     } catch (e) {
-      await client.rollback();
+      if (!dbClient) {
+        await client.rollback();
+      }
 
       console.log("|> UPLOAD ERROR", e);
 
@@ -269,7 +273,9 @@ export default class ImageService {
 
       throw e;
     } finally {
-      await client.end();
+      if (!dbClient) {
+        await client.end();
+      }
     }
 
     return files;
