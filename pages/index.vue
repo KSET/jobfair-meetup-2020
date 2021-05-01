@@ -867,7 +867,7 @@ name: Index
       .participantContainer {
         padding: .5em;
         cursor: pointer;
-        border: 1px dashed rgba(0, 0, 0, .3);
+        //border: 1px dashed rgba(0, 0, 0, .3);
 
         @include media(sm) {
           margin: .5em;
