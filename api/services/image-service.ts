@@ -4,6 +4,12 @@ import {
 import {
   promisify,
 } from "util";
+import {
+ UploadedFile,
+} from "express-fileupload";
+import type {
+  CamelCasedPropertiesDeep,
+} from "type-fest";
 import rimraf from "rimraf";
 import sharp from "sharp";
 import {
@@ -13,6 +19,11 @@ import {
   queryImageGetByIds,
   queryImageVariationCreate,
   queryImageVariationGetByNameAndImage,
+} from "../../db/helpers/image";
+import type {
+  Image as DbImage,
+  ImageVariation as DbImageVariation,
+  ImageInfo as DbImageInfo,
 } from "../../db/helpers/image";
 import {
   Client,
@@ -27,6 +38,9 @@ import {
   pickKeys,
   pipe,
 } from "../../helpers/object";
+import type {
+  User,
+} from "../graphql/types";
 import {
   apiFilePath,
   localFilePath,
@@ -40,6 +54,11 @@ const mkdir = promisify(mkdirCb);
 
 const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
 
+type Image = CamelCasedPropertiesDeep<DbImage>;
+type ImageVariation = CamelCasedPropertiesDeep<DbImageVariation>;
+
+export type ImageInfo = Pick<Image & ImageVariation, "name" | "imageId" | "width" | "height"> & { url: string };
+
 export class ImageError extends ServiceError {
 }
 
@@ -47,16 +66,16 @@ export class ImageUploadError extends ImageError {
 }
 
 export default class ImageService {
-  static async info(id) {
-    return await Client.queryOnce(queryImageGetById(id));
+  static async info(id: Image["id"]): Promise<Image[] | null> {
+    return await Client.queryOnce<Image>(queryImageGetById(id));
   }
 
-  static async listInfo(...ids) {
-    const res = await Client.queryOnce(queryImageGetByIds(...ids.flat())) || [];
+  static async listInfo(...ids: Image["id"][]): Promise<ImageInfo[]> {
+    const res = await Client.queryOnce<DbImageInfo>(queryImageGetByIds(...ids.flat())) || [];
 
-    const format = pipe(
+    const format: (arg: DbImageInfo) => ImageInfo = pipe(
       keysFromSnakeToCamelCase,
-      (image) => ({
+      (image: CamelCasedPropertiesDeep<DbImageInfo>) => ({
         ...pickKeys(
           [
             "name",
@@ -73,21 +92,21 @@ export default class ImageService {
     return res.map(format);
   }
 
-  static async listInfoAsObject(...ids) {
+  static async listInfoAsObject(...ids: Image["id"][]): Promise<Record<ImageInfo["imageId"], ImageInfo>> {
     const list = await this.listInfo(...ids);
 
     return this.ImageListToObject(list);
   }
 
-  static async variationInfo(id, name) {
-    return await Client.queryOneOnce(queryImageVariationGetByNameAndImage({
+  static async variationInfo(id: Image["id"], name: Image["name"]): Promise<DbImageVariation> {
+    return await Client.queryOneOnce<DbImageVariation>(queryImageVariationGetByNameAndImage({
       imageId: id,
       name,
-    }));
+    })) as DbImageVariation;
   }
 
-  static async upload(file, uploaderId) {
-    const files = {};
+  static async upload(file: UploadedFile, uploaderId: User["id"]): Promise<Record<string, ImageInfo>> {
+    const files: Record<string, ImageInfo> = {};
     const client = await Client.inTransaction();
 
     const uploadGif = async ({ file, imageId, extension }) => {
@@ -179,7 +198,7 @@ export default class ImageService {
       );
     };
 
-    let imageFolder = null;
+    let imageFolder = "";
     try {
       if (!file) {
         throw new ImageUploadError("Slika nije predana");
@@ -197,10 +216,16 @@ export default class ImageService {
         throw new ImageUploadError(`Slika prevelika (Najviše ${ bytesToHumanReadable(MAX_IMAGE_SIZE__B) })`);
       }
 
-      const [ { id: imageId } ] = await client.query(queryImageCreate({
+      const image = await client.queryOne<{ id: Image["id"] }>(queryImageCreate({
         name: file.name,
         creatorId: uploaderId,
       }));
+
+      if (!image) {
+        throw new ImageUploadError("Slika nije predana");
+      }
+
+      const { id: imageId } = image;
 
       const dir = localFolderPath({ imageId });
 
@@ -250,7 +275,7 @@ export default class ImageService {
     return files;
   }
 
-  static async remove(id, dbClient = null) {
+  static async remove(id: Image["id"], dbClient: Client | null = null): Promise<boolean> {
     const client = dbClient || await Client.inTransaction();
 
     try {
@@ -274,7 +299,7 @@ export default class ImageService {
     return true;
   }
 
-  static ImageListToObject(images) {
+  static ImageListToObject(images: ImageInfo[]): Record<ImageInfo["imageId"], ImageInfo> {
     return (
       images
         .reduce(
@@ -296,8 +321,11 @@ export default class ImageService {
     {
       name,
       extension,
+    }: {
+      name: Image["name"];
+      extension: string;
     },
-  ) {
+  ): string {
     if (Number.isInteger(name)) {
       return `w${ name }.${ extension }`;
     } else {
@@ -310,8 +338,12 @@ export default class ImageService {
       imageId,
       name,
       extension = "",
+    }: {
+      imageId: Image["id"];
+      name: ImageVariation["name"];
+      extension: string;
     },
-  ) {
+  ): string {
     return localFilePath({
       imageId,
       name: this.GetUploadName({ name, extension }),
@@ -325,14 +357,20 @@ export default class ImageService {
       mimeType,
       filenameOverride = "",
       extension = "",
+    }: {
+      dbClient: Client;
+      imageId: Image["id"];
+      mimeType: ImageVariation["mimeType"];
+      filenameOverride?: string;
+      extension?: string;
     },
   ) {
-    return async ({ width, height }) => {
-      const name = filenameOverride || width;
+    return async ({ width, height }: { width: number; height: number }): Promise<ImageVariation> => {
+      const name = String(filenameOverride || width);
       const image =
         await
           dbClient
-            .queryOne(
+            .queryOne<DbImageVariation>(
               queryImageVariationCreate({
                 name,
                 path: this.GetUploadPath({
@@ -345,7 +383,7 @@ export default class ImageService {
                 imageId,
                 mimeType,
               }),
-            )
+            ) as DbImageVariation
       ;
 
       return keysFromSnakeToCamelCase(image);
