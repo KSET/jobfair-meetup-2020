@@ -92,7 +92,7 @@ export default class ImageService {
     return res.map(format);
   }
 
-  static async listInfoAsObject(...ids: Image["id"][]): Promise<Record<ImageInfo["imageId"], ImageInfo>> {
+  static async listInfoAsObject(...ids: Image["id"][]): Promise<Record<ImageInfo["imageId"], ImageInfo[]>> {
     const list = await this.listInfo(...ids);
 
     return this.ImageListToObject(list);
@@ -299,7 +299,7 @@ export default class ImageService {
     return true;
   }
 
-  static ImageListToObject(images: ImageInfo[]): Record<ImageInfo["imageId"], ImageInfo> {
+  static ImageListToObject(images: ImageInfo[]): Record<ImageInfo["imageId"], ImageInfo[]> {
     return (
       images
         .reduce(
@@ -312,7 +312,7 @@ export default class ImageService {
 
             return acc;
           },
-          {},
+          {} as Record<ImageInfo["imageId"], ImageInfo[]>,
         )
     );
   }
