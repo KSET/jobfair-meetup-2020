@@ -1,10 +1,45 @@
+import type {
+ CamelCasedPropertiesDeep,
+} from "type-fest";
+import type {
+  User,
+} from "../../api/graphql/types";
 import {
   generateInsertQuery,
   generateUpdateQuery,
 } from "../../db/query";
+import type {
+  Query,
+} from "../methods";
+import {
+  Image,
+} from "./image";
+
+/* eslint-disable camelcase */
+
+export interface PanelCompany {
+  companyId: string;
+  aboutPanelist: string;
+  uploaderId: User["id"];
+  imageId?: Image["id"];
+}
+
+export interface Panel {
+  id: number;
+  title: string;
+  description: string;
+  occures_at: string;
+  companies: PanelCompany[];
+  created_at: string;
+  updated_at: string;
+}
+
+export type PanelData = Omit<CamelCasedPropertiesDeep<Panel>, "createdAt" | "updatedAt" | "id">
+
+/* eslint-enable camelcase */
 
 export const queryPanelsGetAll =
-  () => ({
+  (): Query => ({
     text: `
       select
         *
@@ -17,9 +52,11 @@ export const queryPanelsGetAll =
 ;
 
 export const queryPanelsGetById =
-  ({
-     id,
-   }) => ({
+  (
+    {
+      id,
+    }: Pick<Panel, "id">,
+  ): Query => ({
     text: `
       select
         *
@@ -35,9 +72,11 @@ export const queryPanelsGetById =
 ;
 
 export const queryPanelsDeleteById =
-  ({
-     id,
-   }) => ({
+  (
+    {
+      id,
+    }: Pick<Panel, "id">,
+  ): Query => ({
     text: `
       delete from
         panels
@@ -52,12 +91,14 @@ export const queryPanelsDeleteById =
 ;
 
 export const queryPanelsCreate =
-  ({
-     title,
-     description,
-     occuresAt,
-     companies,
-   }) => generateInsertQuery({
+  (
+    {
+      title,
+      description,
+      occuresAt,
+      companies,
+    }: PanelData,
+  ): Query => generateInsertQuery({
     table: "panels",
     data: {
       title,
@@ -70,14 +111,14 @@ export const queryPanelsCreate =
 
 export const queryPanelsUpdateById =
   (
-    id,
+    id: Panel["id"],
     {
       title,
       description,
       occuresAt,
       companies,
-    },
-  ) => generateUpdateQuery(
+    }: Partial<PanelData>,
+  ): Query => generateUpdateQuery(
     {
       table: "panels",
       data: {
