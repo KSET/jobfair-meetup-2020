@@ -40,6 +40,14 @@ export class Client {
 
   #ended = false;
 
+  static async extend(client: Client | null): Promise<Client> {
+    if (client) {
+      return client;
+    }
+
+    return await this.inTransaction();
+  }
+
   static async connected(): Promise<Client> {
     return await (new Client()).connect();
   }
@@ -65,18 +73,17 @@ export class Client {
   }
 
   static async transaction<T>(fn: (client: Client) => Promise<T>): Promise<T> {
-    return await this.once<T>(async (client) => {
-      try {
-        await client.startTransaction();
-        const result = await fn(client);
-        await client.commit();
+    return await this.once<T>(doSafeTransaction<T>(fn));
+  }
 
-        return result;
-      } catch (e) {
-        await client.rollback();
-        throw e;
-      }
-    });
+  static async extendTransaction<T>(client: Client | null, fn: (client: Client) => Promise<T>): Promise<T> {
+    const transactionFn = doSafeTransaction<T>(fn);
+
+    if (client) {
+      return await transactionFn(client);
+    } else {
+      return this.once<T>(transactionFn);
+    }
   }
 
   static async once<T>(fn: (client: Client) => Promise<T>): Promise<T> {
@@ -169,6 +176,19 @@ export class Client {
     this.#ended = true;
   }
 }
+
+const doSafeTransaction = <T>(fn: (client: Client) => Promise<T>) => async (client: Client) => {
+  try {
+    await client.startTransaction();
+    const result = await fn(client);
+    await client.commit();
+
+    return result;
+  } catch (e) {
+    await client.rollback();
+    throw e;
+  }
+};
 
 export const getClient =
   (): Client => new Client()

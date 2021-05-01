@@ -272,7 +272,6 @@
 
     <v-row :class="$style.participantsContainer">
       <v-col cols="12">
-        <!--
         <v-row>
           <v-col cols="12">
             <h1 :class="$style.participantsHeader">
@@ -306,7 +305,6 @@
             </nuxt-link>
           </v-col>
         </v-row>
-        -->
 
         <v-row>
           <v-col cols="12">
@@ -867,7 +865,7 @@ name: Index
       .participantContainer {
         padding: .5em;
         cursor: pointer;
-        border: 1px dashed rgba(0, 0, 0, .3);
+        //border: 1px dashed rgba(0, 0, 0, .3);
 
         @include media(sm) {
           margin: .5em;
