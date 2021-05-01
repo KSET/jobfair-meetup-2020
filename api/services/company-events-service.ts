@@ -160,7 +160,7 @@ export default class CompanyEventsService {
     };
   }
 
-  static async listPanelsForCompany(id: string | number): Promise<PanelWithInfo> {
+  static async listPanelsForCompany(id: Panel["id"]): Promise<PanelWithInfo> {
     const panel = await PanelsService.fullInfo(id);
 
     return {
@@ -169,7 +169,7 @@ export default class CompanyEventsService {
     };
   }
 
-  static async listEventsForCompany(id: string | number, type: string): Promise<Participant & { company: Company }> {
+  static async listEventsForCompany(id: Panel["id"], type: string): Promise<Participant & { company: Company }> {
     const transformedType = typeTransformer(type);
 
     if (!transformedType) {

@@ -95,7 +95,7 @@ export default class ImageService {
   static async listInfoAsObject(...ids: Image["id"][]): Promise<Record<ImageInfo["imageId"], ImageInfo[]>> {
     const list = await this.listInfo(...ids);
 
-    return this.ImageListToObject(list);
+    return this.imageListToObject(list);
   }
 
   static async variationInfo(id: Image["id"], name: Image["name"]): Promise<DbImageVariation> {
@@ -110,11 +110,11 @@ export default class ImageService {
     const client = await Client.extend(dbClient);
 
     const uploadGif = async ({ file, imageId, extension }) => {
-      const filePath = this.GetUploadPath({ imageId, name: "default", extension });
+      const filePath = this.getUploadPath({ imageId, name: "default", extension });
 
       await file.mv(filePath);
 
-      const image = await this.CreateImageVariation({
+      const image = await this.createImageVariation({
         dbClient: client,
         imageId,
         mimeType: file.mimetype,
@@ -144,12 +144,12 @@ export default class ImageService {
                   width,
                   fit: "contain",
                 })
-                .toFile(this.GetUploadPath({
+                .toFile(this.getUploadPath({
                   imageId,
                   name: width,
                   extension,
                 }))
-                .then(this.CreateImageVariation({
+                .then(this.createImageVariation({
                   dbClient: client,
                   imageId,
                   mimeType: file.mimetype,
@@ -167,12 +167,12 @@ export default class ImageService {
             withoutEnlargement: true,
             fit: "contain",
           })
-          .toFile(this.GetUploadPath({
+          .toFile(this.getUploadPath({
             imageId,
             name: "default",
             extension,
           }))
-          .then(this.CreateImageVariation({
+          .then(this.createImageVariation({
             dbClient: client,
             imageId,
             mimeType: file.mimetype,
@@ -305,7 +305,7 @@ export default class ImageService {
     return true;
   }
 
-  static ImageListToObject(images: ImageInfo[]): Record<ImageInfo["imageId"], ImageInfo[]> {
+  private static imageListToObject(images: ImageInfo[]): Record<ImageInfo["imageId"], ImageInfo[]> {
     return (
       images
         .reduce(
@@ -323,7 +323,7 @@ export default class ImageService {
     );
   }
 
-  static GetUploadName(
+  private static getUploadName(
     {
       name,
       extension,
@@ -339,7 +339,7 @@ export default class ImageService {
     }
   }
 
-  static GetUploadPath(
+  private static getUploadPath(
     {
       imageId,
       name,
@@ -352,11 +352,11 @@ export default class ImageService {
   ): string {
     return localFilePath({
       imageId,
-      name: this.GetUploadName({ name, extension }),
+      name: this.getUploadName({ name, extension }),
     });
   }
 
-  static CreateImageVariation(
+  private static createImageVariation(
     {
       dbClient,
       imageId,
@@ -379,7 +379,7 @@ export default class ImageService {
             .queryOne<DbImageVariation>(
               queryImageVariationCreate({
                 name,
-                path: this.GetUploadPath({
+                path: this.getUploadPath({
                   imageId,
                   name,
                   extension,

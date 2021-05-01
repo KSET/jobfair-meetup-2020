@@ -7,14 +7,53 @@ import {
 import {
   promisify,
 } from "util";
+import type {
+  CamelCasedPropertiesDeep,
+} from "type-fest";
+import type {
+  User,
+} from "../../api/graphql/types";
+import {
+  Client,
+  Query,
+} from "../methods";
 
 const rmdir = promisify(rmdirOld);
 
+/* eslint-disable camelcase */
+
+export interface Image {
+  id: number;
+  name: string;
+  creator_id: User["id"];
+  created_at: string;
+}
+
+type ImageData = Omit<CamelCasedPropertiesDeep<Image>, "id" | "createdAt">;
+
+export interface ImageVariation {
+  id: number;
+  name: string;
+  path: string;
+  width: number;
+  height: number;
+  image_id: Image["id"];
+  mime_type: string;
+}
+
+type ImageVariationData = Omit<CamelCasedPropertiesDeep<ImageVariation>, "id">;
+
+export type ImageInfo = Image & ImageVariation & { original_name: Image["name"] };
+
+/* eslint-enable camelcase */
+
 export const queryImageCreate =
-  ({
-     name,
-     creatorId,
-   }) => ({
+  (
+    {
+      name,
+      creatorId,
+    }: Pick<ImageData, "name" | "creatorId">,
+  ): Query => ({
     text: "insert into images (\"name\", creator_id) values ($1, $2) returning id",
     values: [
       name,
@@ -24,7 +63,9 @@ export const queryImageCreate =
 ;
 
 export const queryImageGetById =
-  (id) => ({
+  (
+    id: Image["id"],
+  ): Query => ({
     text: `
       select
         *,
@@ -44,7 +85,9 @@ export const queryImageGetById =
 ;
 
 export const queryImageGetByIds =
-  (...ids) => ({
+  (
+    ...ids: Image["id"][]
+  ): Query => ({
     text: `
       select
         *,
@@ -64,14 +107,16 @@ export const queryImageGetByIds =
 ;
 
 export const queryImageVariationCreate =
-  ({
-     name,
-     path,
-     width,
-     height,
-     imageId,
-     mimeType,
-   }) => ({
+  (
+    {
+      name,
+      path,
+      width,
+      height,
+      imageId,
+      mimeType,
+    }: ImageVariationData,
+  ): Query => ({
     text: "insert into image_variations (\"name\", \"path\", width, height, image_id, mime_type) values ($1, $2, $3, $4, $5, $6) returning id, \"name\", image_id",
     values: [
       name,
@@ -85,10 +130,12 @@ export const queryImageVariationCreate =
 ;
 
 export const queryImageVariationGetByNameAndImage =
-  ({
-     name,
-     imageId,
-   }) => ({
+  (
+    {
+      name,
+      imageId,
+    }: Pick<ImageVariationData, "name" | "imageId">,
+  ): Query => ({
     text: `
       select
         *
@@ -105,9 +152,11 @@ export const queryImageVariationGetByNameAndImage =
   });
 
 export const queryImageDeleteById =
-  ({
-     id,
-   }) => ({
+  (
+    {
+      id,
+    }: Pick<Image, "id">,
+  ): Query => ({
     text: `
       delete from
         images
@@ -122,12 +171,12 @@ export const queryImageDeleteById =
 
 export const deleteImageById =
   async (
-    client,
+    client: Client,
     {
       id,
-    },
-  ) => {
-    const [ image ] = await client.query(queryImageGetById(id));
+    }: Pick<Image, "id">,
+  ): Promise<boolean> => {
+    const [ image ] = await client.query(queryImageGetById(id)) as any;
 
     if (!image) {
       return false;

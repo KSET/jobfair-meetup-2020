@@ -9,6 +9,9 @@ import {
   queryPanelsGetById,
   queryPanelsUpdateById,
 } from "../../db/helpers/panels";
+import type {
+  PanelCompany,
+} from "../../db/helpers/panels";
 import {
   queryReservationsDeleteByEventId,
 } from "../../db/helpers/reservations";
@@ -32,7 +35,7 @@ import type {
 } from "./company-service";
 import CompanyService from "./company-service";
 
-type ID = number | string;
+type ID = number;
 
 interface CompanyInfo {
   info: Company;
@@ -48,7 +51,7 @@ interface PanelEditableFields {
   title: string;
   description: string;
   occuresAt: string;
-  companies: string[];
+  companies: PanelCompany[];
 }
 
 export interface Panel {
