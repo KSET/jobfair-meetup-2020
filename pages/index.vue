@@ -272,7 +272,6 @@
 
     <v-row :class="$style.participantsContainer">
       <v-col cols="12">
-        <!--
         <v-row>
           <v-col cols="12">
             <h1 :class="$style.participantsHeader">
@@ -306,7 +305,6 @@
             </nuxt-link>
           </v-col>
         </v-row>
-        -->
 
         <v-row>
           <v-col cols="12">
