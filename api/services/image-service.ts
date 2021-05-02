@@ -142,6 +142,7 @@ export default class ImageService {
               sharp(file.tempFilePath)
                 .resize({
                   width,
+                  withoutEnlargement: true,
                   fit: "contain",
                 })
                 .toFile(this.getUploadPath({
@@ -152,6 +153,7 @@ export default class ImageService {
                 .then(this.createImageVariation({
                   dbClient: client,
                   imageId,
+                  filenameOverride: String(width),
                   mimeType: file.mimetype,
                   extension,
                 }))
@@ -323,19 +325,11 @@ export default class ImageService {
     );
   }
 
-  private static getUploadName(
-    {
-      name,
-      extension,
-    }: {
-      name: Image["name"];
-      extension: string;
-    },
-  ): string {
-    if (Number.isInteger(name)) {
-      return `w${ name }.${ extension }`;
+  private static getUploadName(name: string | number): string {
+    if ("number" === typeof name) {
+      return `w${ name }`;
     } else {
-      return `${ name }.${ extension }`;
+      return name;
     }
   }
 
@@ -352,7 +346,7 @@ export default class ImageService {
   ): string {
     return localFilePath({
       imageId,
-      name: this.getUploadName({ name, extension }),
+      name: `${ name }.${ extension }`,
     });
   }
 
@@ -372,7 +366,7 @@ export default class ImageService {
     },
   ) {
     return async ({ width, height }: { width: number; height: number }): Promise<ImageVariation> => {
-      const name = String(filenameOverride || width);
+      const name = this.getUploadName(filenameOverride || width);
       const image =
         await
           dbClient
