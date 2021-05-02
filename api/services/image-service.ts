@@ -52,7 +52,7 @@ import {
 
 const mkdir = promisify(mkdirCb);
 
-const imageSizes = [ 80, 160, 240, 320, 400, 480, "default" ];
+const imageSizes = [ 80, 150, 320, 720, 1200, "default" ];
 
 type Image = CamelCasedPropertiesDeep<DbImage>;
 type ImageVariation = CamelCasedPropertiesDeep<DbImageVariation>;
