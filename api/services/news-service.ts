@@ -170,7 +170,7 @@ export default class NewsService {
 
       const res = await client.queryOne<Pick<DbNews, "slug">>(queryNewsUpdateBySlug(slug, {
         ...body,
-        date: new Date(body.date).toISOString(),
+        date: new Date(String(body.date)),
       })) as Pick<DbNews, "slug">;
 
       return {
@@ -199,7 +199,7 @@ export default class NewsService {
     const newNews: NewsCreateData = {
       ...body,
       slug: `${ sluggedTitle }-${ timeStamp }`,
-      date: new Date(body.date).toISOString(),
+      date: new Date(String(body.date)),
       creatorId,
     };
 

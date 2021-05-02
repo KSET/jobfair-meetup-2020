@@ -18,12 +18,12 @@ export interface News {
   title: string;
   description: string;
   content: string;
-  date: string;
+  date: string | Date;
   slug: string;
   creator_id: User["id"];
   image_id: Image["id"];
-  created_at: string;
-  updated_at: string;
+  created_at: string | Date;
+  updated_at: string | Date;
 }
 
 export type NewsCreateData = Omit<CamelCasedPropertiesDeep<News>, "createdAt" | "updatedAt" | "id">;
