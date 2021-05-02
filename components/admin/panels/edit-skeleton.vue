@@ -155,8 +155,9 @@
                 v-model="autocomplete.values"
                 :filter="autocompleteFilter"
                 :items="autocompleteCompanies"
-                :search-input.sync="autocomplete.text"
+                :rules="inputRules.companies"
 
+                :search-input.sync="autocomplete.text"
                 chips
                 deletable-chips
                 hide-selected
@@ -166,9 +167,8 @@
                 multiple
                 outlined
                 prepend-inner-icon="mdi-account-group"
-                required
 
-                :rules="inputRules.companies"
+                required
 
                 @change="companiesChanged"
               >
@@ -272,6 +272,38 @@
                           prepend-inner-icon="mdi-account-details"
                           rows="1"
                         />
+
+                        <div
+                          v-if="entry.imageId"
+                          class="d-flex align-center"
+                        >
+                          <v-btn
+                            color="red"
+                            icon
+                            @click="entry.imageId = null"
+                          >
+                            <v-icon>mdi-delete</v-icon>
+                          </v-btn>
+
+                          <v-img
+                            v-for="{ main, thumb } in [ panelistImage(entry.images) ]"
+                            :key="`${main}-${thumb}`"
+                            :lazy-src="thumb"
+                            :src="main"
+                            aspect-ratio="1"
+                            contain
+                            height="80"
+                          />
+                        </div>
+                        <v-file-input
+                          v-else
+                          v-model="entry.imageFile"
+
+                          :accept="acceptedImageTypes.join(', ')"
+                          label="Slika panelista"
+                          show-size
+                          truncate-length="50"
+                        />
                       </v-col>
                       <v-col cols="1">
                         <div :class="$style.textareaButtons" class="d-flex">
@@ -328,6 +360,7 @@
 
 <script>
   import fuzzySearch from "fuzzysearch";
+  import isNil from "lodash/fp/isNil";
   import {
     mapActions,
   } from "vuex";
@@ -335,6 +368,9 @@
   import {
     dotGet,
   } from "~/helpers/data";
+  import {
+    ALLOWED_MIME_TYPES,
+  } from "~/helpers/image";
 
   /**
    * @param setA
@@ -432,12 +468,14 @@
     },
 
     data() {
-      const { title, date: rawDate, description, companies } = this;
+      const { title, date: rawDate, description, companies: rawCompanies } = this;
       const date =
         rawDate
           ? new Date(rawDate)
           : ""
       ;
+
+      const companies = rawCompanies.map((c) => ({ ...c, imageFile: null }));
 
       const data = {
         panel: {
@@ -471,6 +509,8 @@
           "brandName",
           "industry.name",
         ],
+
+        acceptedImageTypes: ALLOWED_MIME_TYPES,
       };
 
       if (date) {
@@ -565,6 +605,7 @@
         companies.push({
           companyId,
           aboutPanelist: "",
+          imageFile: null,
         });
       },
 
@@ -624,10 +665,28 @@
       async commitChanges() {
         const { id, isNew, panel } = this;
 
+        const payload = new FormData();
+
+        payload.set("id", id);
+        payload.set("title", panel.title);
+        payload.set("description", panel.description);
+        payload.set("occuresAt", panel.date.toISOString());
+
+        for (const [ i, company ] of Object.entries(panel.companies)) {
+          const base = `companies[${ i }]`;
+          for (const [ k, v ] of Object.entries(company)) {
+            if (isNil(v) || "images" === k) {
+              continue;
+            }
+
+            payload.set(`${ base }[${ k }]`, v);
+          }
+        }
+
         if (isNew || !id) {
-          return await this.doCreatePanel(panel);
+          return await this.doCreatePanel({ payload });
         } else {
-          return await this.doUpdatePanel({ id, panel });
+          return await this.doUpdatePanel({ id, payload });
         }
       },
 
@@ -651,6 +710,15 @@
 
         await this.$router.push({ name: "PageAdminPanelsIndex" });
       },
+
+      panelistImage(images) {
+        const sorted = [ ...images ].sort((a, b) => b.width - a.width);
+
+        return {
+          main: sorted[0].url,
+          thumb: sorted[sorted.length - 1].url,
+        };
+      },
     },
   };
 </script>
@@ -661,7 +729,7 @@
     .textareaButtons {
       align-items: center;
       justify-content: center;
-      height: calc(100% - 35px);
+      height: 100%;
     }
   }
 </style>

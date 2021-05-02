@@ -1,4 +1,11 @@
 import {
+  FileArray,
+} from "express-fileupload";
+import qs from "qs";
+import type {
+  User,
+} from "../graphql/types";
+import {
   HttpStatus,
 } from "../helpers/http";
 import {
@@ -10,6 +17,9 @@ import {
   Router,
 } from "../helpers/route";
 import PanelsService from "../services/panels-service";
+import type {
+  PanelEditableFields,
+} from "../services/panels-service";
 
 const router = new Router();
 
@@ -37,17 +47,53 @@ const authRouter = AuthRouter.boundToRouter(router, {
   role: RoleNames.ADMIN,
 });
 
-authRouter.post("/", async ({ body }) => {
-  const { date, ...rest } = body;
+const fixupPanelPostBody =
+  (
+    userId: User["id"],
+    body: Record<string, unknown>,
+    files?: FileArray,
+  ): PanelEditableFields => {
+    const data =
+      qs.parse(
+        Object
+          .entries(body)
+          .map(([ key, value ]) => `${ encodeURIComponent(key) }=${ encodeURIComponent(String(value)) }`)
+          .join("&")
+        ,
+      ) as unknown as PanelEditableFields
+    ;
 
-  return await PanelsService.create({
-    ...rest,
-    occuresAt: date,
-  });
+    if (!files) {
+      return data;
+    }
+
+    for (const [ i, company ] of Object.entries(data?.companies || {})) {
+      const file = files[`companies[${ i }][imageFile]`];
+
+      company.uploaderId = userId;
+      company.imageFile =
+        Array.isArray(file)
+        ? file.pop()
+        : file
+      ;
+    }
+
+    return data;
+  }
+;
+
+
+authRouter.post("/", async ({ body, files, authUser }) => {
+  const data = fixupPanelPostBody(
+    authUser.id,
+    body,
+    files,
+  );
+
+  return await PanelsService.create(data);
 });
 
-authRouter.patch("/:id", async ({ body, params }) => {
-  const { date, ...rest } = body;
+authRouter.patch("/:id", async ({ body, params, files, authUser }) => {
   const { id } = params;
 
   if (!id) {
@@ -56,10 +102,11 @@ authRouter.patch("/:id", async ({ body, params }) => {
 
   return await PanelsService.update(
     id,
-    {
-      ...rest,
-      occuresAt: date,
-    },
+    fixupPanelPostBody(
+      authUser.id,
+      body,
+      files,
+    ),
   );
 });
 

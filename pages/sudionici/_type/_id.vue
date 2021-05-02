@@ -197,7 +197,7 @@
             </h2>
 
             <v-row
-              v-for="{ info: company, aboutPanelist } in eventObj.companies"
+              v-for="{ info: company, images, aboutPanelist } in eventObj.companies"
               :key="company.id"
             >
               <v-col cols="12">
@@ -215,14 +215,16 @@
                       flat
                     >
                       <v-img
-                        :lazy-src="company.thumbnail"
-                        :src="getSrcWithWidth(company.images, 300)"
+                        v-for="{main, thumb} in [ getPanelCompanyImage(company, images) ]"
+                        :key="`${main}-${thumb}`"
+                        :lazy-src="thumb"
+                        :src="main"
                         contain
                         width="100%"
                       />
 
                       <v-card-subtitle
-                        class="text-center pt-1"
+                        class="text-center py-1"
                         v-text="company.name"
                       />
                     </v-card>
@@ -345,7 +347,6 @@ name: PageSudioniciInfo
 
     methods: {
       dotGet,
-      getSrcWithWidth,
       capitalize,
 
       weekday(date) {
@@ -367,6 +368,22 @@ name: PageSudioniciInfo
         const dateObj = new Date(date);
         const zeroPad = (n) => String(n).padStart(2, "0");
         return `${ zeroPad(dateObj.getHours()) }:${ zeroPad(dateObj.getMinutes()) }`;
+      },
+
+      getPanelCompanyImage(company, images) {
+        if (!images) {
+          return {
+            main: getSrcWithWidth(company.images, 300),
+            thumb: company.thumbnail,
+          };
+        }
+
+        const sorted = [ ...images ].sort((a, b) => b.width - a.width);
+
+        return {
+          main: sorted[0].url,
+          thumb: sorted[sorted.length - 1].url,
+        };
       },
     },
 

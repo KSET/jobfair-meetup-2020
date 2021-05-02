@@ -17,17 +17,17 @@ export const mutations = {
 };
 
 export const actions = {
-  async createPanel(_context, { title, description, date, companies }) {
+  async createPanel(_context, { payload }) {
     return await this.$api.$post(
       "/panels",
-      { title, description, date, companies },
+      payload,
     );
   },
 
-  async updatePanel(_context, { id, panel: { title, description, date, companies } }) {
+  async updatePanel(_context, { id, payload }) {
     return await this.$api.$patch(
       `/panels/${ id }`,
-      { title, description, date, companies },
+      payload,
     );
   },
 
