@@ -120,7 +120,7 @@ name: PageAdminNewsList
       ;
 
       return {
-        news: await store.dispatch("news/fetchNews").then(addProperty("loading", false)),
+        news: await store.dispatch("news/fetchNewsAll").then(addProperty("loading", false)),
       };
     },
 
