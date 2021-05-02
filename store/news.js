@@ -24,6 +24,11 @@ export const actions = {
 
     return data;
   },
+  async fetchNewsAll() {
+    const { data } = await this.$api.$get("/news/list/all");
+
+    return data;
+  },
 
   async fetchNewsItem({ commit, state }, { slug, force = false }) {
     if (!force && state.item && state.item.slug === slug) {

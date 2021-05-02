@@ -1,5 +1,41 @@
+import type {
+  CamelCasedPropertiesDeep,
+} from "type-fest";
+import type {
+ User,
+} from "../../api/graphql/types";
+import type {
+  Query,
+} from "../methods";
+import type {
+ Image,
+} from "./image";
+
+/* eslint-disable camelcase */
+
+export interface News {
+  id: number;
+  title: string;
+  description: string;
+  content: string;
+  date: string | Date;
+  slug: string;
+  creator_id: User["id"];
+  image_id: Image["id"];
+  created_at: string | Date;
+  updated_at: string | Date;
+}
+
+export type NewsCreateData = Omit<CamelCasedPropertiesDeep<News>, "createdAt" | "updatedAt" | "id">;
+
+export type NewsData = Pick<NewsCreateData, "date" | "content" | "title" | "description" | "imageId">
+
+/* eslint-enable camelcase */
+
 export const queryNewsGetBySlug =
-  (slug) => ({
+  (
+    slug: News["slug"],
+  ): Query => ({
     text: `
       select
         *
@@ -15,7 +51,7 @@ export const queryNewsGetBySlug =
 ;
 
 export const queryNewsGetAll =
-  () => ({
+  (): Query => ({
     text: `
       select
         *
@@ -29,15 +65,15 @@ export const queryNewsGetAll =
 
 export const queryNewsUpdateBySlug =
   (
-    slug,
+    slug: News["slug"],
     {
       date,
       content,
       title,
       description,
       imageId,
-    },
-  ) => {
+    }: NewsData,
+  ): Query => {
     const news = {
       date,
       content,
@@ -76,15 +112,17 @@ export const queryNewsUpdateBySlug =
 ;
 
 export const queryNewsCreate =
-  ({
-     date,
-     content,
-     title,
-     slug,
-     description,
-     creatorId,
-     imageId,
-   }) => {
+  (
+    {
+      date,
+      content,
+      title,
+      slug,
+      description,
+      creatorId,
+      imageId,
+    }: NewsCreateData,
+  ): Query => {
     const news = {
       date,
       content,
@@ -124,7 +162,9 @@ export const queryNewsCreate =
 ;
 
 export const queryNewsDeleteBySlug =
-  (slug) => ({
+  (
+    slug: News["slug"],
+  ): Query => ({
     text: `
       delete from
         news

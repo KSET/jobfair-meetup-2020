@@ -363,7 +363,7 @@ name: PageAdminNewsEdit
       async submitForm() {
         const { slug, date, content, title, description } = this.rawNews;
         const news = {
-          date,
+          date: new Date(new Date(date).toDateString()),
           content,
           title,
           description,
