@@ -11,6 +11,9 @@ import {
   queryImageGetById,
   queryImageGetByIds,
 } from "../../db/helpers/image";
+import type {
+  ImageInfo as DbImageInfo,
+} from "../../db/helpers/image";
 import {
   queryNewsGetAll,
   queryNewsGetBySlug,
@@ -18,8 +21,11 @@ import {
   queryNewsCreate,
   queryNewsDeleteBySlug,
 } from "../../db/helpers/news";
+import type {
+  News as DbNews,
+} from "../../db/helpers/news";
 import {
-  query,
+  Client,
 } from "../../db/methods";
 import {
   apiFilePath,
@@ -83,27 +89,31 @@ const capitalize = (s) => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-const validateNews = (body) => {
+type ValidationOutput = false | [ string, string ];
+
+const validateNews = (body: DbNews): Exclude<ValidationOutput, false>[] => {
+  type Prop = keyof DbNews;
+
   const minLength =
-    (prop, length) =>
-      body[prop] && length < body[prop].length
+    (prop: Prop, length: number): ValidationOutput =>
+      body[prop] && length < String(body[prop]).length
       ? false
       : [ prop, `${ capitalize(prop) } must be at least ${ length } characters long` ]
   ;
 
   const maxLength =
-    (prop, length) =>
-      body[prop] && length > body[prop].length
+    (prop: Prop, length: number): ValidationOutput =>
+      body[prop] && length > String(body[prop]).length
       ? false
       : [ prop, `${ capitalize(prop) } must be at most ${ length } characters long` ]
   ;
 
   const validDate =
-    (prop) => {
-      const data = body[prop];
+    (prop: Prop): ValidationOutput => {
+      const data = body[prop] as string;
       const date = Date.parse(data);
 
-      if (false === isNaN(date)) {
+      if (!isNaN(date)) {
         return false;
       }
 
@@ -119,12 +129,12 @@ const validateNews = (body) => {
     validDate("date"),
   ];
 
-  return validations.filter((e) => false !== e);
+  return validations.filter((e) => false !== e) as Exclude<ValidationOutput, false>[];
 };
 
 router.get("/list", async () => {
-  const rawNews = await query(queryNewsGetAll());
-  const rawImages = await query(queryImageGetByIds(...rawNews.map((n) => n.image_id)));
+  const rawNews = await Client.queryOnce<DbNews>(queryNewsGetAll()) || [];
+  const rawImages = await Client.queryOnce<DbImageInfo>(queryImageGetByIds(...rawNews.map((n) => n.image_id))) || [];
 
   const images = rawImages.map(processImage);
 
@@ -134,13 +144,13 @@ router.get("/list", async () => {
 router.get("/item/:slug", async ({ params }) => {
   const { slug } = params;
 
-  const [ rawNews ] = await query(queryNewsGetBySlug(slug));
+  const rawNews = await Client.queryOneOnce<DbNews>(queryNewsGetBySlug(slug));
 
   if (!rawNews) {
     throw new ApiError("not-found", HttpStatus.Error.Client.NotFound);
   }
 
-  const rawImages = await query(queryImageGetById(rawNews.image_id));
+  const rawImages = await Client.queryOnce<DbImageInfo>(queryImageGetById(rawNews.image_id)) || [];
 
   const images = rawImages.map(processImage);
 
@@ -150,28 +160,30 @@ router.get("/item/:slug", async ({ params }) => {
 const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });
 
 authRouter.patch("/item/:slug", async ({ params, body }) => {
-  const [ oldNews ] = await query(queryNewsGetBySlug(params.slug));
+  return await Client.transaction<Pick<DbNews, "slug">>(async (client) => {
+    const oldNews = await client.queryOne<DbNews>(queryNewsGetBySlug(params.slug));
 
-  if (!oldNews) {
-    throw new ApiError("news-not-found", HttpStatus.Error.Forbidden, {
-      global: "News not found",
-    });
-  }
+    if (!oldNews) {
+      throw new ApiError("news-not-found", HttpStatus.Error.Forbidden, {
+        global: "News not found",
+      });
+    }
 
-  const errors = validateNews(body);
+    const errors = validateNews(body);
 
-  if (0 < errors.length) {
-    throw new ApiError("validation-failed", HttpStatus.Error.Forbidden, Object.fromEntries(errors));
-  }
+    if (0 < errors.length) {
+      throw new ApiError("validation-failed", HttpStatus.Error.Forbidden, Object.fromEntries(errors));
+    }
 
-  const [ res ] = await query(queryNewsUpdateBySlug(params.slug, {
-    ...body,
-    date: new Date(body.date),
-  }));
+    const res = await client.queryOne<Pick<DbNews, "slug">>(queryNewsUpdateBySlug(params.slug, {
+      ...body,
+      date: new Date(body.date),
+    })) as Pick<DbNews, "slug">;
 
-  return {
-    slug: res.slug,
-  };
+    return {
+      slug: res.slug,
+    };
+  });
 });
 
 authRouter.put("/item/", async ({ body, authUser }) => {
@@ -197,7 +209,11 @@ authRouter.put("/item/", async ({ body, authUser }) => {
     creatorId: authUser.id,
   };
 
-  const [ res ] = await query(queryNewsCreate(newNews));
+  const res = await Client.queryOneOnce<DbNews>(queryNewsCreate(newNews));
+
+  if (!res) {
+    throw new ApiError("something-went-wrong");
+  }
 
   return {
     id: res.id,
@@ -208,17 +224,19 @@ authRouter.put("/item/", async ({ body, authUser }) => {
 authRouter.delete("/item/:slug", async ({ params }) => {
   const { slug } = params;
 
-  const [ news ] = await query(queryNewsGetBySlug(slug));
+  return await Client.transaction<true>(async (client) => {
+    const news = await client.queryOne<DbNews>(queryNewsGetBySlug(slug));
 
-  if (!news) {
-    throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
-      "News item not found",
-    ]);
-  }
+    if (!news) {
+      throw new ApiError("not-found", HttpStatus.Error.Client.NotFound, [
+        "News item not found",
+      ]);
+    }
 
-  await query(queryNewsDeleteBySlug(slug));
+    await client.query<DbNews>(queryNewsDeleteBySlug(slug));
 
-  return true;
+    return true;
+  });
 });
 
 export default authRouter;
