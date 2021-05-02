@@ -10,7 +10,7 @@ const moderatorRouter = new AuthRouter({
   role: RoleNames.MODERATOR,
 });
 
-moderatorRouter.get("/users", async ({ authHeader }) => {
+moderatorRouter.get("/", async ({ authHeader }) => {
   return await EventReservationsService.listAll(authHeader);
 });
 

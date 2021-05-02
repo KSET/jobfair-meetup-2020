@@ -70,7 +70,7 @@ router.post("/", requireAuth({ fullUserData: true }), requireGateGuardian, async
   return keysFromSnakeToCamelCase(data);
 });
 
-router.get("//:eventType/-?:eventId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
+router.get("/:eventType/-?:eventId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
   const {
     eventId: eventIdRaw,
     eventType,
@@ -103,7 +103,7 @@ router.get("//:eventType/-?:eventId(\\d+)", requireAuth({ fullUserData: true }),
   return Array.from(userIds);
 });
 
-router.post("//manual", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ body, authUser }) => {
+router.post("/manual", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ body, authUser }) => {
   const {
     userId,
     eventId,
@@ -140,13 +140,13 @@ const moderatorRouter = AuthRouter.boundToRouter(router, {
   role: RoleNames.MODERATOR,
 });
 
-moderatorRouter.get("//all", async () => {
+moderatorRouter.get("/all", async () => {
   const list = await Client.queryOnce(queryEventLogEntriesGetAll());
 
   return keysFromSnakeToCamelCase(list);
 });
 
-moderatorRouter.get("//for-event/:eventType/:eventId(\\d+)", async ({ params }) => {
+moderatorRouter.get("/for-event/:eventType/:eventId(\\d+)", async ({ params }) => {
   const list = await Client.queryOnce(queryEventLogEntriesGetByEvent(params));
 
   return keysFromSnakeToCamelCase(list);
@@ -265,7 +265,7 @@ const exportEntryLogToCsv = (res, eventList, scanned, resumes, fileName) => {
   return csvEventsExport(res, data, fileName);
 };
 
-moderatorRouter.getRaw("//export/all.csv", async ({ authHeader }, res) => {
+moderatorRouter.getRaw("/export/all.csv", async ({ authHeader }, res) => {
   const auth = {
     headers: {
       Authorization: authHeader,
@@ -326,7 +326,7 @@ moderatorRouter.getRaw("//export/all.csv", async ({ authHeader }, res) => {
   return exportEntryLogToCsv(res, eventList, scanned, resumes, fileName);
 });
 
-moderatorRouter.getRaw("//export/:eventType/:eventId(\\d+).csv", async ({ authHeader, params }, res) => {
+moderatorRouter.getRaw("/export/:eventType/:eventId(\\d+).csv", async ({ authHeader, params }, res) => {
   const { eventType, eventId } = params;
   const auth = {
     headers: {
