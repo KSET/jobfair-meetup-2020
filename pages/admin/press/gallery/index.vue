@@ -170,6 +170,9 @@ name: PageAdminPressGalleryList
     mapActions,
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
+  import {
+    ALLOWED_MIME_TYPES,
+  } from "~/helpers/image";
 
   const image404 = require("@/assets/images/404.png");
 
@@ -217,7 +220,7 @@ name: PageAdminPressGalleryList
       fileUrl: image404,
       fileError: "",
 
-      acceptedImageTypes: [ "image/jpeg", "image/png", "image/gif" ],
+      acceptedImageTypes: ALLOWED_MIME_TYPES,
     }),
 
     computed: {

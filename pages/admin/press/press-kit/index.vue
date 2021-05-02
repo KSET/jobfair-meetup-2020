@@ -210,6 +210,9 @@ name: PageAdminPressKitList
   } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import JfPressKit from "~/components/press/JfPressKit";
+  import {
+    ALLOWED_MIME_TYPES,
+  } from "~/helpers/image";
 
   const image404 = require("@/assets/images/404.png");
 
@@ -265,7 +268,7 @@ name: PageAdminPressKitList
 
         zipLoading: false,
 
-        acceptedImageTypes: [ "image/jpeg", "image/png", "image/gif" ],
+        acceptedImageTypes: ALLOWED_MIME_TYPES,
       };
     },
 
