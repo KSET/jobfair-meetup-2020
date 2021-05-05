@@ -102,7 +102,7 @@
               v-text="eventObj.title || eventObj.name"
             />
             <v-row v-if="isPanel" class="mb-6">
-              <v-col class="pb-0" cols="12">
+              <v-col class="pb-0 mb-n6" cols="12">
                 <h3 class="secondary--text text-uppercase">
                   <translated-text trans-key="participants.event.otherParticipants" />
                 </h3>
@@ -112,7 +112,7 @@
                   v-for="{ info: company } in eventObj.companies"
                   :key="company.id"
                   :to="{ name: 'PageSudioniciCompanyInfo', params: { id: company.id } }"
-                  class="mr-6"
+                  class="mr-6 mt-6"
                   label
                   large
                   outlined
