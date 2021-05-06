@@ -48,14 +48,28 @@
           >
             Zahtjev se još procesira...
           </span>
-          <a
+          <span
             v-else
-            class="font-weight-light ml-3 black--text"
-            href="https://jobfair.fer.unizg.hr/users/sign_up"
-            target="_blank"
+            class="ml-3"
           >
-            Registriraj se
-          </a>
+            <a
+              class="font-weight-light black--text"
+              :href="`${loginUrlHref}/users/sign_up?locale=hr`"
+              target="_blank"
+            >
+              Registracija
+            </a>
+
+            <v-divider class="my-1" style="opacity: .2;" />
+
+            <a
+              class="font-weight-light black--text"
+              :href="`${loginUrlHref}/users/password/new?locale=hr`"
+              target="_blank"
+            >
+              Zaboravili ste lozinku?
+            </a>
+          </span>
         </transition>
 
         <v-btn
