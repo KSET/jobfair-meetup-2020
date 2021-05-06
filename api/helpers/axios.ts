@@ -1,13 +1,12 @@
 import axios from "axios";
+import type {
+  AxiosRequestConfig,
+} from "axios";
 import {
   getSetting,
 } from "./settings";
 
-/**
- * @param {AxiosRequestConfig} config
- * @returns {Promise<any>}
- */
-export async function request(config) {
+export async function request<T>(config: AxiosRequestConfig): Promise<T> {
   return (
     await axios
       .request(config)
@@ -23,23 +22,12 @@ export async function request(config) {
   );
 }
 
-/**
- * @param {string} url
- * @param {AxiosRequestConfig} config
- * @returns {Promise<any>}
- */
-export async function get(url, config = {}) {
-  return await request({ url, method: "GET", ...config });
+export async function get<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
+  return await request<T>({ url, method: "GET", ...config });
 }
 
 
-/**
- * @param {string} url
- * @param {any} data
- * @param {AxiosRequestConfig} config
- * @returns {Promise<any>}
- */
-export async function post(url, data = undefined, config = {}) {
+export async function post<T>(url: string, data: unknown = undefined, config: AxiosRequestConfig = {}): Promise<T> {
   return await request({
     url,
     data,
@@ -51,19 +39,13 @@ export async function post(url, data = undefined, config = {}) {
   });
 }
 
-/**
- * @typedef {Object} QueryParams
- * @property {string} query
- * @property {string} [operationName]
- * @property {Object} [variables]
- */
+export interface GraphQlQueryParams {
+  query: string;
+  operationName?: string;
+  variables?: Record<string, unknown>;
+}
 
-/**
- * @param {QueryParams} params
- * @param {string} [token]
- * @returns {Promise<object>}
- */
-export async function graphQlQuery({ query, operationName, variables }, token = "") {
+export async function graphQlQuery<T>({ query, operationName, variables }: GraphQlQueryParams, token = ""): Promise<T> {
   const config =
     token
     ? {
