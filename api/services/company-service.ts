@@ -13,6 +13,9 @@ import {
   post,
 } from "../helpers/axios";
 import {
+  cachedFetcher,
+} from "../helpers/fetchCache";
+import {
   getSetting,
 } from "../helpers/settings";
 import type {
@@ -47,21 +50,22 @@ interface CompanyWithEvents extends Company {
   events: Event[];
 }
 
-export class CompanyError extends ServiceError {
-}
-
-export default class CompanyService {
-  static async fetchListAll(): Promise<Company[]> {
+const fetchAllCompanies = cachedFetcher<Company[]>(
+  3 * 1000,
+  async () => {
     const { companies } = await graphQlQuery(participantsQuery());
 
     if (!companies) {
       return [];
     }
 
-    return companies.map(this.fixCompany);
-  }
+    return companies.map(CompanyService.fixCompany);
+  },
+);
 
-  static async fetchIndustries(): Promise<Industry[]> {
+const fetchAllIndustries = cachedFetcher<Industry[]>(
+  15 * 1000,
+  async () => {
     const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery());
 
     if (!industries) {
@@ -69,6 +73,19 @@ export default class CompanyService {
     }
 
     return industries.sort((a, b) => Number(a.id) - Number(b.id));
+  },
+);
+
+export class CompanyError extends ServiceError {
+}
+
+export default class CompanyService {
+  static async fetchListAll(): Promise<Company[]> {
+    return await fetchAllCompanies();
+  }
+
+  static async fetchIndustries(): Promise<Industry[]> {
+    return await fetchAllIndustries();
   }
 
   static async fetchInfo(id: number): Promise<CompanyWithEvents> {

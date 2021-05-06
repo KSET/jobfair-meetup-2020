@@ -33,9 +33,6 @@ import {
   keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
-  cachedFetcher,
-} from "../helpers/fetchCache";
-import {
   HttpStatus,
 } from "../helpers/http";
 import {
@@ -121,15 +118,6 @@ const addInfo =
     )
 ;
 
-const fetchCompanies = cachedFetcher<CompanyMap>(
-  15 * 1000,
-  async () => {
-    const rawCompanies = await CompanyService.fetchListAll();
-
-    return Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
-  },
-);
-
 export class PanelsServiceError extends ServiceError {
 }
 
@@ -214,7 +202,7 @@ export default class PanelsService {
       companyList,
     ] = await Promise.all([
       this.list(),
-      fetchCompanies(),
+      this.fetchCompanies(),
     ]);
 
     return panels.map(addInfo(companyList)) || [];
@@ -241,7 +229,7 @@ export default class PanelsService {
       companyList,
     ] = await Promise.all([
       this.info(id),
-      fetchCompanies(),
+      this.fetchCompanies(),
     ]);
 
     return addInfo(companyList)(entry);
@@ -369,5 +357,11 @@ export default class PanelsService {
 
       return true;
     });
+  }
+
+  private static async fetchCompanies(): Promise<CompanyMap> {
+    const rawCompanies = await CompanyService.fetchListAll();
+
+    return Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
   }
 }
