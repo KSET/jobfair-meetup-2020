@@ -12,6 +12,7 @@ import {
 } from "../../helpers/string";
 import {
   resumeQuery,
+  resumesFullDataQuery,
   resumesQuery,
 } from "../graphql/queries";
 import type {
@@ -112,7 +113,7 @@ const afterGdpr =
     new Date(updatedAt) >= gdprDate
 ;
 
-const cacheTimeoutMs = 10 * 1000;
+const cacheTimeoutMs = 3 * 1000;
 const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
   cachedFetcher<BasicResumeInfo[]>(
     cacheTimeoutMs,
@@ -131,6 +132,23 @@ const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
     },
   )
 ;
+
+const fetchListFullInfoCached = cachedFetcher<Resume[]>(
+  cacheTimeoutMs,
+  async (authHeader: string) => {
+    const {
+      resumes,
+    }: {
+      resumes: GraphQlResume[];
+    } = await graphQlQuery(resumesFullDataQuery(), authHeader);
+
+    if (!resumes) {
+      return [];
+    }
+
+    return resumes.map((r) => fixResume(r)).filter(afterGdpr);
+  },
+);
 
 
 const fetchByIdCached: (authHeader: string, id: Resume["id"]) => Promise<Resume | null> =
@@ -159,6 +177,10 @@ export class ResumeServiceError extends ServiceError {
 export default class ResumeService {
   static async list(authHeader: string): Promise<BasicResumeInfo[]> {
     return await fetchListCached(authHeader);
+  }
+
+  static async listWithFullInfo(authHeader: string): Promise<Resume[]> {
+    return await fetchListFullInfoCached(authHeader);
   }
 
   static async byUid(authHeader: string, uid: Resume["uid"]): Promise<BasicResumeInfo> {

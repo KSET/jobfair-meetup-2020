@@ -2,14 +2,8 @@ import {
   dotGet,
 } from "../../../helpers/data";
 import {
- sendCsv,
+  sendCsv,
 } from "../../helpers/csv";
-import {
-  resumesFullDataQuery,
-} from "../../graphql/queries";
-import {
-  graphQlQuery,
-} from "../../helpers/axios";
 import {
   internalRequest,
 } from "../../helpers/http";
@@ -17,35 +11,9 @@ import {
   ApiNotFoundError,
   AuthRouter,
 } from "../../helpers/route";
-import {
-  cachedFetcher,
-} from "../../helpers/fetchCache";
-import {
- fixResume,
-} from "../../services/resume-service";
+import ResumeService from "../../services/resume-service";
 
 const authRouter = new AuthRouter({ fullUserData: true });
-
-const cacheForMs = 2 * 1000;
-
-const gdprDate = new Date("2018-05-25T00:00:00Z");
-const afterGdpr =
-  ({ updatedAt }) =>
-    new Date(updatedAt) >= gdprDate
-;
-
-const fetchAllResumes = cachedFetcher(
-  cacheForMs,
-  async (authHeader) => {
-    const { resumes } = await graphQlQuery(resumesFullDataQuery(), authHeader);
-
-    if (!resumes) {
-      return [];
-    }
-
-    return resumes.map(fixResume).filter(afterGdpr);
-  },
-);
 
 const csvResumesExport = (res, data, fileName = "Svi") => {
   const headers = [
@@ -113,14 +81,14 @@ authRouter.use((req, res, next) => {
   return next();
 });
 
-authRouter.getRaw("/all.csv", cachedFetcher(cacheForMs, async ({ authHeader }, res) => {
-  const resumes = await fetchAllResumes(authHeader);
+authRouter.getRaw("/all.csv", async ({ authHeader }, res) => {
+  const resumes = await ResumeService.listWithFullInfo(authHeader);
 
   return csvResumesExport(res, resumes, "Svi");
-}));
+});
 
-authRouter.getRaw("/favourites.csv", cachedFetcher(cacheForMs, async ({ authHeader }, res) => {
-  const resumes = await fetchAllResumes(authHeader);
+authRouter.getRaw("/favourites.csv", async ({ authHeader }, res) => {
+  const resumes = await ResumeService.listWithFullInfo(authHeader);
   const { data: favouriteIds } = await internalRequest("get", "/resumes/favourites/list", {
     headers: {
       Authorization: authHeader,
@@ -132,10 +100,10 @@ authRouter.getRaw("/favourites.csv", cachedFetcher(cacheForMs, async ({ authHead
   const filteredResumes = resumes.filter(({ id }) => id in favourites);
 
   return csvResumesExport(res, filteredResumes, "Favoriti");
-}));
+});
 
-authRouter.getRaw("/scanned.csv", cachedFetcher(cacheForMs, async ({ authHeader }, res) => {
-  const resumes = await fetchAllResumes(authHeader);
+authRouter.getRaw("/scanned.csv", async ({ authHeader }, res) => {
+  const resumes = await ResumeService.listWithFullInfo(authHeader);
   const { data: scannedIds } = await internalRequest("get", "/resumes/scans/list", {
     headers: {
       Authorization: authHeader,
@@ -147,6 +115,6 @@ authRouter.getRaw("/scanned.csv", cachedFetcher(cacheForMs, async ({ authHeader 
   const filteredResumes = resumes.filter(({ id }) => id in scanned);
 
   return csvResumesExport(res, filteredResumes, "Skenirani");
-}));
+});
 
 export default authRouter;

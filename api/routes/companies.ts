@@ -14,9 +14,6 @@ import {
   sendCsv,
 } from "../helpers/csv";
 import {
-  cachedFetcher,
-} from "../helpers/fetchCache";
-import {
   HttpStatus,
 } from "../helpers/http";
 import {
@@ -43,8 +40,6 @@ import SlackNotificationService from "../services/slack-notification-service";
 import VatValidator from "../services/vat-validator";
 
 const router = new Router();
-
-const cacheForMs = 15 * 1000;
 
 router.post("/application/submit", async (req) => {
   const { body, files } = req;
@@ -218,13 +213,13 @@ router.get("/application/by-vat/:vat", async ({ params }) => {
   return await CompanyApplicationService.fetchApplicationsByVat(vat) || [];
 });
 
-router.get("/participants", cachedFetcher(cacheForMs, async () => {
+router.get("/participants", async () => {
   return await CompanyService.fetchListAll();
-}));
+});
 
-router.get("/industries", cachedFetcher(cacheForMs, async () => {
+router.get("/industries", async () => {
   return await CompanyService.fetchIndustries();
-}));
+});
 
 router.get("/events/all", async () => {
   return await CompanyEventsService.listAll();
@@ -234,13 +229,11 @@ router.get("/events", async () => {
   return await CompanyEventsService.listNotPassed();
 });
 
-router.get("/events/panel/:id", cachedFetcher(cacheForMs, async ({ params }) => {
+router.get("/events/panel/:id", async ({ params }) => {
   const { id } = params;
 
   return await CompanyEventsService.listPanelsForCompany(id);
-}, ({ params }) => {
-  return params.id;
-}));
+});
 
 router.get("/events/:type/:id", async ({ params }) => {
   const { type, id } = params;
