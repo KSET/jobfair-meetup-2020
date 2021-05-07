@@ -31,7 +31,7 @@ const newCacheEntry = (cacheFor = 0): ICache<unknown> => ({
 });
 
 const timeMs = (): bigint => process.hrtime.bigint();
-const toMs = (num: bigint): number => Number(num) / 1000000;
+const toMs = (num: bigint): number => Number(num / 1000000n);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
