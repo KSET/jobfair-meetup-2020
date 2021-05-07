@@ -18,6 +18,7 @@ interface ICache<T> {
 }
 
 export const cachedFetcher = <T>(
+  baseCacheKey: string,
   timeoutMs: number,
   fetchFn: FetchFn<T>,
   cacheKeyFn: KeyFn = () => "default" as CacheKey,
@@ -112,8 +113,13 @@ export const cachedFetcher = <T>(
       (timeMs() - timeoutMs) <= cacheGet(key, "time")
   ;
 
+  const cacheKey =
+    (...args: unknown[]) =>
+      `cache:${ baseCacheKey }:${ cacheKeyFn(...args) }` as CacheKey
+  ;
+
   return async (...args: unknown[]): Promise<T> => {
-    const key = cacheKeyFn(...args);
+    const key = cacheKey(...args);
     // console.log("CACHE GET", key);
 
     if (hasFreshCache(key)) {

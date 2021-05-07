@@ -116,6 +116,7 @@ const afterGdpr =
 const cacheTimeoutMs = 3 * 1000;
 const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
   cachedFetcher<BasicResumeInfo[]>(
+    "resumes",
     cacheTimeoutMs,
     async (authHeader: string): Promise<BasicResumeInfo[]> => {
       const {
@@ -134,6 +135,7 @@ const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
 ;
 
 const fetchListFullInfoCached = cachedFetcher<Resume[]>(
+  "resumes-full-data",
   cacheTimeoutMs,
   async (authHeader: string) => {
     const {
@@ -153,6 +155,7 @@ const fetchListFullInfoCached = cachedFetcher<Resume[]>(
 
 const fetchByIdCached: (authHeader: string, id: Resume["id"]) => Promise<Resume | null> =
   cachedFetcher<Resume | null>(
+    "resume",
     cacheTimeoutMs,
     async (authHeader: string, id: Resume["id"]) => {
       const {
