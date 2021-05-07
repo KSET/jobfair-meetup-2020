@@ -14,15 +14,17 @@ export type KeyFn = (...args: unknown[]) => CacheKey;
 
 interface ICache<T> {
   time: number;
+  fetchedFor: number;
   cacheFor: number;
   data: T | null;
-  fetching: Readonly<AtomicBool>;
+  fetching: AtomicBool;
 }
 
 const cache: Record<CacheKey, ICache<unknown>> = {};
 
 const newCacheEntry = (cacheFor = 0): ICache<unknown> => ({
   time: 0,
+  fetchedFor: 0,
   cacheFor,
   data: null,
   fetching: new AtomicBool(),
@@ -39,16 +41,14 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
   _.flow(
     _.toPairs,
-    _.map(([ key, oldCache ]: [ string, ICache<unknown> ]) => {
-      const cache: Omit<ICache<unknown>, "fetching"> = _.omit([ "fetching" ], oldCache);
+    _.map(([ key, { fetching, time, ...cache } ]: [ string, ICache<unknown> ]) => {
       const timeCurrent = timeMs();
 
       return [
         key,
         {
-          fetching: oldCache.fetching.value,
-          ageMs: timeCurrent - cache.time,
-          timeCurrent,
+          fetching: fetching.value,
+          age: timeCurrent - time,
           ...cache,
         },
       ];
@@ -69,8 +69,9 @@ export const cachedFetcher = <T>(
 ): (...args: unknown[]) => Promise<T> => {
   type Cache = ICache<T>;
 
-  function cacheSet(cacheKey: CacheKey, key: "time", value: number): void;
-  function cacheSet(cacheKey: CacheKey, key: "data", value: T): void;
+  function cacheSet(cacheKey: CacheKey, key: "time", value: Cache["time"]): void;
+  function cacheSet(cacheKey: CacheKey, key: "data", value: Cache["data"]): void;
+  function cacheSet(cacheKey: CacheKey, key: "fetchedFor", value: Cache["fetchedFor"]): void;
   function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
       cache[cacheKey] = newCacheEntry(timeoutMs);
@@ -79,9 +80,9 @@ export const cachedFetcher = <T>(
     cache[cacheKey][key] = value;
   }
 
-  function cacheGet(cacheKey: CacheKey, key: "time"): number;
-  function cacheGet(cacheKey: CacheKey, key: "data"): T;
-  function cacheGet(cacheKey: CacheKey, key: "fetching"): AtomicBool;
+  function cacheGet(cacheKey: CacheKey, key: "time"): Cache["time"];
+  function cacheGet(cacheKey: CacheKey, key: "data"): Cache["data"];
+  function cacheGet(cacheKey: CacheKey, key: "fetching"): Cache["fetching"];
   function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
       cache[cacheKey] = newCacheEntry(timeoutMs);
@@ -90,9 +91,13 @@ export const cachedFetcher = <T>(
     return cache[cacheKey][key];
   }
 
-  const setData = (key: CacheKey, data: T): void => {
+  const setData = (key: CacheKey, data: Cache["data"], fetchedFor?: Cache["fetchedFor"]): void => {
     cacheSet(key, "data", data);
     cacheSet(key, "time", timeMs());
+
+    if (fetchedFor) {
+      cacheSet(key, "fetchedFor", fetchedFor);
+    }
   };
 
   const setFetching = (key: CacheKey, fetching: boolean): void => {
@@ -131,8 +136,8 @@ export const cachedFetcher = <T>(
   ;
 
   const getData =
-    (key: CacheKey): T =>
-      cacheGet(key, "data")
+    (key: CacheKey): NonNullable<Cache["data"]> =>
+      cacheGet(key, "data") as NonNullable<Cache["data"]>
   ;
 
   const hasFreshCache =
@@ -159,10 +164,12 @@ export const cachedFetcher = <T>(
       setFetching(key, true);
 
       // console.log("FETCH START", key);
+      const startTime = timeMs();
       const data = await fetchFn(...args);
+      const endTime = timeMs();
       // console.log("FETCH  DONE", key);
 
-      setData(key, data);
+      setData(key, data, endTime - startTime);
 
       setFetching(key, false);
 
