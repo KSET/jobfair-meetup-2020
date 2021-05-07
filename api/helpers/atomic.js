@@ -1,6 +1,3 @@
-/* global SharedArrayBuffer */
-/* global Atomics */
-
 export class AtomicInt32Array {
   /**
    * @var {Int32Array}

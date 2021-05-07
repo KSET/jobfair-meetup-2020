@@ -1,3 +1,4 @@
+import _ from "lodash/fp";
 import {
   clearCacheKey,
   getCache,
@@ -9,6 +10,16 @@ import {
 const router = new Router();
 
 router.get("/", () => {
+  const cache = getCache();
+
+  return _.flow(
+    _.toPairs,
+    _.map(([ k, { data: _data, ...rest } ]) => [ k, rest ]),
+    _.fromPairs,
+  )(cache);
+});
+
+router.get("/with-data", () => {
   return getCache();
 });
 

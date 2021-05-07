@@ -13,7 +13,7 @@ export type FetchFn<T> = (...args: unknown[]) => Promised<T>;
 export type KeyFn = (...args: unknown[]) => CacheKey;
 
 interface ICache<T> {
-  time: number;
+  time: bigint;
   fetchedFor: number;
   cacheFor: number;
   data: T | null;
@@ -23,18 +23,15 @@ interface ICache<T> {
 const cache: Record<CacheKey, ICache<unknown>> = {};
 
 const newCacheEntry = (cacheFor = 0): ICache<unknown> => ({
-  time: 0,
+  time: 0n,
   fetchedFor: 0,
   cacheFor,
   data: null,
   fetching: new AtomicBool(),
 });
 
-const timeMs = (): number => {
-  const hrTime = process.hrtime();
-
-  return hrTime[0] * 1000 + hrTime[1] / 1000000;
-};
+const timeMs = (): bigint => process.hrtime.bigint();
+const toMs = (num: bigint): number => Number(num) / 1000000;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -48,7 +45,7 @@ export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
         key,
         {
           fetching: fetching.value,
-          age: timeCurrent - time,
+          age: toMs(timeCurrent - time),
           ...cache,
         },
       ];
@@ -143,7 +140,7 @@ export const cachedFetcher = <T>(
   const hasFreshCache =
     (key: CacheKey): boolean =>
       hasData(key) &&
-      (timeMs() - timeoutMs) <= cacheGet(key, "time")
+      (timeMs() - BigInt(timeoutMs)) <= cacheGet(key, "time")
   ;
 
   const cacheKey =
@@ -169,7 +166,7 @@ export const cachedFetcher = <T>(
       const endTime = timeMs();
       // console.log("FETCH  DONE", key);
 
-      setData(key, data, endTime - startTime);
+      setData(key, data, toMs(endTime - startTime));
 
       setFetching(key, false);
 
