@@ -26,9 +26,7 @@ import {
 } from "../helpers/route";
 import CompanyApplicationService from "../services/company-application-service";
 import CompanyApplicationTokenService from "../services/company-application-token-service";
-import CompanyEventsService, {
-  CompanyEventsError,
-} from "../services/company-events-service";
+import CompanyEventsService from "../services/company-events-service";
 import CompanyService, {
   CompanyError,
 } from "../services/company-service";
@@ -229,12 +227,6 @@ router.get("/events", async () => {
   return await CompanyEventsService.listNotPassed();
 });
 
-router.get("/events/panel/:id", async ({ params }) => {
-  const { id } = params;
-
-  return await CompanyEventsService.listPanelsForCompany(id);
-});
-
 router.get("/events/:type/:id", async ({ params }) => {
   const { type, id } = params;
 
@@ -244,15 +236,7 @@ router.get("/events/:type/:id", async ({ params }) => {
     ]);
   }
 
-  try {
-    return await CompanyEventsService.listEventsForCompany(id, type);
-  } catch (e) {
-    if (e instanceof CompanyEventsError) {
-      throw new ApiError(e.message, HttpStatus.Error.Client.NotFound);
-    }
-
-    throw e;
-  }
+  return await CompanyEventsService.listEventOfTypeForCompany(id, type);
 });
 
 router.get("/info/:id", async ({ params }) => {

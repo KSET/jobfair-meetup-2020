@@ -1,4 +1,5 @@
-import {
+import _ from "lodash/fp";
+import type {
   Opaque,
 } from "type-fest";
 import {
@@ -13,30 +14,66 @@ export type KeyFn = (...args: unknown[]) => CacheKey;
 
 interface ICache<T> {
   time: number;
+  cacheFor: number;
   data: T | null;
   fetching: Readonly<AtomicBool>;
 }
 
+const cache: Record<CacheKey, ICache<unknown>> = {};
+
+const newCacheEntry = (cacheFor = 0): ICache<unknown> => ({
+  time: 0,
+  cacheFor,
+  data: null,
+  fetching: new AtomicBool(),
+});
+
+const timeMs = (): number => {
+  const hrTime = process.hrtime();
+
+  return hrTime[0] * 1000 + hrTime[1] / 1000000;
+};
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
+  _.flow(
+    _.toPairs,
+    _.map(([ key, oldCache ]: [ string, ICache<unknown> ]) => {
+      const cache: Omit<ICache<unknown>, "fetching"> = _.omit([ "fetching" ], oldCache);
+      const timeCurrent = timeMs();
+
+      return [
+        key,
+        {
+          fetching: oldCache.fetching.value,
+          ageMs: timeCurrent - cache.time,
+          timeCurrent,
+          ...cache,
+        },
+      ];
+    }),
+    _.fromPairs,
+  )(cache)
+;
+
+export const clearCacheKey = (key: keyof (typeof cache)): void => {
+  delete cache[key];
+};
+
 export const cachedFetcher = <T>(
+  baseCacheKey: string,
   timeoutMs: number,
   fetchFn: FetchFn<T>,
   cacheKeyFn: KeyFn = () => "default" as CacheKey,
 ): (...args: unknown[]) => Promise<T> => {
   type Cache = ICache<T>;
 
-  const getBaseData = (): Cache => ({
-    time: 0,
-    data: null,
-    fetching: new AtomicBool(),
-  });
-
-  const cache: Record<CacheKey, Cache> = {};
-
   function cacheSet(cacheKey: CacheKey, key: "time", value: number): void;
   function cacheSet(cacheKey: CacheKey, key: "data", value: T): void;
   function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
-      cache[cacheKey] = getBaseData();
+      cache[cacheKey] = newCacheEntry(timeoutMs);
     }
 
     cache[cacheKey][key] = value;
@@ -47,19 +84,11 @@ export const cachedFetcher = <T>(
   function cacheGet(cacheKey: CacheKey, key: "fetching"): AtomicBool;
   function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
-      cache[cacheKey] = getBaseData();
+      cache[cacheKey] = newCacheEntry(timeoutMs);
     }
 
     return cache[cacheKey][key];
   }
-
-  const timeMs = (): number => {
-    const hrTime = process.hrtime();
-
-    return hrTime[0] * 1000 + hrTime[1] / 1000000;
-  };
-
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const setData = (key: CacheKey, data: T): void => {
     cacheSet(key, "data", data);
@@ -112,8 +141,13 @@ export const cachedFetcher = <T>(
       (timeMs() - timeoutMs) <= cacheGet(key, "time")
   ;
 
+  const cacheKey =
+    (...args: unknown[]) =>
+      `cache:${ baseCacheKey }:${ cacheKeyFn(...args) }` as CacheKey
+  ;
+
   return async (...args: unknown[]): Promise<T> => {
-    const key = cacheKeyFn(...args);
+    const key = cacheKey(...args);
     // console.log("CACHE GET", key);
 
     if (hasFreshCache(key)) {
