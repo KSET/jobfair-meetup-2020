@@ -5,12 +5,11 @@ import {
   sendCsv,
 } from "../../helpers/csv";
 import {
-  internalRequest,
-} from "../../helpers/http";
-import {
   ApiNotFoundError,
   AuthRouter,
 } from "../../helpers/route";
+import ResumeFavouritesService from "../../services/resume-favourites-service";
+import ResumeScanService from "../../services/resume-scan-service";
 import ResumeService from "../../services/resume-service";
 
 const authRouter = new AuthRouter({ fullUserData: true });
@@ -68,7 +67,7 @@ const csvResumesExport = (res, data, fileName = "Svi") => {
   );
 };
 
-authRouter.use((req, res, next) => {
+authRouter.use((req, _res, next) => {
   const { authUser } = req;
 
   if (!authUser.companies.length) {
@@ -87,13 +86,14 @@ authRouter.getRaw("/all.csv", async ({ authHeader }, res) => {
   return csvResumesExport(res, resumes, "Svi");
 });
 
-authRouter.getRaw("/favourites.csv", async ({ authHeader }, res) => {
-  const resumes = await ResumeService.listWithFullInfo(authHeader);
-  const { data: favouriteIds } = await internalRequest("get", "/resumes/favourites/list", {
-    headers: {
-      Authorization: authHeader,
-    },
-  });
+authRouter.getRaw("/favourites.csv", async ({ authHeader, company }, res) => {
+  const [
+    resumes,
+    favouriteIds,
+  ] = await Promise.all([
+    ResumeService.listWithFullInfo(authHeader),
+    ResumeFavouritesService.listFor(company.id),
+  ]);
 
   const favourites = Object.fromEntries(favouriteIds.map((id) => [ id, id ]));
 
@@ -102,13 +102,14 @@ authRouter.getRaw("/favourites.csv", async ({ authHeader }, res) => {
   return csvResumesExport(res, filteredResumes, "Favoriti");
 });
 
-authRouter.getRaw("/scanned.csv", async ({ authHeader }, res) => {
-  const resumes = await ResumeService.listWithFullInfo(authHeader);
-  const { data: scannedIds } = await internalRequest("get", "/resumes/scans/list", {
-    headers: {
-      Authorization: authHeader,
-    },
-  });
+authRouter.getRaw("/scanned.csv", async ({ authHeader, company }, res) => {
+  const [
+    resumes,
+    scannedIds,
+  ] = await Promise.all([
+    ResumeService.listWithFullInfo(authHeader),
+    ResumeScanService.listFor(company.id),
+  ]);
 
   const scanned = Object.fromEntries(scannedIds.map((id) => [ id, id ]));
 

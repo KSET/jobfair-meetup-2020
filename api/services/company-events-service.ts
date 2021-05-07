@@ -162,54 +162,12 @@ export default class CompanyEventsService {
     };
   }
 
-  static async listPanelsForCompany(id: Company["id"]): Promise<PanelWithInfo> {
-    const panel = await PanelsService.fullInfo(Number(id));
-
-    return {
-      ...panel,
-      occuresAt: panel.date,
-    };
-  }
-
-  static async listEventsForCompany(id: Company["id"], type: string): Promise<Participant & { company: Company }> {
-    const transformedType = typeTransformer(type);
-
-    if (!transformedType) {
-      throw new CompanyEventsError(
-        `Nepoznat tip eventa: ${ type }`,
-        null,
-        HttpStatus.Error.Client.Forbidden,
-      );
+  static async listEventOfTypeForCompany(companyId: Company["id"], type: string): Promise<Event> {
+    if ("panel" === type) {
+      return await CompanyEventsService.listPanelsForCompany(companyId);
+    } else {
+      return await CompanyEventsService.listEventsForCompany(companyId, type);
     }
-
-    const data = await fetchParticipantsCached();
-    const { companies, ...events } = data;
-    const objList: Participant[] = events[transformedType];
-
-    if (!objList) {
-      throw new CompanyEventsError(
-        `Nepoznat tip eventa: ${ type }`,
-        null,
-        HttpStatus.Error.Client.Forbidden,
-      );
-    }
-
-    const obj = objList.find(({ id: i }) => String(i) === String(id));
-
-    if (!obj) {
-      throw new CompanyEventsError("Event nije pronađen");
-    }
-
-    const company = companies.find(({ id }) => id === obj.company.id);
-
-    if (!company) {
-      throw new CompanyEventsError("Event nije pronađen");
-    }
-
-    return {
-      ...obj,
-      company,
-    };
   }
 
   static Format(data: Events): FixedEvent[] {
@@ -292,5 +250,55 @@ export default class CompanyEventsService {
           ,
         )
     );
+  }
+
+  private static async listPanelsForCompany(id: Company["id"]): Promise<PanelWithInfo> {
+    const panel = await PanelsService.fullInfo(Number(id));
+
+    return {
+      ...panel,
+      occuresAt: panel.date,
+    };
+  }
+
+  private static async listEventsForCompany(id: Company["id"], type: string): Promise<Participant & { company: Company }> {
+    const transformedType = typeTransformer(type);
+
+    if (!transformedType) {
+      throw new CompanyEventsError(
+        `Nepoznat tip eventa: ${ type }`,
+        null,
+        HttpStatus.Error.Client.Forbidden,
+      );
+    }
+
+    const data = await fetchParticipantsCached();
+    const { companies, ...events } = data;
+    const objList: Participant[] = events[transformedType];
+
+    if (!objList) {
+      throw new CompanyEventsError(
+        `Nepoznat tip eventa: ${ type }`,
+        null,
+        HttpStatus.Error.Client.Forbidden,
+      );
+    }
+
+    const obj = objList.find(({ id: i }) => String(i) === String(id));
+
+    if (!obj) {
+      throw new CompanyEventsError("Event nije pronađen");
+    }
+
+    const company = companies.find(({ id }) => id === obj.company.id);
+
+    if (!company) {
+      throw new CompanyEventsError("Event nije pronađen");
+    }
+
+    return {
+      ...obj,
+      company,
+    };
   }
 }
