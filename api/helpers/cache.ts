@@ -6,23 +6,41 @@ import type {
 } from "./fetchCache";
 import {
   expireCacheKey,
-  getCache,
 } from "./fetchCache";
 
+const cachedFetchers = {
+  "participant-events": {
+    auth: false,
+    handler: CompanyEventsService.listAll,
+  },
+  participants: {
+    auth: false,
+    handler: CompanyService.fetchListAll,
+  },
+  industries: {
+    auth: false,
+    handler: CompanyService.fetchIndustries,
+  },
+  resumes: {
+    auth: true,
+    handler: ResumeService.list,
+  },
+  "resumes-full-data": {
+    auth: true,
+    handler: ResumeService.listWithFullInfo,
+  },
+};
+
 export const refreshCacheItems =
-  async (authHeader = "") => {
-    const items: ((authHeader?: string) => unknown)[] = [
-      CompanyEventsService.listAll,
-      CompanyService.fetchListAll,
-      CompanyService.fetchIndustries,
-    ];
+  async (authHeader = ""): Promise<void> => {
+    const entries = Object.values(cachedFetchers);
+    const items: {
+      auth: boolean;
+      handler: (authHeader?: string) => unknown;
+    }[] = entries.filter(({ auth }) => !auth);
+    const authItems = entries.filter(({ auth }) => !auth);
 
-    const authItems: ((authHeader: string) => unknown)[] = [
-      ResumeService.list,
-      ResumeService.listWithFullInfo,
-    ];
-
-    for (const key of Object.keys(getCache())) {
+    for (const key of Object.keys(cachedFetchers)) {
       expireCacheKey(key as CacheKey);
     }
 
@@ -32,6 +50,27 @@ export const refreshCacheItems =
       }
     }
 
-    await Promise.all(items.map((fn) => fn(authHeader)));
+    await Promise.all(items.map(({ handler }) => handler(authHeader)));
+  }
+;
+
+export const refreshCacheItem =
+  async (key: CacheKey, authHeader = ""): Promise<void> => {
+    const entry = cachedFetchers[key.replace(/:default$/i, "").replace(/^cache:/i, "")];
+
+    if (!entry) {
+      return;
+    }
+
+    expireCacheKey(key);
+
+    if (entry.auth && authHeader) {
+      await entry.handler(authHeader);
+      return;
+    }
+
+    if (!entry.auth) {
+      await entry.handler();
+    }
   }
 ;

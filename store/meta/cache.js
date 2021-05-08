@@ -92,4 +92,28 @@ export const actions = {
 
     return data;
   },
+
+  async refreshCache() {
+    const { data } = await this.$api.$post(
+      "/meta/cache/refresh",
+      null,
+      {
+        progress: false,
+      },
+    );
+
+    return data;
+  },
+
+  async refreshCacheFor(_context, key) {
+    const { data } = await this.$api.$post(
+      `/meta/cache/refresh/${ key }`,
+      null,
+      {
+        progress: false,
+      },
+    );
+
+    return data;
+  },
 };

@@ -21,6 +21,24 @@
     </v-row>
 
     <v-row>
+      <v-col cols="12">
+        <div class="d-flex">
+          <v-spacer />
+
+          <v-btn
+            :loading="refreshLoading"
+            color="warning"
+            @click="doRefreshCache"
+          >
+            <v-icon>mdi-cached</v-icon>
+            &nbsp;
+            Refresh all
+          </v-btn>
+        </div>
+      </v-col>
+    </v-row>
+
+    <v-row>
       <v-col
         v-for="(data, key) in allEntries"
         :key="key"
@@ -28,7 +46,9 @@
         lg="4"
         sm="6"
       >
-        <v-card>
+        <v-card
+          :loading="itemLoading[key] || data.fetching"
+        >
           <v-card-title
             v-text="key.replace(/:default$/i, '').replace(/^cache:/i, '').split(':').join(' > ')"
           />
@@ -74,6 +94,16 @@
               target="_blank"
             >
               <v-icon>mdi-information</v-icon>
+            </v-btn>
+
+            <v-spacer />
+
+            <v-btn
+              :loading="itemLoading[key] || data.fetching"
+              icon
+              @click.prevent="refreshCacheItem(key)"
+            >
+              <v-icon>mdi-cached</v-icon>
             </v-btn>
 
             <v-spacer />
@@ -131,6 +161,7 @@ name: PageAdminCacheManage
         fetchInterval: null,
 
         itemLoading: Object.fromEntries(Object.keys(entries).map((k) => [ k, false ])),
+        refreshLoading: false,
       };
     },
 
@@ -164,6 +195,8 @@ name: PageAdminCacheManage
       ...mapActions("meta/cache", [
         "fetchEntries",
         "deleteEntry",
+        "refreshCache",
+        "refreshCacheFor",
       ]),
 
       prettyMs(ms, rounded = true) {
@@ -181,8 +214,21 @@ name: PageAdminCacheManage
         this.$set(this.itemLoading, key, false);
       },
 
+      async refreshCacheItem(key) {
+        this.$set(this.itemLoading, key, true);
+        await this.refreshCacheFor(key);
+        await this.fetchEntries();
+        this.$set(this.itemLoading, key, false);
+      },
+
       formatKey(key) {
         return formatKey(key);
+      },
+
+      async doRefreshCache() {
+        this.refreshLoading = true;
+        await this.refreshCache();
+        this.refreshLoading = false;
       },
     },
   };
