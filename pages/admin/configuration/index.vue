@@ -69,6 +69,12 @@ name: PageAdminConfigurationIndex
           requiredRole: RoleNames.ADMIN,
           icon: "mdi-cog",
         },
+        {
+          name: "Cache",
+          to: { name: "PageAdminCacheManage" },
+          requiredRole: RoleNames.ADMIN,
+          icon: "mdi-cached",
+        },
       ],
     }),
   };

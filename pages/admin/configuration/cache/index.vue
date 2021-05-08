@@ -1,0 +1,185 @@
+<template>
+  <app-max-width-container>
+    <v-row>
+      <v-col cols="12">
+        <h1>Cache</h1>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <v-btn
+          :to="{ name: 'PageAdminConfigurationIndex' }"
+          exact
+        >
+          <v-icon left>
+            mdi-arrow-left
+          </v-icon>
+          Back
+        </v-btn>
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12">
+        <v-expansion-panels accordion>
+          <v-expansion-panel
+            v-for="(data, key) in allEntries"
+            :key="key"
+          >
+            <v-expansion-panel-header>
+              <span v-text="key.split(':').splice(1).join(' > ')" />
+
+              <v-spacer />
+
+              <span class="text-right">
+                {{ prettyMs(data.age) }} | {{ prettyMs(data.fetchedFor, false) }}
+              </span>
+            </v-expansion-panel-header>
+
+            <v-expansion-panel-content>
+              <v-card class="mx-auto" width="350">
+                <v-card-text>
+                  <v-simple-table dense>
+                    <template v-slot:default>
+                      <tbody>
+                        <tr
+                          v-for="(value, key) in data"
+                          :key="key"
+
+                          :title="`${key}: ${value}`"
+                        >
+                          <td v-text="formatKey(key)" />
+                          <td v-if="typeof value === 'number'" v-text="prettyMs(value, false)" />
+                          <td v-else-if="typeof value === 'boolean'" v-text="value ? '✅' : '❌'" />
+                          <td v-else v-text="value" />
+                        </tr>
+                      </tbody>
+                    </template>
+                  </v-simple-table>
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-btn
+                    :href="`/api/meta/cache/info/for/${key}/with-data`"
+                    color="warning"
+                    icon
+                    target="_blank"
+                  >
+                    <v-icon>mdi-information</v-icon>
+                  </v-btn>
+
+                  <v-spacer />
+
+                  <v-btn
+                    :loading="itemLoading[key]"
+                    color="red"
+                    icon
+                    @click.prevent="deleteCacheItem(key)"
+                  >
+                    <v-icon>mdi-trash-can</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </v-col>
+    </v-row>
+  </app-max-width-container>
+</template>
+
+<router>
+name: PageAdminCacheManage
+</router>
+
+<script>
+  import {
+    flow,
+    kebabCase,
+    replace,
+    capitalize,
+  } from "lodash/fp";
+  import {
+    mapActions,
+    mapGetters,
+  } from "vuex";
+  import prettyMs from "pretty-ms";
+  import AppMaxWidthContainer from "../../../../components/AppMaxWidthContainer";
+
+  const formatKey =
+    flow(
+      kebabCase,
+      replace(/-/gi, " "),
+      capitalize,
+    )
+  ;
+
+  export default {
+    components: {
+      AppMaxWidthContainer,
+    },
+
+    async asyncData({ store }) {
+      const entries = await store.dispatch("meta/cache/fetchEntries");
+
+      return {
+        fetchInterval: null,
+
+        itemLoading: Object.fromEntries(Object.keys(entries).map((k) => [ k, false ])),
+      };
+    },
+
+    computed: {
+      ...mapGetters("meta/cache", [
+        "allEntries",
+      ]),
+    },
+
+    watch: {
+      allEntries(entries) {
+        for (const key of Object.keys(entries)) {
+          if (key in this.itemLoading) {
+            continue;
+          }
+
+          this.$set(this.itemLoading, key, false);
+        }
+      },
+    },
+
+    mounted() {
+      this.fetchInterval = setInterval(this.fetchEntries, 1000 + 1000 * Math.random());
+    },
+
+    beforeDestroy() {
+      clearInterval(this.fetchInterval);
+    },
+
+    methods: {
+      ...mapActions("meta/cache", [
+        "fetchEntries",
+        "deleteEntry",
+      ]),
+
+      prettyMs(ms, rounded = true) {
+        if (rounded) {
+          return prettyMs(Math.round(ms / 1000) * 1000);
+        }
+
+        return prettyMs(ms);
+      },
+
+      async deleteCacheItem(key) {
+        this.$set(this.itemLoading, key, true);
+        await this.deleteEntry(key);
+        await this.fetchEntries();
+        this.$set(this.itemLoading, key, false);
+      },
+
+      formatKey(key) {
+        return formatKey(key);
+      },
+    },
+  };
+</script>

@@ -9,21 +9,32 @@ import {
 
 const router = new Router();
 
+const removeData = <T extends { data: never }>({ data: _data, ...rest }: T = { data: null } as T): Omit<T, "data"> => rest;
+const removeDataFromCache: (cache: ReturnType<typeof getCache>) => unknown = _.mapValues(removeData);
+
 router.get("/", () => {
   const cache = getCache();
 
-  return _.flow(
-    _.toPairs,
-    _.map(([ k, { data: _data, ...rest } ]) => [ k, rest ]),
-    _.fromPairs,
-  )(cache);
+  return removeDataFromCache(cache);
 });
 
 router.get("/with-data", () => {
   return getCache();
 });
 
-router.get("/clear/:key", ({ params }) => {
+router.get("/for/:key", ({ params }) => {
+  const cache = getCache();
+
+  return removeData(cache[params.key]);
+});
+
+router.get("/for/:key/with-data", ({ params }) => {
+  const cache = getCache();
+
+  return cache[params.key];
+});
+
+router.delete("/:key", ({ params }) => {
   clearCacheKey(params.key);
 
   return true;
