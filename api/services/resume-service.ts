@@ -11,7 +11,6 @@ import {
   isString,
 } from "../../helpers/string";
 import {
-  resumeQuery,
   resumesFullDataQuery,
   resumesQuery,
 } from "../graphql/queries";
@@ -29,7 +28,6 @@ import {
 } from "../helpers/axios";
 import {
   cachedFetcher,
-  CacheKey,
 } from "../helpers/fetchCache";
 import {
   HttpStatus,
@@ -113,7 +111,7 @@ const afterGdpr =
     new Date(updatedAt) >= gdprDate
 ;
 
-const cacheTimeoutMs = 3 * 1000;
+const cacheTimeoutMs = 10 * 1000;
 const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
   cachedFetcher<BasicResumeInfo[]>(
     "resumes",
@@ -152,28 +150,6 @@ const fetchListFullInfoCached = cachedFetcher<Resume[]>(
   },
 );
 
-
-const fetchByIdCached: (authHeader: string, id: Resume["id"]) => Promise<Resume | null> =
-  cachedFetcher<Resume | null>(
-    "resume",
-    cacheTimeoutMs,
-    async (authHeader: string, id: Resume["id"]) => {
-      const {
-        resume,
-      }: {
-        resume: GraphQlResume | null,
-      } = await graphQlQuery(resumeQuery(Number(id)), authHeader);
-
-      if (!resume) {
-        return null;
-      }
-
-      return fixResume(resume);
-    },
-    (_: string, id: Resume["id"]) => id as CacheKey,
-  )
-;
-
 export class ResumeServiceError extends ServiceError {
 }
 
@@ -203,7 +179,9 @@ export default class ResumeService {
   }
 
   static async byId(authHeader: string, id: Resume["id"]): Promise<Resume> {
-    const resume = await fetchByIdCached(authHeader, id);
+    const resumes = await this.listWithFullInfo(authHeader);
+
+    const resume = resumes.find((r) => r.id === id);
 
     if (!resume) {
       throw new ResumeServiceError(
