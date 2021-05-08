@@ -52,7 +52,7 @@ interface CompanyWithEvents extends Company {
 
 const fetchAllCompanies = cachedFetcher<Company[]>(
   "participants",
-3 * 1000,
+  15 * 1000,
   async () => {
     const { companies } = await graphQlQuery(participantsQuery());
 
@@ -66,7 +66,7 @@ const fetchAllCompanies = cachedFetcher<Company[]>(
 
 const fetchAllIndustries = cachedFetcher<Industry[]>(
   "industries",
-15 * 1000,
+  15 * 1000,
   async () => {
     const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery());
 
