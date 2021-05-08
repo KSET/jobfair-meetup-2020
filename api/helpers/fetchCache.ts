@@ -22,16 +22,18 @@ interface ICache<T> {
 
 const cache: Record<CacheKey, ICache<unknown>> = {};
 
-const newCacheEntry = (cacheFor = 0): ICache<unknown> => ({
+const newCacheEntry = (cacheFor = 0n): ICache<unknown> => ({
   time: 0n,
   fetchedFor: 0,
-  cacheFor,
+  cacheFor: toMs(cacheFor),
   data: null,
   fetching: new AtomicBool(),
 });
 
+const HRTIME_BIGINT_MS_FACTOR = 1000000n;
+
 const timeMs = (): bigint => process.hrtime.bigint();
-const toMs = (num: bigint): number => Number(num / 1000000n);
+const toMs = (num: bigint): number => Number(num / HRTIME_BIGINT_MS_FACTOR);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -65,13 +67,14 @@ export const cachedFetcher = <T>(
   cacheKeyFn: KeyFn = () => "default" as CacheKey,
 ): (...args: unknown[]) => Promise<T> => {
   type Cache = ICache<T>;
+  const timeout = BigInt(timeoutMs) * HRTIME_BIGINT_MS_FACTOR;
 
   function cacheSet(cacheKey: CacheKey, key: "time", value: Cache["time"]): void;
   function cacheSet(cacheKey: CacheKey, key: "data", value: Cache["data"]): void;
   function cacheSet(cacheKey: CacheKey, key: "fetchedFor", value: Cache["fetchedFor"]): void;
   function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
-      cache[cacheKey] = newCacheEntry(timeoutMs);
+      cache[cacheKey] = newCacheEntry(timeout);
     }
 
     cache[cacheKey][key] = value;
@@ -82,7 +85,7 @@ export const cachedFetcher = <T>(
   function cacheGet(cacheKey: CacheKey, key: "fetching"): Cache["fetching"];
   function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
-      cache[cacheKey] = newCacheEntry(timeoutMs);
+      cache[cacheKey] = newCacheEntry(timeout);
     }
 
     return cache[cacheKey][key];
@@ -140,7 +143,7 @@ export const cachedFetcher = <T>(
   const hasFreshCache =
     (key: CacheKey): boolean =>
       hasData(key) &&
-      (timeMs() - BigInt(timeoutMs)) <= cacheGet(key, "time")
+      (timeMs() - timeout) <= cacheGet(key, "time")
   ;
 
   const cacheKey =
