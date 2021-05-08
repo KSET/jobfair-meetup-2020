@@ -16,29 +16,33 @@ interface ICache<T> {
   time: bigint;
   fetchedFor: number;
   cacheFor: number;
+  accessedSinceFetch: number,
   data: T | null;
   fetching: AtomicBool;
 }
 
 const cache: Record<CacheKey, ICache<unknown>> = {};
 
-const newCacheEntry = (cacheFor = 0): ICache<unknown> => ({
+const newCacheEntry = (cacheFor = 0n): ICache<unknown> => ({
   time: 0n,
   fetchedFor: 0,
-  cacheFor,
+  accessedSinceFetch: 0,
+  cacheFor: toMs(cacheFor),
   data: null,
   fetching: new AtomicBool(),
 });
 
+const HRTIME_BIGINT_MS_FACTOR = 1000000n;
+
 const timeMs = (): bigint => process.hrtime.bigint();
-const toMs = (num: bigint): number => Number(num) / 1000000;
+const toMs = (num: bigint): number => Number(num / HRTIME_BIGINT_MS_FACTOR);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
   _.flow(
     _.toPairs,
-    _.map(([ key, { fetching, time, ...cache } ]: [ string, ICache<unknown> ]) => {
+    _.map(([ key, { fetching, time, accessedSinceFetch, ...cache } ]: [ string, ICache<unknown> ]) => {
       const timeCurrent = timeMs();
 
       return [
@@ -46,6 +50,7 @@ export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
         {
           fetching: fetching.value,
           age: toMs(timeCurrent - time),
+          accessedSinceFetch: String(accessedSinceFetch),
           ...cache,
         },
       ];
@@ -58,6 +63,16 @@ export const clearCacheKey = (key: keyof (typeof cache)): void => {
   delete cache[key];
 };
 
+export const expireCacheKey = (key: keyof (typeof cache)): void => {
+  const item: ICache<unknown> = cache[key];
+
+  if (!item) {
+    return;
+  }
+
+  item.time = -BigInt(item.cacheFor);
+};
+
 export const cachedFetcher = <T>(
   baseCacheKey: string,
   timeoutMs: number,
@@ -65,13 +80,15 @@ export const cachedFetcher = <T>(
   cacheKeyFn: KeyFn = () => "default" as CacheKey,
 ): (...args: unknown[]) => Promise<T> => {
   type Cache = ICache<T>;
+  const timeout = BigInt(timeoutMs) * HRTIME_BIGINT_MS_FACTOR;
 
   function cacheSet(cacheKey: CacheKey, key: "time", value: Cache["time"]): void;
   function cacheSet(cacheKey: CacheKey, key: "data", value: Cache["data"]): void;
   function cacheSet(cacheKey: CacheKey, key: "fetchedFor", value: Cache["fetchedFor"]): void;
+  function cacheSet(cacheKey: CacheKey, key: "accessedSinceFetch", value: Cache["accessedSinceFetch"]): void;
   function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
-      cache[cacheKey] = newCacheEntry(timeoutMs);
+      cache[cacheKey] = newCacheEntry(timeout);
     }
 
     cache[cacheKey][key] = value;
@@ -80,9 +97,10 @@ export const cachedFetcher = <T>(
   function cacheGet(cacheKey: CacheKey, key: "time"): Cache["time"];
   function cacheGet(cacheKey: CacheKey, key: "data"): Cache["data"];
   function cacheGet(cacheKey: CacheKey, key: "fetching"): Cache["fetching"];
+  function cacheGet(cacheKey: CacheKey, key: "accessedSinceFetch"): Cache["accessedSinceFetch"];
   function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
-      cache[cacheKey] = newCacheEntry(timeoutMs);
+      cache[cacheKey] = newCacheEntry(timeout);
     }
 
     return cache[cacheKey][key];
@@ -99,6 +117,16 @@ export const cachedFetcher = <T>(
 
   const setFetching = (key: CacheKey, fetching: boolean): void => {
     cacheGet(key, "fetching").value = fetching;
+  };
+
+  const incrementAccessed = (key: CacheKey): void => {
+    const oldValue = cacheGet(key, "accessedSinceFetch");
+
+    cacheSet(key, "accessedSinceFetch", oldValue + 1);
+  };
+
+  const resetAccessed = (key: CacheKey): void => {
+    cacheSet(key, "accessedSinceFetch", 1);
   };
 
   const isFetching =
@@ -140,7 +168,7 @@ export const cachedFetcher = <T>(
   const hasFreshCache =
     (key: CacheKey): boolean =>
       hasData(key) &&
-      (timeMs() - BigInt(timeoutMs)) <= cacheGet(key, "time")
+      (timeMs() - timeout) <= cacheGet(key, "time")
   ;
 
   const cacheKey =
@@ -151,6 +179,7 @@ export const cachedFetcher = <T>(
   return async (...args: unknown[]): Promise<T> => {
     const key = cacheKey(...args);
     // console.log("CACHE GET", key);
+    incrementAccessed(key);
 
     if (hasFreshCache(key)) {
       // console.log("CACHE FRESH", key);
@@ -167,6 +196,8 @@ export const cachedFetcher = <T>(
       // console.log("FETCH  DONE", key);
 
       setData(key, data, toMs(endTime - startTime));
+
+      resetAccessed(key);
 
       setFetching(key, false);
 

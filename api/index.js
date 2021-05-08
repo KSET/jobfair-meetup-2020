@@ -15,6 +15,9 @@ import {
   versions as dbVersions,
 } from "../db/structure";
 import {
+ refreshCacheItems,
+} from "./helpers/cache";
+import {
   apiRoute,
   ApiNotFoundError,
   registerRoutesInFolderRecursive,
@@ -132,6 +135,13 @@ query(dbBase)
     } finally {
       await client.end();
     }
+  })
+  .then(async () => {
+    console.log("|> Cache warmup...");
+
+    await refreshCacheItems();
+
+    console.log("|> Cache warmup done");
   })
 ;
 
