@@ -70,7 +70,7 @@ export const expireCacheKey = (key: keyof (typeof cache)): void => {
     return;
   }
 
-  item.time += BigInt(item.cacheFor) * 2n;
+  item.time = -BigInt(item.cacheFor);
 };
 
 export const cachedFetcher = <T>(
