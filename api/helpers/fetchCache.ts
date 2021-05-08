@@ -63,6 +63,16 @@ export const clearCacheKey = (key: keyof (typeof cache)): void => {
   delete cache[key];
 };
 
+export const expireCacheKey = (key: keyof (typeof cache)): void => {
+  const item: ICache<unknown> = cache[key];
+
+  if (!item) {
+    return;
+  }
+
+  item.time += BigInt(item.cacheFor) * 2n;
+};
+
 export const cachedFetcher = <T>(
   baseCacheKey: string,
   timeoutMs: number,
