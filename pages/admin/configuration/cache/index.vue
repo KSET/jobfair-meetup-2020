@@ -21,69 +21,73 @@
     </v-row>
 
     <v-row>
-      <v-col cols="12">
-        <v-expansion-panels accordion>
-          <v-expansion-panel
-            v-for="(data, key) in allEntries"
-            :key="key"
-          >
-            <v-expansion-panel-header>
-              <span v-text="key.split(':').splice(1).join(' > ')" />
+      <v-col
+        v-for="(data, key) in allEntries"
+        :key="key"
+        cols="12"
+        lg="4"
+        sm="6"
+      >
+        <v-card>
+          <v-card-title
+            v-text="key.replace(/:default$/i, '').replace(/^cache:/i, '').split(':').join(' > ')"
+          />
 
-              <v-spacer />
+          <v-card-text>
+            <v-simple-table dense>
+              <template v-slot:default>
+                <tbody>
+                  <tr
+                    v-for="(value, key) in data"
+                    :key="key"
 
-              <span class="text-right">
-                {{ prettyMs(data.age) }} | {{ prettyMs(data.fetchedFor, false) }}
-              </span>
-            </v-expansion-panel-header>
-
-            <v-expansion-panel-content>
-              <v-card class="mx-auto" width="350">
-                <v-card-text>
-                  <v-simple-table dense>
-                    <template v-slot:default>
-                      <tbody>
-                        <tr
-                          v-for="(value, key) in data"
-                          :key="key"
-
-                          :title="`${key}: ${value}`"
-                        >
-                          <td v-text="formatKey(key)" />
-                          <td v-if="typeof value === 'number'" v-text="prettyMs(value, false)" />
-                          <td v-else-if="typeof value === 'boolean'" v-text="value ? '✅' : '❌'" />
-                          <td v-else v-text="value" />
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </v-card-text>
-
-                <v-card-actions>
-                  <v-btn
-                    :href="`/api/meta/cache/info/for/${key}/with-data`"
-                    color="warning"
-                    icon
-                    target="_blank"
+                    :title="`${key}: ${value}`"
                   >
-                    <v-icon>mdi-information</v-icon>
-                  </v-btn>
+                    <td v-text="formatKey(key)" />
 
-                  <v-spacer />
+                    <td
+                      v-if="typeof value === 'number'"
+                      class="text-right"
+                      v-text="prettyMs(value, false)"
+                    />
+                    <td
+                      v-else-if="typeof value === 'boolean'"
+                      class="text-right"
+                      v-text="value ? '✅' : '❌'"
+                    />
+                    <td
+                      v-else
+                      class="text-right"
+                      v-text="value"
+                    />
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card-text>
 
-                  <v-btn
-                    :loading="itemLoading[key]"
-                    color="red"
-                    icon
-                    @click.prevent="deleteCacheItem(key)"
-                  >
-                    <v-icon>mdi-trash-can</v-icon>
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+          <v-card-actions>
+            <v-btn
+              :href="`/api/meta/cache/info/for/${key}/with-data`"
+              color="warning"
+              icon
+              target="_blank"
+            >
+              <v-icon>mdi-information</v-icon>
+            </v-btn>
+
+            <v-spacer />
+
+            <v-btn
+              :loading="itemLoading[key]"
+              color="red"
+              icon
+              @click.prevent="deleteCacheItem(key)"
+            >
+              <v-icon>mdi-trash-can</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
       </v-col>
     </v-row>
   </app-max-width-container>
