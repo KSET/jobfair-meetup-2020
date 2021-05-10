@@ -82,11 +82,10 @@ const typeTransformer = (type: string): keyof Omit<Events, "companies"> | null =
   }
 };
 
-const cacheTimeoutMs = 15 * 1000;
 const fetchParticipantsCached: () => Promise<EventsWithoutPanels> =
   cachedFetcher<EventsWithoutPanels>(
     "participant-events",
-    cacheTimeoutMs,
+    45 * 1000,
     async (): Promise<EventsWithoutPanels> => {
       const {
         companies,

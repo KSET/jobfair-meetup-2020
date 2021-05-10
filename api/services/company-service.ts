@@ -66,7 +66,7 @@ const fetchAllCompanies = cachedFetcher<Company[]>(
 
 const fetchAllIndustries = cachedFetcher<Industry[]>(
   "industries",
-  15 * 1000,
+  3 * 60 * 1000,
   async () => {
     const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery());
 
