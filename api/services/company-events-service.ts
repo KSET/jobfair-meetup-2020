@@ -90,10 +90,10 @@ const fetchParticipantsCached: () => Promise<EventsWithoutPanels> =
       const {
         companies,
         ...eventList
-      }: GraphQlParticipants = await graphQlQuery(participantEventsQuery());
+      }: GraphQlParticipants = await graphQlQuery(participantEventsQuery()) || {};
 
       return keysFromSnakeToCamelCase({
-        companies: companies.map(CompanyService.fixCompany),
+        companies: companies?.map(CompanyService.fixCompany),
         ...eventList,
       });
     },
@@ -272,7 +272,7 @@ export default class CompanyEventsService {
       );
     }
 
-    const data = await fetchParticipantsCached();
+    const data = await fetchParticipantsCached() || {};
     const { companies, ...events } = data;
     const objList: Participant[] = events[transformedType];
 

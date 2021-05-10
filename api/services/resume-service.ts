@@ -120,7 +120,7 @@ const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
         resumes,
       }: {
         resumes: GraphQlBasicResume[];
-      } = await graphQlQuery(resumesQuery(), authHeader);
+      } = await graphQlQuery(resumesQuery(), authHeader) || {};
 
       if (!resumes) {
         return [];
@@ -139,7 +139,7 @@ const fetchListFullInfoCached = cachedFetcher<Resume[]>(
       resumes,
     }: {
       resumes: GraphQlResume[];
-    } = await graphQlQuery(resumesFullDataQuery(), authHeader);
+    } = await graphQlQuery(resumesFullDataQuery(), authHeader) || {};
 
     if (!resumes) {
       return [];

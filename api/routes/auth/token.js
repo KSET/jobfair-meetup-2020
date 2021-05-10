@@ -19,7 +19,7 @@ router.post("/refresh", async (req) => {
   const { token, refreshToken } = req.body;
 
   try {
-    const data = await graphQlQuery(refreshTokenMutation({ token, refreshToken }));
+    const data = await graphQlQuery(refreshTokenMutation({ token, refreshToken })) || {};
 
     return data.refresh_token || null;
   } catch (e) {

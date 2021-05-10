@@ -106,7 +106,7 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
     const { current_user: rawUser } = await graphQlQuery(
       fullUser ? currentUserQuery() : basicUserQuery(),
       auth,
-    );
+    ) || {};
 
     const user = keysFromSnakeToCamelCase({
       uid: rawUser.resume && rawUser.resume.uid,

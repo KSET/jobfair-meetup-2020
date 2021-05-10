@@ -54,7 +54,7 @@ const fetchAllCompanies = cachedFetcher<Company[]>(
   "participants",
   15 * 1000,
   async () => {
-    const { companies } = await graphQlQuery(participantsQuery());
+    const { companies } = await graphQlQuery(participantsQuery()) || {};
 
     if (!companies) {
       return [];
@@ -68,7 +68,7 @@ const fetchAllIndustries = cachedFetcher<Industry[]>(
   "industries",
   3 * 60 * 1000,
   async () => {
-    const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery());
+    const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery()) || {};
 
     if (!industries) {
       return [];
@@ -83,11 +83,11 @@ export class CompanyError extends ServiceError {
 
 export default class CompanyService {
   static async fetchListAll(): Promise<Company[]> {
-    return await fetchAllCompanies();
+    return await fetchAllCompanies() || [];
   }
 
   static async fetchIndustries(): Promise<Industry[]> {
-    return await fetchAllIndustries();
+    return await fetchAllIndustries() || [];
   }
 
   static async fetchInfo(id: number): Promise<CompanyWithEvents> {

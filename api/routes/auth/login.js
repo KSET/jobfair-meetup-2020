@@ -22,7 +22,7 @@ router.post("/", apiRoute(async (req) => {
   }
 
   try {
-    const data = await graphQlQuery(loginMutation({ email, password }));
+    const data = await graphQlQuery(loginMutation({ email, password })) || {};
 
     return data.login || null;
   } catch (e) {
