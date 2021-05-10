@@ -7,8 +7,8 @@ export const state = () => (
 );
 
 export const getters = {
-  getPages({ pages }) {
-    return pages;
+  getPages(state, _getters, _rootState, rootGetters) {
+    return state.pages.filter(({ showOffline }) => showOffline || rootGetters["meta/health/isLive"]);
   },
 };
 

@@ -1,6 +1,7 @@
 <template>
   <app-max-width-container class="py-12 align-self-center">
     <v-card
+      v-if="isLive"
       class="mx-auto pa-4"
       light
       max-width="600"
@@ -53,8 +54,8 @@
             class="ml-3"
           >
             <a
-              class="font-weight-light black--text"
               :href="`${loginUrlHref}/users/sign_up?locale=hr`"
+              class="font-weight-light black--text"
               target="_blank"
             >
               Registracija
@@ -63,8 +64,8 @@
             <v-divider class="my-1" style="opacity: .2;" />
 
             <a
-              class="font-weight-light black--text"
               :href="`${loginUrlHref}/users/password/new?locale=hr`"
+              class="font-weight-light black--text"
               target="_blank"
             >
               Zaboravili ste lozinku?
@@ -88,6 +89,20 @@
         </v-btn>
       </v-card-actions>
     </v-card>
+
+    <v-card
+      v-else
+      class="mx-auto pa-4"
+      light
+      max-width="600"
+    >
+      <v-card-title>Prijava</v-card-title>
+
+      <v-card-text>
+        Aplikacija je trenutno u reduciranom stanju rada te login nije dostupan
+      </v-card-text>
+    </v-card>
+
     <v-snackbar
       v-model="hasError"
       :timeout="5000"
@@ -152,6 +167,7 @@ name: PageLogin
         user: "user/getUser",
         isModerator: "user/isModerator",
         getSetting: "settings/getSetting",
+        isLive: "meta/health/isLive",
       }),
 
       loginUrlHref() {
