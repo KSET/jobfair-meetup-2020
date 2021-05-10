@@ -1,5 +1,5 @@
 import {
- RoleNames,
+  RoleNames,
 } from "../helpers/permissions";
 import {
   AuthRouter,
@@ -21,6 +21,7 @@ router.get("/list", () => {
     {
       name: "page.name.participants",
       to: { name: "PageSudionici" },
+      showOffline: false,
     },
     {
       name: "page.name.contact",
@@ -34,7 +35,10 @@ router.get("/list", () => {
     //   name: "button.joinNow",
     //   setting: "Join Now URL",
     // },
-  ];
+  ].map((p) => ({
+    showOffline: true,
+    ...p,
+  }));
 });
 
 const authRouter = AuthRouter.boundToRouter(router, { role: RoleNames.MODERATOR });

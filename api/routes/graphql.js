@@ -19,7 +19,7 @@ router.post("/proxy", injectAuthData(), apiRoute((req) => {
     throw new ApiError("no-query");
   }
 
-  return graphQlQuery(req.body, req.authHeader);
+  return graphQlQuery(req.body, req.authHeader) || {};
 }));
 
 export default router;

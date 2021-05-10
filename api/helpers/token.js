@@ -2,13 +2,14 @@ import {
   verify,
 } from "jsonwebtoken";
 import {
- keysFromSnakeToCamelCase,
+  keysFromSnakeToCamelCase,
 } from "../../helpers/object";
 import {
   basicUserQuery,
   currentUserQuery,
 } from "../graphql/queries";
 import CompanyService from "../services/company-service";
+import isLive from "./health";
 import {
   getSetting,
 } from "./settings";
@@ -16,7 +17,7 @@ import {
   graphQlQuery,
 } from "./axios";
 import {
- internalRequest,
+  internalRequest,
 } from "./http";
 
 export const extractAuthorizationToken = (req) => {
@@ -102,11 +103,15 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
     console.log("Failed local JWT verification:", e.message);
   }
 
+  if (!isLive()) {
+    return null;
+  }
+
   try {
     const { current_user: rawUser } = await graphQlQuery(
       fullUser ? currentUserQuery() : basicUserQuery(),
       auth,
-    );
+    ) || {};
 
     const user = keysFromSnakeToCamelCase({
       uid: rawUser.resume && rawUser.resume.uid,
