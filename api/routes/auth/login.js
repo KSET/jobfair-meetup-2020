@@ -1,6 +1,7 @@
 import {
   Router,
 } from "express";
+import isLive from "../../helpers/health";
 import {
   ApiError,
   apiRoute,
@@ -19,6 +20,10 @@ router.post("/", apiRoute(async (req) => {
 
   if (!email || !password) {
     throw new ApiError("no-credentials-provided");
+  }
+
+  if (!isLive()) {
+    throw new ApiError("application-offline");
   }
 
   try {

@@ -5,6 +5,7 @@ import type {
 import {
   AtomicBool,
 } from "./atomic";
+import isLive from "./health";
 
 export type CacheKey = Opaque<string, "CacheKey">;
 
@@ -235,7 +236,9 @@ export const cachedFetcher = <T>(
     }
 
     if (isFetching(key)) {
-      await waitForFetchingToBe(key, false);
+      if (isLive()) {
+        await waitForFetchingToBe(key, false);
+      }
 
       return getData(key);
     }
