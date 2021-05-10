@@ -8,7 +8,7 @@ import {
   isGateGuardian,
 } from "~/helpers/auth";
 import {
- dotGet,
+  dotGet,
 } from "~/helpers/data";
 
 export const state = () => (
@@ -142,7 +142,7 @@ export const actions = {
 
   async doLogin({ commit, dispatch }, { email, password }) {
     try {
-      const { data = {} } = await this.$api.$post(
+      const response = await this.$api.$post(
         "/auth/login",
         {
           email,
@@ -150,11 +150,15 @@ export const actions = {
         },
       );
 
-      await commit("SET_USER", data.user);
-      await dispatch("setJfToken", data);
+      const { data = {} } = response || {};
 
-      return data;
+      await commit("SET_USER", data?.user);
+      await dispatch("setJfToken", data || {});
+
+      return response;
     } catch (e) {
+      console.log(e);
+
       return null;
     }
   },

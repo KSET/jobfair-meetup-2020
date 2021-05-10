@@ -99,7 +99,7 @@
       <v-card-title>Prijava</v-card-title>
 
       <v-card-text>
-        Aplikacija je trenutno u reduciranom stanju rada te login nije dostupan
+        Aplikacija je trenutno u reduciranom stanju rada. Prijava je nedostupna.
       </v-card-text>
     </v-card>
 
@@ -110,7 +110,8 @@
       right
       top
     >
-      Neispravni email ili lozinka
+      <span v-text="errorMessage" />
+
       <v-btn
         light
         text
@@ -147,6 +148,7 @@ name: PageLogin
       isValid: false,
       isLoading: false,
       hasError: false,
+      errorReason: "",
       showTimeError: false,
       timer: null,
       email: "",
@@ -181,6 +183,15 @@ name: PageLogin
         const parsedUrl = new URL(this.loginUrlHref);
 
         return parsedUrl.hostname;
+      },
+
+      errorMessage() {
+        switch (this.errorReason) {
+          case "application-offline":
+            return "Aplikacija je trenutno u reduciranom stanju rada. Prijava je nedostupna.";
+          default:
+            return "Neispravni email ili lozinka";
+        }
       },
     },
 
@@ -224,14 +235,15 @@ name: PageLogin
         this.showTimeError = false;
         this.timer = startTimer();
 
-        const success = await this.doLogin({ email, password });
+        const { error, reason } = await this.doLogin({ email, password });
 
         clearTimeout(this.timer);
         this.showTimeError = false;
         this.isLoading = false;
 
-        if (!success) {
+        if (error) {
           this.hasError = true;
+          this.errorReason = reason;
           return;
         }
 
