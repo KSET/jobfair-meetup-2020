@@ -19,6 +19,7 @@ interface ICache<T> {
   accessedSinceFetch: number,
   data: T | null;
   fetching: AtomicBool;
+  timer: ReturnType<typeof setInterval> | null;
 }
 
 const cache: Record<CacheKey, ICache<unknown>> = {};
@@ -30,6 +31,7 @@ const newCacheEntry = (cacheFor = 0n): ICache<unknown> => ({
   cacheFor: toMs(cacheFor),
   data: null,
   fetching: new AtomicBool(),
+  timer: null,
 });
 
 const HRTIME_BIGINT_MS_FACTOR = 1000000n;
@@ -42,7 +44,7 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
   _.flow(
     _.toPairs,
-    _.map(([ key, { fetching, time, accessedSinceFetch, ...cache } ]: [ string, ICache<unknown> ]) => {
+    _.map(([ key, { timer: _timer, fetching, time, accessedSinceFetch, ...cache } ]: [ string, ICache<unknown> ]) => {
       const timeCurrent = timeMs();
 
       return [
@@ -56,10 +58,12 @@ export const getCache = (): Readonly<Record<CacheKey, unknown>> =>
       ];
     }),
     _.fromPairs,
+    Object.freeze,
   )(cache)
 ;
 
 export const clearCacheKey = (key: keyof (typeof cache)): void => {
+  clearInterval(cache[key].timer);
   delete cache[key];
 };
 
@@ -86,6 +90,7 @@ export const cachedFetcher = <T>(
   function cacheSet(cacheKey: CacheKey, key: "data", value: Cache["data"]): void;
   function cacheSet(cacheKey: CacheKey, key: "fetchedFor", value: Cache["fetchedFor"]): void;
   function cacheSet(cacheKey: CacheKey, key: "accessedSinceFetch", value: Cache["accessedSinceFetch"]): void;
+  function cacheSet(cacheKey: CacheKey, key: "timer", value: Cache["timer"]): void;
   function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
       cache[cacheKey] = newCacheEntry(timeout);
@@ -98,6 +103,7 @@ export const cachedFetcher = <T>(
   function cacheGet(cacheKey: CacheKey, key: "data"): Cache["data"];
   function cacheGet(cacheKey: CacheKey, key: "fetching"): Cache["fetching"];
   function cacheGet(cacheKey: CacheKey, key: "accessedSinceFetch"): Cache["accessedSinceFetch"];
+  function cacheGet(cacheKey: CacheKey, key: "timer"): Cache["timer"];
   function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
       cache[cacheKey] = newCacheEntry(timeout);
@@ -127,6 +133,18 @@ export const cachedFetcher = <T>(
 
   const resetAccessed = (key: CacheKey): void => {
     cacheSet(key, "accessedSinceFetch", 1);
+  };
+
+  const setTimer = (key: CacheKey, fetchData: (...args: unknown[]) => unknown): void => {
+    const oldTimer = cacheGet(key, "timer");
+
+    if (oldTimer) {
+      clearInterval(oldTimer);
+    }
+
+    const newTimer = setInterval(fetchData, timeoutMs * 2);
+
+    cacheSet(key, "timer", newTimer);
   };
 
   const isFetching =
@@ -200,6 +218,8 @@ export const cachedFetcher = <T>(
       resetAccessed(key);
 
       setFetching(key, false);
+
+      setTimer(key, fetchData);
 
       return data;
     };
