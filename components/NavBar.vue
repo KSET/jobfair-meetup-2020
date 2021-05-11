@@ -8,7 +8,12 @@
 
     <v-spacer />
 
-    <div :class="$style.navLinkContainer">
+    <v-slide-x-transition
+      :class="$style.navLinkContainer"
+      group
+      name="expand-x-transition"
+      tag="div"
+    >
       <nuxt-link
         :is="page.href ? 'v-btn' : 'nuxt-link'"
 
@@ -33,11 +38,15 @@
 
       <nav-user-module
         v-if="isLoggedIn"
+
+        key="nav-user-module"
         class="ml-6"
       />
 
       <v-btn
         v-else
+
+        key="join-now-button"
 
         v-ripple
 
@@ -51,7 +60,7 @@
       >
         <translated-text :class="$style.navLinkText" trans-key="button.joinNow" />
       </v-btn>
-    </div>
+    </v-slide-x-transition>
 
     <v-btn :class="$style.navBurgerButton" icon @click.stop="toggleOpen">
       <menu-icon />

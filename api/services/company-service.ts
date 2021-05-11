@@ -1,3 +1,6 @@
+import type {
+ AsyncReturnType,
+} from "type-fest";
 import {
   dotGet,
 } from "../../helpers/data";
@@ -20,8 +23,8 @@ import {
 } from "../helpers/settings";
 import type {
   Company as GraphQlCompany,
-  Image,
-  Industry,
+  Image as GraphQlImage,
+  Industry as GraphQlIndustry,
 } from "../graphql/types";
 import CompanyEventsService from "./company-events-service";
 import type {
@@ -37,13 +40,13 @@ export interface Company {
   legalName: string;
   brandName: string;
   description: string;
-  image: Image["large"]["url"];
+  image: GraphQlImage["large"]["url"];
   thumbnail: string;
   homepageUrl: string;
   address: string;
-  cover: Image | null;
-  industry: Industry;
-  images: Image | null;
+  cover: GraphQlImage | null;
+  industry: GraphQlIndustry;
+  images: GraphQlImage | null;
 }
 
 interface CompanyWithEvents extends Company {
@@ -64,11 +67,11 @@ const fetchAllCompanies = cachedFetcher<Company[]>(
   },
 );
 
-const fetchAllIndustries = cachedFetcher<Industry[]>(
+const fetchAllIndustries = cachedFetcher<GraphQlIndustry[]>(
   "industries",
   3 * 60 * 1000,
   async () => {
-    const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery()) || {};
+    const { industries }: { industries: GraphQlIndustry[] } = await graphQlQuery(industriesQuery()) || {};
 
     if (!industries) {
       return [];
@@ -86,12 +89,12 @@ export default class CompanyService {
     return await fetchAllCompanies() || [];
   }
 
-  static async fetchIndustries(): Promise<Industry[]> {
+  static async fetchIndustries(): Promise<GraphQlIndustry[]> {
     return await fetchAllIndustries() || [];
   }
 
   static async fetchInfo(id: number): Promise<CompanyWithEvents> {
-    const { companies, ...rawEvents } = await CompanyEventsService.listAll();
+    const { companies, ...rawEvents }: AsyncReturnType<typeof CompanyEventsService.listAll> | { companies: never[] } = await CompanyEventsService.listAll() || { companies: [] };
 
     const company = companies.find(({ id: i }) => String(i) === String(id));
 

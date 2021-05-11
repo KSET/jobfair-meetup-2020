@@ -111,7 +111,7 @@ const afterGdpr =
     new Date(updatedAt) >= gdprDate
 ;
 
-const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
+const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[] | null> =
   cachedFetcher<BasicResumeInfo[]>(
     "resumes",
     5 * 1000,
@@ -154,11 +154,11 @@ export class ResumeServiceError extends ServiceError {
 
 export default class ResumeService {
   static async list(authHeader: string): Promise<BasicResumeInfo[]> {
-    return await fetchListCached(authHeader);
+    return await fetchListCached(authHeader) || [];
   }
 
   static async listWithFullInfo(authHeader: string): Promise<Resume[]> {
-    return await fetchListFullInfoCached(authHeader);
+    return await fetchListFullInfoCached(authHeader) || [];
   }
 
   static async byUid(authHeader: string, uid: Resume["uid"]): Promise<BasicResumeInfo> {

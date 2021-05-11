@@ -83,7 +83,7 @@ export const cachedFetcher = <T>(
   timeoutMs: number,
   fetchFn: FetchFn<T>,
   cacheKeyFn: KeyFn = () => "default" as CacheKey,
-): (...args: unknown[]) => Promise<T> => {
+): (...args: unknown[]) => Promise<T | null> => {
   type Cache = ICache<T>;
   const timeout = BigInt(timeoutMs) * HRTIME_BIGINT_MS_FACTOR;
 
@@ -180,8 +180,8 @@ export const cachedFetcher = <T>(
   ;
 
   const getData =
-    (key: CacheKey): NonNullable<Cache["data"]> =>
-      cacheGet(key, "data") as NonNullable<Cache["data"]>
+    (key: CacheKey): Cache["data"] =>
+      cacheGet(key, "data")
   ;
 
   const hasFreshCache =
@@ -195,7 +195,7 @@ export const cachedFetcher = <T>(
       `cache:${ baseCacheKey }:${ cacheKeyFn(...args) }` as CacheKey
   ;
 
-  return async (...args: unknown[]): Promise<T> => {
+  return async (...args: unknown[]): Promise<T | null> => {
     const key = cacheKey(...args);
     // console.log("CACHE GET", key);
     incrementAccessed(key);

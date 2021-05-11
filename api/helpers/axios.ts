@@ -45,14 +45,15 @@ export interface GraphQlQueryParams {
   variables?: Record<string, unknown>;
 }
 
-export async function graphQlQuery<T>({ query, operationName, variables }: GraphQlQueryParams, token = ""): Promise<T> {
-  const config =
+export async function graphQlQuery<T>({ query, operationName, variables }: GraphQlQueryParams, token = "", timeout = 0): Promise<T> {
+  const config: AxiosRequestConfig =
     token
     ? {
         headers: {
           "Content-Type": "application/json",
           Authorization: token,
         },
+        timeout,
       }
     : {}
   ;
