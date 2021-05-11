@@ -1,3 +1,6 @@
+import type {
+ AsyncReturnType,
+} from "type-fest";
 import {
   dotGet,
 } from "../../helpers/data";
@@ -91,7 +94,7 @@ export default class CompanyService {
   }
 
   static async fetchInfo(id: number): Promise<CompanyWithEvents> {
-    const { companies, ...rawEvents } = await CompanyEventsService.listAll();
+    const { companies, ...rawEvents }: AsyncReturnType<typeof CompanyEventsService.listAll> | { companies: never[] } = await CompanyEventsService.listAll() || { companies: [] };
 
     const company = companies.find(({ id: i }) => String(i) === String(id));
 

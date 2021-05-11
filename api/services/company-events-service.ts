@@ -1,5 +1,6 @@
 import _ from "lodash/fp";
 import type {
+  AsyncReturnType,
   CamelCasedPropertiesDeep,
 } from "type-fest";
 import {
@@ -82,7 +83,7 @@ const typeTransformer = (type: string): keyof Omit<Events, "companies"> | null =
   }
 };
 
-const fetchParticipantsCached: () => Promise<EventsWithoutPanels> =
+const fetchParticipantsCached: () => Promise<EventsWithoutPanels | null> =
   cachedFetcher<EventsWithoutPanels>(
     "participant-events",
     45 * 1000,
@@ -113,8 +114,14 @@ export default class CompanyEventsService {
       PanelsService.listWithInfo(),
     ]);
 
+    const noParticipants: AsyncReturnType<typeof fetchParticipantsCached> = {
+      companies: [],
+      presentations: [],
+      workshops: [],
+    };
+
     return {
-      ...participants,
+      ...(participants || noParticipants),
       panels,
     };
   }
@@ -272,8 +279,9 @@ export default class CompanyEventsService {
       );
     }
 
-    const data = await fetchParticipantsCached() || {};
-    const { companies, ...events } = data;
+    const data: AsyncReturnType<typeof fetchParticipantsCached> | Record<string, never> = await fetchParticipantsCached() || {};
+    const { companies = [], ...events } = data;
+
     const objList: Participant[] = events[transformedType];
 
     if (!objList) {

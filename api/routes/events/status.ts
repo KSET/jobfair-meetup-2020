@@ -52,6 +52,13 @@ router.post("/", async ({ body, authUser }) => {
 
   const eventInfo = await CompanyEventsService.listAll();
 
+  if (!eventInfo) {
+    throw new ApiError(
+      "Something went wrong. Could not acquire info. Please try again.",
+      HttpStatus.Error.Client.UnprocessableEntity,
+    );
+  }
+
   let events: Event[] = [];
   switch (eventType) {
     case EventType.workshop:
