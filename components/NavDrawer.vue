@@ -1,9 +1,9 @@
 <template>
   <v-navigation-drawer
-    :value="isOpen"
     :class="{
       'd-none': !isMounted,
     }"
+    :value="isOpen"
     app
     dark
     right
@@ -17,7 +17,11 @@
         </nuxt-link>
       </v-subheader>
 
-      <v-list-item-group :class="$style.linkContainer">
+      <v-slide-y-transition
+        :class="$style.linkContainer"
+        group
+        tag="v-list"
+      >
         <v-list-item
           v-for="page in pages"
           :key="page.href || JSON.stringify(page.to)"
@@ -51,6 +55,8 @@
 
         <v-list-item
           v-if="isLoggedIn"
+
+          key="nav-user-module"
         >
           <v-list-item-content>
             <nav-user-module />
@@ -60,6 +66,7 @@
         <v-list-item
           v-else
 
+          key="join-now-button"
           :to="joinNowRoute"
           ripple
         >
@@ -78,7 +85,7 @@
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-      </v-list-item-group>
+      </v-slide-y-transition>
     </v-list>
   </v-navigation-drawer>
 </template>
