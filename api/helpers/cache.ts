@@ -38,13 +38,14 @@ export const refreshCacheItems =
       auth: boolean;
       handler: (authHeader?: string) => unknown;
     }[] = entries.filter(({ auth }) => !auth);
-    const authItems = entries.filter(({ auth }) => !auth);
 
     for (const key of Object.keys(cachedFetchers)) {
       expireCacheKey(key as CacheKey);
     }
 
     if (authHeader) {
+      const authItems = entries.filter(({ auth }) => auth);
+
       for (const item of authItems) {
         items.push(item);
       }

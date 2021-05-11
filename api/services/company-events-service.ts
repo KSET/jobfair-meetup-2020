@@ -82,19 +82,18 @@ const typeTransformer = (type: string): keyof Omit<Events, "companies"> | null =
   }
 };
 
-const cacheTimeoutMs = 15 * 1000;
 const fetchParticipantsCached: () => Promise<EventsWithoutPanels> =
   cachedFetcher<EventsWithoutPanels>(
     "participant-events",
-    cacheTimeoutMs,
+    45 * 1000,
     async (): Promise<EventsWithoutPanels> => {
       const {
         companies,
         ...eventList
-      }: GraphQlParticipants = await graphQlQuery(participantEventsQuery());
+      }: GraphQlParticipants = await graphQlQuery(participantEventsQuery()) || {};
 
       return keysFromSnakeToCamelCase({
-        companies: companies.map(CompanyService.fixCompany),
+        companies: companies?.map(CompanyService.fixCompany),
         ...eventList,
       });
     },
@@ -273,7 +272,7 @@ export default class CompanyEventsService {
       );
     }
 
-    const data = await fetchParticipantsCached();
+    const data = await fetchParticipantsCached() || {};
     const { companies, ...events } = data;
     const objList: Participant[] = events[transformedType];
 
