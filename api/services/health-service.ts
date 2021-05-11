@@ -10,6 +10,7 @@ import {
 
 const PING_INTERVAL_MS = 30 * 1000;
 const ON_ERROR_SLEEP_FOR_MS = 3 * 1000;
+const REQUEST_TIMEOUT_MS = 5 * 1000;
 
 export default class HealthService {
   #live = true;
@@ -44,7 +45,11 @@ export default class HealthService {
   private async doCheck(): Promise<boolean> {
     for (let i = 0; 5 > i; i++) {
       try {
-        const { industries }: { industries: Industry[] } = await graphQlQuery(industriesQuery());
+        const { industries }: { industries: Industry[] } = await graphQlQuery(
+          industriesQuery(),
+          "",
+          REQUEST_TIMEOUT_MS,
+        );
 
         if (industries) {
           return true;
