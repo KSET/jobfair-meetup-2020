@@ -1,6 +1,7 @@
 import {
   Router,
 } from "express";
+import isLive from "../../helpers/health";
 import {
   ApiError,
   apiRoute,
@@ -21,8 +22,12 @@ router.post("/", apiRoute(async (req) => {
     throw new ApiError("no-credentials-provided");
   }
 
+  if (!isLive()) {
+    throw new ApiError("application-offline");
+  }
+
   try {
-    const data = await graphQlQuery(loginMutation({ email, password }));
+    const data = await graphQlQuery(loginMutation({ email, password })) || {};
 
     return data.login || null;
   } catch (e) {

@@ -111,17 +111,16 @@ const afterGdpr =
     new Date(updatedAt) >= gdprDate
 ;
 
-const cacheTimeoutMs = 10 * 1000;
 const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
   cachedFetcher<BasicResumeInfo[]>(
     "resumes",
-    cacheTimeoutMs,
+    5 * 1000,
     async (authHeader: string): Promise<BasicResumeInfo[]> => {
       const {
         resumes,
       }: {
         resumes: GraphQlBasicResume[];
-      } = await graphQlQuery(resumesQuery(), authHeader);
+      } = await graphQlQuery(resumesQuery(), authHeader) || {};
 
       if (!resumes) {
         return [];
@@ -134,13 +133,13 @@ const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[]> =
 
 const fetchListFullInfoCached = cachedFetcher<Resume[]>(
   "resumes-full-data",
-  cacheTimeoutMs,
+  60 * 1000,
   async (authHeader: string) => {
     const {
       resumes,
     }: {
       resumes: GraphQlResume[];
-    } = await graphQlQuery(resumesFullDataQuery(), authHeader);
+    } = await graphQlQuery(resumesFullDataQuery(), authHeader) || {};
 
     if (!resumes) {
       return [];

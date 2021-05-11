@@ -11,6 +11,8 @@
     </v-main>
 
     <app-footer />
+
+    <health-status />
   </v-app>
 </template>
 
@@ -18,6 +20,7 @@
   import AppNavBar from "@/components/NavBar";
   import AppNavDrawer from "@/components/NavDrawer";
   import AppFooter from "@/components/Footer";
+  import HealthStatus from "../components/HealthStatus";
   import {
     generateMetadata,
   } from "~/helpers/head";
@@ -26,6 +29,7 @@
     name: "LayoutDefault",
 
     components: {
+      HealthStatus,
       AppNavBar,
       AppNavDrawer,
       AppFooter,

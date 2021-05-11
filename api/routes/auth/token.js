@@ -1,3 +1,4 @@
+import isLive from "../../helpers/health";
 import {
   ApiError,
   Router,
@@ -18,8 +19,12 @@ const router = new Router();
 router.post("/refresh", async (req) => {
   const { token, refreshToken } = req.body;
 
+  if (!isLive()) {
+    throw new ApiError("application-offline");
+  }
+
   try {
-    const data = await graphQlQuery(refreshTokenMutation({ token, refreshToken }));
+    const data = await graphQlQuery(refreshTokenMutation({ token, refreshToken })) || {};
 
     return data.refresh_token || null;
   } catch (e) {
