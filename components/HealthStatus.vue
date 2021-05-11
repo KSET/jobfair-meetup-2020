@@ -40,7 +40,7 @@
       ]),
 
       show() {
-        return !this.isLive;
+        return !this.isLive || !this.isOnline;
       },
 
       errorMessage() {
