@@ -136,12 +136,16 @@ export const cachedFetcher = <T>(
     cacheSet(key, "accessedSinceFetch", 1);
   };
 
-  const setTimer = (key: CacheKey, fetchData: (...args: unknown[]) => unknown): void => {
+  const clearTimer = (key: CacheKey): void => {
     const oldTimer = cacheGet(key, "timer");
 
     if (oldTimer) {
       clearInterval(oldTimer);
     }
+  };
+
+  const setTimer = (key: CacheKey, fetchData: (...args: unknown[]) => unknown): void => {
+    clearTimer(key);
 
     const newTimer = setInterval(fetchData, timeoutMs * 2);
 
@@ -206,23 +210,23 @@ export const cachedFetcher = <T>(
     }
 
     const fetchData = async () => {
-      setFetching(key, true);
+      try {
+        setFetching(key, true);
+        clearTimer(key);
+        // console.log("FETCH START", key);
+        const startTime = timeMs();
+        const data = await fetchFn(...args);
+        const endTime = timeMs();
 
-      // console.log("FETCH START", key);
-      const startTime = timeMs();
-      const data = await fetchFn(...args);
-      const endTime = timeMs();
-      // console.log("FETCH  DONE", key);
+        setData(key, data, toMs(endTime - startTime));
+        resetAccessed(key);
 
-      setData(key, data, toMs(endTime - startTime));
-
-      resetAccessed(key);
-
-      setFetching(key, false);
-
-      setTimer(key, fetchData);
-
-      return data;
+        return data;
+      } finally {
+        setFetching(key, false);
+        setTimer(key, fetchData);
+        // console.log("FETCH  DONE", key);
+      }
     };
 
     if (hasData(key)) {

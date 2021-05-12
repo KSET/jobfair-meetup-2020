@@ -1,5 +1,5 @@
 import type {
- AsyncReturnType,
+  AsyncReturnType,
 } from "type-fest";
 import {
   dotGet,
@@ -55,12 +55,12 @@ interface CompanyWithEvents extends Company {
 
 const fetchAllCompanies = cachedFetcher<Company[]>(
   "participants",
-  15 * 1000,
+  60 * 1000,
   async () => {
     const { companies } = await graphQlQuery(participantsQuery()) || {};
 
     if (!companies) {
-      return [];
+      throw new Error("Site offline");
     }
 
     return companies.map(CompanyService.fixCompany);
@@ -74,7 +74,7 @@ const fetchAllIndustries = cachedFetcher<GraphQlIndustry[]>(
     const { industries }: { industries: GraphQlIndustry[] } = await graphQlQuery(industriesQuery()) || {};
 
     if (!industries) {
-      return [];
+      throw new Error("Site offline");
     }
 
     return industries.sort((a, b) => Number(a.id) - Number(b.id));

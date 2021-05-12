@@ -114,7 +114,7 @@ const afterGdpr =
 const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[] | null> =
   cachedFetcher<BasicResumeInfo[]>(
     "resumes",
-    5 * 1000,
+    7.5 * 1000,
     async (authHeader: string): Promise<BasicResumeInfo[]> => {
       const {
         resumes,
@@ -123,7 +123,7 @@ const fetchListCached: (authHeader: string) => Promise<BasicResumeInfo[] | null>
       } = await graphQlQuery(resumesQuery(), authHeader) || {};
 
       if (!resumes) {
-        return [];
+        throw new Error("Site offline");
       }
 
       return resumes.map(fixResume).filter(afterGdpr);
@@ -142,7 +142,7 @@ const fetchListFullInfoCached = cachedFetcher<Resume[]>(
     } = await graphQlQuery(resumesFullDataQuery(), authHeader) || {};
 
     if (!resumes) {
-      return [];
+      throw new Error("Site offline");
     }
 
     return resumes.map((r) => fixResume(r)).filter(afterGdpr);
