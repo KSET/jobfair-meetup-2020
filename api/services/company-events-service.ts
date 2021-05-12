@@ -93,8 +93,12 @@ const fetchParticipantsCached: () => Promise<EventsWithoutPanels | null> =
         ...eventList
       }: GraphQlParticipants = await graphQlQuery(participantEventsQuery()) || {};
 
+      if (!companies || !eventList) {
+        throw new Error("Site offline");
+      }
+
       return keysFromSnakeToCamelCase({
-        companies: companies?.map(CompanyService.fixCompany),
+        companies: companies.map(CompanyService.fixCompany),
         ...eventList,
       });
     },
