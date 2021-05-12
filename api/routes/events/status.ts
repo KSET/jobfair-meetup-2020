@@ -52,13 +52,6 @@ router.post("/", async ({ body, authUser }) => {
 
   const eventInfo = await CompanyEventsService.listAll();
 
-  if (!eventInfo) {
-    throw new ApiError(
-      "Something went wrong. Could not acquire info. Please try again.",
-      HttpStatus.Error.Client.UnprocessableEntity,
-    );
-  }
-
   let events: Event[] = [];
   switch (eventType) {
     case EventType.workshop:
@@ -70,6 +63,13 @@ router.post("/", async ({ body, authUser }) => {
     case EventType.panel:
       events = eventInfo.panels;
       break;
+  }
+
+  if (!events) {
+    throw new ApiError(
+      "Something went wrong. Could not acquire info. Please try again.",
+      HttpStatus.Error.Client.UnprocessableEntity,
+    );
   }
 
   const event = events.find((event) => String(event.id) === String(id));
