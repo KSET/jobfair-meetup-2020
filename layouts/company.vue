@@ -114,10 +114,13 @@
         <nuxt :class="$style.pageContainer" />
       </v-container>
     </v-main>
+
+    <data-refresher />
   </v-app>
 </template>
 
 <script>
+  import DataRefresher from "../components/DataRefresher";
   import NavUserModule from "~/components/NavUserModule";
   import TranslatedText from "~/components/TranslatedText";
   import {
@@ -129,6 +132,7 @@
     name: "LayoutCompany",
 
     components: {
+      DataRefresher,
       TranslatedText,
       NavUserModule,
       MenuIcon,
