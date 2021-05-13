@@ -5,10 +5,17 @@ import {
   AuthRouter,
   Router,
 } from "../helpers/route";
+import {
+  getSetting,
+} from "../helpers/settings";
+import YoutubeService from "../services/external/google/youtube-service";
 
 const router = new Router();
 
-router.get("/list", () => {
+router.get("/list", async () => {
+  const youtubeChannelId = await getSetting("YouTube channel id", "");
+  const isYoutubeLive = await YoutubeService.isChannelLive(youtubeChannelId);
+
   return [
     {
       name: "page.name.blog",
@@ -23,6 +30,12 @@ router.get("/list", () => {
       to: { name: "PageSudionici" },
       showOffline: false,
     },
+    isYoutubeLive
+    ? {
+        name: "page.name.broadcast",
+        to: { name: "PageLive" },
+      }
+    : null,
     {
       name: "page.name.contact",
       to: { name: "PageKontakt" },
@@ -35,7 +48,7 @@ router.get("/list", () => {
     //   name: "button.joinNow",
     //   setting: "Join Now URL",
     // },
-  ].map((p) => ({
+  ].filter((i) => i).map((p) => ({
     showOffline: true,
     ...p,
   }));
