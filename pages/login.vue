@@ -132,6 +132,9 @@ name: PageLogin
     mapActions,
     mapGetters,
   } from "vuex";
+  import {
+    generateMetadata,
+  } from "../helpers/head";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import {
     decodeRedirectParam,
@@ -264,6 +267,19 @@ name: PageLogin
 
         return await window.location.assign(redirectUrl);
       },
+    },
+
+    head() {
+      const title = "Prijava";
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+          }),
+        ],
+      };
     },
   };
 </script>

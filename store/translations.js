@@ -1,4 +1,9 @@
 import Vue from "vue";
+import flow from "lodash/fp/flow";
+import split from "lodash/fp/split";
+import join from "lodash/fp/join";
+import capitalize from "lodash/fp/capitalize";
+import map from "lodash/fp/map";
 
 export const state = () => (
   {
@@ -12,6 +17,17 @@ export const state = () => (
 export const getters = {
   translation({ translations }) {
     return (key) => translations[key] || key;
+  },
+
+  capitalizedTranslation(state) {
+    const getValue = (key) => state.translations[key] || key;
+
+    return flow(
+      getValue,
+      split(" "),
+      map(capitalize),
+      join(" "),
+    );
   },
 
   isEditable({ editable }) {

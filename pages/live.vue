@@ -40,6 +40,9 @@ name: PageLive
   } from "vuex";
   import AppMaxWidthContainer from "../components/AppMaxWidthContainer";
   import TranslatedText from "../components/TranslatedText";
+  import {
+    generateMetadata,
+  } from "../helpers/head";
 
   export default {
     components: {
@@ -61,6 +64,22 @@ name: PageLive
       ...mapGetters("external/live", [
         "youtubeId",
       ]),
+      ...mapGetters("translations", [
+        "capitalizedTranslation",
+      ]),
+    },
+
+    head() {
+      const title = this.capitalizedTranslation("live.header");
+
+      return ({
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+          }),
+        ],
+      });
     },
   };
 </script>

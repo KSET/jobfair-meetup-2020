@@ -176,16 +176,24 @@ name: PageKontakt
       ...mapGetters({
         getSetting: "settings/getSetting",
       }),
+
+      ...mapGetters("translations", [
+        "capitalizedTranslation",
+      ]),
     },
 
-    head: () => ({
-      title: "Kontakt",
-      meta: [
-        ...generateMetadata({
-          title: "Kontakt",
-        }),
-      ],
-    }),
+    head() {
+      const title = this.capitalizedTranslation("contact.header");
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+          }),
+        ],
+      };
+    },
   };
 </script>
 
