@@ -106,6 +106,8 @@
         <nuxt :class="$style.pageContainer" />
       </v-container>
     </v-main>
+
+    <data-refresher />
   </v-app>
 </template>
 
@@ -113,6 +115,7 @@
   import {
     mapGetters,
   } from "vuex";
+  import DataRefresher from "../components/DataRefresher";
   import NavUserModule from "~/components/NavUserModule";
   import {
     generateMetadata,
@@ -122,6 +125,7 @@
   export default {
     name: "LayoutAdmin",
     components: {
+      DataRefresher,
       NavUserModule,
       MenuIcon,
     },

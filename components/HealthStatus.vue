@@ -24,19 +24,14 @@
 
 <script>
   import {
-    mapActions,
     mapGetters,
   } from "vuex";
 
   export default {
-    data: () => ({
-      timer: null,
-      isOnline: true,
-    }),
-
     computed: {
       ...mapGetters("meta/health", [
         "isLive",
+        "isOnline",
       ]),
 
       show() {
@@ -54,32 +49,6 @@
 
         return "Nešto je pošlo po zlu. Molimo budite strpljivi dok otklanjamo poteškoće";
       },
-    },
-
-    mounted() {
-      this.timer = setInterval(
-        () =>
-          this.fetchLiveStatus()
-        ,
-        4000 + 2000 * Math.random(),
-      );
-
-      const setOnline = (toStatus) => () => {
-        this.isOnline = Boolean(toStatus);
-      };
-
-      window.addEventListener("online", setOnline(true));
-      window.addEventListener("offline", setOnline(false));
-    },
-
-    beforeDestroy() {
-      clearInterval(this.timer);
-    },
-
-    methods: {
-      ...mapActions("meta/health", [
-        "fetchLiveStatus",
-      ]),
     },
   };
 </script>

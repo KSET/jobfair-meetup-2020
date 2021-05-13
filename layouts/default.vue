@@ -13,6 +13,7 @@
     <app-footer />
 
     <health-status />
+    <data-refresher />
   </v-app>
 </template>
 
@@ -20,6 +21,7 @@
   import AppNavBar from "@/components/NavBar";
   import AppNavDrawer from "@/components/NavDrawer";
   import AppFooter from "@/components/Footer";
+  import DataRefresher from "../components/DataRefresher";
   import HealthStatus from "../components/HealthStatus";
   import {
     generateMetadata,
@@ -29,6 +31,7 @@
     name: "LayoutDefault",
 
     components: {
+      DataRefresher,
       HealthStatus,
       AppNavBar,
       AppNavDrawer,
