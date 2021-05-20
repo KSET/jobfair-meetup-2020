@@ -8,6 +8,7 @@ import {
   basicResumeData,
   companyDataWithMeta,
   industry,
+  basicFields,
 } from "./data";
 import {
   createObject,
@@ -66,6 +67,17 @@ export const participantEventsQuery = () => ({
 export const resumesFullDataQuery = () => ({
   query: `{ ${ createObject({
     resumes: resumeData,
+  }) } }`,
+});
+
+export const resumesOnlyResumeQuery = () => ({
+  query: `{ ${ createObject({
+    resumes: {
+      ...basicFields(
+        "id",
+        "resume_file_data",
+      ),
+    },
   }) } }`,
 });
 
