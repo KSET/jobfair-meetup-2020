@@ -326,6 +326,9 @@ name: PageAbout
 </router>
 
 <script>
+  import {
+    mapGetters,
+  } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import TranslatedText from "~/components/TranslatedText";
   import {
@@ -340,14 +343,24 @@ name: PageAbout
       AppMaxWidthContainer,
     },
 
-    head: () => ({
-      title: "O Meetupu",
-      meta: [
-        ...generateMetadata({
-          title: "O Meetupu",
-        }),
-      ],
-    }),
+    computed: {
+      ...mapGetters("translations", [
+        "capitalizedTranslation",
+      ]),
+    },
+
+    head() {
+      const title = this.capitalizedTranslation("meetup.header");
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+          }),
+        ],
+      };
+    },
   };
 </script>
 

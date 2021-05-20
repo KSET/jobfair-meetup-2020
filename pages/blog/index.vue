@@ -125,15 +125,19 @@ name: PageBlogHome
       srcSet: getSrcSet,
     },
 
-    head: () => ({
-      title: "Blog - Home",
-      meta: [
-        ...generateMetadata({
-          title: "Blog - Home",
-          description: "Job Fair Meetup Blog",
-        }),
-      ],
-    }),
+    head() {
+      const title = this.capitalizedTranslation("blog.header");
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+            description: "Job Fair Meetup Blog",
+          }),
+        ],
+      };
+    },
   };
 </script>
 

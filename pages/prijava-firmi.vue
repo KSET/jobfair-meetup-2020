@@ -941,15 +941,19 @@ name: PagePrijavaFirmi
       },
     },
 
-    head: () => ({
-      title: "Prijava poduzeća",
-      meta: [
-        ...generateMetadata({
-          title: "Prijava poduzeća",
-          description: "Prijavite svoje poduzeće na ovogodišnji Job Fair Meetup!",
-        }),
-      ],
-    }),
+    head() {
+      const title = this.capitalizedTranslation("prijavaFirmi.header");
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+            description: "Prijavite svoje poduzeće na ovogodišnji Job Fair Meetup!",
+          }),
+        ],
+      };
+    },
   };
 </script>
 

@@ -183,6 +183,9 @@ name: PagePress
 
 <script>
   import downloadIconSrc from "@/assets/images/icons/icon-download.svg?inline";
+  import {
+    mapGetters,
+  } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import JfPressKit from "~/components/press/JfPressKit";
   import TranslatedText from "~/components/TranslatedText";
@@ -226,6 +229,9 @@ name: PagePress
       downloadIconSrc() {
         return downloadIconSrc;
       },
+      ...mapGetters("translations", [
+        "capitalizedTranslation",
+      ]),
     },
 
     methods: {
@@ -264,14 +270,18 @@ name: PagePress
       },
     },
 
-    head: () => ({
-      title: "Press",
-      meta: [
-        ...generateMetadata({
-          title: "Press",
-        }),
-      ],
-    }),
+    head() {
+      const title = this.capitalizedTranslation("press.header");
+
+      return {
+        title,
+        meta: [
+          ...generateMetadata({
+            title,
+          }),
+        ],
+      };
+    },
   };
 </script>
 

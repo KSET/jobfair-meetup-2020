@@ -1,8 +1,8 @@
 export const escapeCsvValue =
   (str) =>
     String(str)
-      .replaceAll("\"", "\"\"")
-      .replaceAll("\n", "\t")
+      .replace(/"/gi, "\"\"")
+      .replace(/\n/gi, "\t")
 ;
 
 export const encodeRow =

@@ -105,7 +105,7 @@ export const keysFromCamelCaseToSnakeCase = <T>(object: T): SnakeCasedProperties
 ;
 
 export const mapArray =
-  <P, Q>(fn: (item: P, index?: number, array?: P[]) => Q) => (array: P[]): Q[] =>
+  <P, Q>(fn: (item: P, index?: number, array?: P[]) => Q) => (array: P[] = []): Q[] =>
     Array.isArray(array)
     ? array.map(fn)
     : []
