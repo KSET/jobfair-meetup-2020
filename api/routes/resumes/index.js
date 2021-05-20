@@ -20,7 +20,16 @@ authRouter.get("/list", async ({ authHeader }) => {
 });
 
 authRouter.get("/for-user/:uid", async ({ authHeader, params }) => {
-  return await ResumeService.byUid(authHeader, params.uid);
+  const resume = await ResumeService.byUid(authHeader, params.uid);
+
+  if (!resume) {
+    throw new ApiError(
+      "Resume not found",
+      HttpStatus.Error.Client.NotFound,
+    );
+  }
+
+  return resume;
 });
 
 authRouter.getRaw("/info/:id.pdf", async ({ authHeader, params, headers: reqHeaders }, res) => {
