@@ -27,7 +27,13 @@ authRouter.post("/scan", async ({ body, company, authHeader }) => {
     throw new ApiError("No user provided");
   }
 
-  return await ResumeScanService.create(authHeader, company.id, uid);
+  const scan = await ResumeScanService.create(authHeader, company.id, uid);
+
+  if (!scan) {
+    throw new ApiError("No such resume");
+  }
+
+  return scan;
 });
 
 authRouter.get("/list", async ({ company }) => {

@@ -16,14 +16,12 @@ import {
   keysFromSnakeToCamelCase,
 } from "../../../helpers/object";
 import {
-  internalRequest,
-} from "../../helpers/http";
-import {
   requireAuth,
 } from "../../helpers/middleware";
 import {
   Router,
 } from "../../helpers/route";
+import CompanyEventsService from "../../services/company-events-service";
 import {
   requireCv,
   requireGateGuardian,
@@ -57,7 +55,7 @@ router.get("/", requireCv, async () => {
 router.get("/is-participant/networking/-1/:userId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
   const { userId } = params;
 
-  const { data: { panels, workshops, presentations } } = await internalRequest("get", "/companies/events/all") || {};
+  const { panels, workshops, presentations } = await CompanyEventsService.listAll() || {};
   const reservations: any = await Client.queryOnce(queryReservationsGetByUserId({
     userId,
   }));
@@ -89,7 +87,7 @@ router.get("/is-participant/networking/-1/:userId(\\d+)", requireAuth({ fullUser
   for (const reservation of keysFromSnakeToCamelCase(reservations)) {
     const event = getEvent(reservation);
 
-    if (!isToday(event.occuresAt)) {
+    if (!isToday(event?.occuresAt)) {
       continue;
     }
 

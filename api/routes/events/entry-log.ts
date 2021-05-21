@@ -1,5 +1,5 @@
 import {
- EventType,
+  EventType,
 } from "../../../components/student/event-status";
 import {
   queryEventLogEntriesCreate,
@@ -33,6 +33,8 @@ import {
   AuthRouter,
   Router,
 } from "../../helpers/route";
+import CompanyEventsService from "../../services/company-events-service";
+import ResumeService from "../../services/resume-service";
 import {
   requireGateGuardian,
 } from "./_helpers";
@@ -274,12 +276,12 @@ moderatorRouter.getRaw("/export/all.csv", async ({ authHeader }, res) => {
 
   const [
     { data: scanned },
-    { data: { companies: rawCompanies, ...rawEventList } },
-    { data: resumes },
+    { companies: rawCompanies, ...rawEventList },
+    resumes,
   ] = await Promise.all([
     internalRequest("get", "/events/entry-log/all", auth),
-    internalRequest("get", "/companies/events/all", auth),
-    internalRequest("get", "/resumes/list", auth),
+    CompanyEventsService.listAll(),
+    ResumeService.list(authHeader),
   ]);
 
   const typeTransformer = (key: string): EventType => {
@@ -336,15 +338,20 @@ moderatorRouter.getRaw("/export/:eventType/:eventId(\\d+).csv", async ({ authHea
 
   const [
     { data: scanned },
-    { data: event },
-    { data: resumes },
+    event,
+    resumes,
   ] = await Promise.all([
     internalRequest("get", `/events/entry-log/for-event/${ eventType }/${ eventId }`, auth),
-    internalRequest("get", `/companies/events/${ eventType }/${ eventId }`, auth),
-    internalRequest("get", "/resumes/list", auth),
-  ]).then((xs) => xs.map((x) => x || {}));
+    CompanyEventsService.listEventOfTypeForCompany(eventId, eventType),
+    ResumeService.list(authHeader),
+  ]);
 
-  if (!event) {
+  if (
+    !event ||
+    !("title" in event) ||
+    !("name" in event.company) ||
+    !("type" in event)
+  ) {
     throw new ApiError("Event not found", HttpStatus.Error.Client.NotFound);
   }
 

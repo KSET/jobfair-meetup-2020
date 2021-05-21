@@ -16,9 +16,6 @@ import {
 import {
   graphQlQuery,
 } from "./axios";
-import {
-  internalRequest,
-} from "./http";
 
 export const extractAuthorizationToken = (req) => {
   const header = req.get("Authorization");
@@ -123,7 +120,7 @@ export const fetchAuthenticatedUser = async (reqOrToken, fullUser = false) => {
     const { companies = [] } = user;
 
     if (companies) {
-      const { data: rawParticipants = [] } = await internalRequest("get", "/companies/participants");
+      const rawParticipants = await CompanyService.fetchListAll();
       const participantIds = new Set(rawParticipants.map(({ id }) => id));
 
       user.companies = companies.filter(({ id }) => participantIds.has(id)).map(CompanyService.fixCompany);
