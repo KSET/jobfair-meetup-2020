@@ -233,6 +233,16 @@ name: PageCompanyResumes
         v: filterType = null,
       } = route.query;
 
+      const [
+        resumeList,
+        favourites,
+        scanned,
+      ] = await Promise.all([
+        store.dispatch("resume/fetchResumes"),
+        store.dispatch("resume/listFavourites"),
+        store.dispatch("resume/listScans"),
+      ]);
+
       return {
         search,
         page: Number(rawPage),
@@ -241,9 +251,9 @@ name: PageCompanyResumes
 
         filterType,
 
-        resumeList: await store.dispatch("resume/fetchResumes"),
-        favourites: await store.dispatch("resume/listFavourites"),
-        scanned: await store.dispatch("resume/listScans"),
+        resumeList,
+        favourites,
+        scanned,
 
         headers: [
           {
