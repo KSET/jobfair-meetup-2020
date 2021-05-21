@@ -1,6 +1,13 @@
+import type {
+  CamelCasedPropertiesDeep,
+  SetOptional,
+} from "type-fest";
 import {
   User,
 } from "../../api/graphql/types";
+import {
+  EventType,
+} from "../../components/student/event-status";
 import {
   Query,
 } from "../methods";
@@ -8,12 +15,19 @@ import {
   generateInsertQuery,
 } from "../query";
 
-interface Data {
-  userId: User["id"];
-  eventId: number;
-  eventType: string;
-  scannerId: User["id"];
+/* eslint-disable camelcase */
+
+export interface EventLogEntry {
+  user_id: User["id"];
+  event_id: number;
+  event_type: EventType;
+  scanner_id: User["id"];
+  scanned_at: string;
 }
+
+/* eslint-enable camelcase */
+
+type Data = CamelCasedPropertiesDeep<EventLogEntry>;
 
 export const queryEventLogEntriesGetByUserAndEvent =
   (
@@ -89,7 +103,8 @@ export const queryEventLogEntriesCreate =
       eventId,
       eventType,
       scannerId,
-    }: Pick<Data, "userId" | "eventId" | "eventType" | "scannerId">,
+      scannedAt,
+    }: SetOptional<Data, "scannedAt">,
   ): Query => generateInsertQuery({
     table: "event_log_entries",
     data: {
@@ -97,6 +112,7 @@ export const queryEventLogEntriesCreate =
       eventId,
       eventType,
       scannerId,
+      scannedAt,
     },
   })
 ;
