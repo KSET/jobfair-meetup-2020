@@ -496,6 +496,7 @@ name: PagePrijavaFirmi
   } from "vuelidate";
   import {
     mapActions,
+    mapGetters,
   } from "vuex";
   import {
     companyExtrasFormInputs,
@@ -599,6 +600,10 @@ name: PagePrijavaFirmi
     }),
 
     computed: {
+      ...mapGetters("translations", [
+        "capitalizedTranslation",
+      ]),
+
       vatValid() {
         return this.vatInfo.isValid;
       },
