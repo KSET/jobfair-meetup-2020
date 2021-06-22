@@ -24,8 +24,12 @@ export class ResumeScanServiceError extends ServiceError {
 }
 
 export default class ResumeScanService {
-  public static async create(authHeader: string, companyId: ResumeScanData["companyId"], uid: ResumeScanData["resumeId"]): Promise<BasicResumeInfo> {
+  public static async create(authHeader: string, companyId: ResumeScanData["companyId"], uid: ResumeScanData["resumeId"]): Promise<BasicResumeInfo | null> {
     const resume = await ResumeService.byUid(authHeader, uid);
+
+    if (!resume) {
+      return null;
+    }
 
     return await Client.transaction(async (client) => {
       const key: ResumeScanData = {

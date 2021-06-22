@@ -1,20 +1,9 @@
 import {
- EventType,
+  EventType,
 } from "../../../components/student/event-status";
-import {
-  queryEventLogEntriesCreate,
-  queryEventLogEntriesGetAll,
-  queryEventLogEntriesGetByEvent,
-} from "../../../db/helpers/eventLogEntries";
-import {
-  Client,
-} from "../../../db/methods";
 import {
   dotGet,
 } from "../../../helpers/data";
-import {
-  keysFromSnakeToCamelCase,
-} from "../../../helpers/object";
 import {
   sendCsv,
 } from "../../helpers/csv";
@@ -33,6 +22,15 @@ import {
   AuthRouter,
   Router,
 } from "../../helpers/route";
+import CompanyEventsService from "../../services/company-events-service";
+import type {
+  Company,
+} from "../../services/company-service";
+import EntryLogService from "../../services/entry-log-service";
+import type {
+  EventLogEntry,
+} from "../../services/entry-log-service";
+import ResumeService from "../../services/resume-service";
 import {
   requireGateGuardian,
 } from "./_helpers";
@@ -65,9 +63,7 @@ router.post("/", requireAuth({ fullUserData: true }), requireGateGuardian, async
     scannerId: authUser.id,
   };
 
-  const data = await Client.queryOneOnce(queryEventLogEntriesCreate(payload));
-
-  return keysFromSnakeToCamelCase(data);
+  return await EntryLogService.create(payload);
 });
 
 router.get("/:eventType/-?:eventId(\\d+)", requireAuth({ fullUserData: true }), requireGateGuardian, async ({ params }) => {
@@ -92,11 +88,11 @@ router.get("/:eventType/-?:eventId(\\d+)", requireAuth({ fullUserData: true }), 
     );
   }
 
-  const userIds = new Set();
+  const userIds = new Set<EventLogEntry["userId"]>();
 
-  const logEntries = await Client.queryOnce(queryEventLogEntriesGetByEvent({ eventId, eventType })) as any;
+  const logEntries = await EntryLogService.forEvent(eventId, eventType);
 
-  for (const { user_id: userId } of logEntries) {
+  for (const { userId } of logEntries) {
     userIds.add(userId);
   }
 
@@ -128,12 +124,10 @@ router.post("/manual", requireAuth({ fullUserData: true }), requireGateGuardian,
     eventId,
     eventType,
     scannerId: authUser.id,
-    scannedAt: new Date(eventDate),
+    scannedAt: eventDate,
   };
 
-  const data = await Client.queryOneOnce(queryEventLogEntriesCreate(payload));
-
-  return keysFromSnakeToCamelCase(data);
+  return await EntryLogService.create(payload);
 });
 
 const moderatorRouter = AuthRouter.boundToRouter(router, {
@@ -141,15 +135,11 @@ const moderatorRouter = AuthRouter.boundToRouter(router, {
 });
 
 moderatorRouter.get("/all", async () => {
-  const list = await Client.queryOnce(queryEventLogEntriesGetAll());
-
-  return keysFromSnakeToCamelCase(list);
+  return await EntryLogService.list();
 });
 
 moderatorRouter.get("/for-event/:eventType/:eventId(\\d+)", async ({ params }) => {
-  const list = await Client.queryOnce(queryEventLogEntriesGetByEvent(params));
-
-  return keysFromSnakeToCamelCase(list);
+  return await EntryLogService.forEvent(params.eventId, params.eventType);
 });
 
 const csvEventsExport = (res, data, fileName = "Svi") => {
@@ -266,20 +256,14 @@ const exportEntryLogToCsv = (res, eventList, scanned, resumes, fileName) => {
 };
 
 moderatorRouter.getRaw("/export/all.csv", async ({ authHeader }, res) => {
-  const auth = {
-    headers: {
-      Authorization: authHeader,
-    },
-  };
-
   const [
-    { data: scanned },
-    { data: { companies: rawCompanies, ...rawEventList } },
-    { data: resumes },
+    scanned,
+    { companies: rawCompanies, ...rawEventList },
+    resumes,
   ] = await Promise.all([
-    internalRequest("get", "/events/entry-log/all", auth),
-    internalRequest("get", "/companies/events/all", auth),
-    internalRequest("get", "/resumes/list", auth),
+    EntryLogService.list(),
+    CompanyEventsService.listAll(),
+    ResumeService.list(authHeader),
   ]);
 
   const typeTransformer = (key: string): EventType => {
@@ -293,13 +277,13 @@ moderatorRouter.getRaw("/export/all.csv", async ({ authHeader }, res) => {
     }
   };
 
-  const companies = Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
+  const companies: Record<Company["id"], Company> = Object.fromEntries(rawCompanies.map((c) => [ c.id, c ]));
 
   const eventList =
     Object
       .entries(rawEventList)
       .map(([ type, eventList ]) =>
-          (eventList as any[])
+          (eventList)
             .map(
               ({
                  id,
@@ -336,15 +320,20 @@ moderatorRouter.getRaw("/export/:eventType/:eventId(\\d+).csv", async ({ authHea
 
   const [
     { data: scanned },
-    { data: event },
-    { data: resumes },
+    event,
+    resumes,
   ] = await Promise.all([
     internalRequest("get", `/events/entry-log/for-event/${ eventType }/${ eventId }`, auth),
-    internalRequest("get", `/companies/events/${ eventType }/${ eventId }`, auth),
-    internalRequest("get", "/resumes/list", auth),
-  ]).then((xs) => xs.map((x) => x || {}));
+    CompanyEventsService.listEventOfTypeForCompany(eventId, eventType),
+    ResumeService.list(authHeader),
+  ]);
 
-  if (!event) {
+  if (
+    !event ||
+    !("title" in event) ||
+    !("name" in event.company) ||
+    !("type" in event)
+  ) {
     throw new ApiError("Event not found", HttpStatus.Error.Client.NotFound);
   }
 

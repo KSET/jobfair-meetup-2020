@@ -2,11 +2,11 @@ import * as Sentry from "@sentry/node";
 import QRCode from "qrcode";
 import {
   HttpStatus,
-  internalRequest,
 } from "../../helpers/http";
 import {
   AuthRouter,
 } from "../../helpers/route";
+import ResumeService from "../../services/resume-service";
 
 const router = new AuthRouter({});
 
@@ -14,15 +14,7 @@ router.getRaw("/for-uid/:uid.svg", async (req, res) => {
   const { params, authHeader } = req;
   const { uid } = params;
 
-  const { data } = await internalRequest(
-    "get",
-    `/resumes/for-user/${ uid }`,
-    {
-      headers: {
-        Authorization: authHeader,
-      },
-    },
-  ) || {};
+  const data = await ResumeService.byUid(authHeader, uid);
 
   if (!data) {
     res.status(HttpStatus.Error.Client.NotFound);

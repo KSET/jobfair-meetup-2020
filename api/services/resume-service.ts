@@ -267,17 +267,13 @@ export default class ResumeService {
     return await fetchListFullInfoCached(authHeader) || [];
   }
 
-  static async byUid(authHeader: string, uid: Resume["uid"]): Promise<BasicResumeInfo> {
+  static async byUid(authHeader: string, uid: Resume["uid"]): Promise<BasicResumeInfo | null> {
     const resumes = await this.list(authHeader);
 
     const resume = resumes.find((r) => r.uid === uid);
 
     if (!resume) {
-      throw new ResumeServiceError(
-        "Resume not found",
-        null,
-        HttpStatus.Error.Client.NotFound,
-      );
+      return null;
     }
 
     return resume;

@@ -76,6 +76,9 @@ name: PageBlogHome
 </router>
 
 <script>
+  import {
+    mapGetters,
+  } from "vuex";
   import AppMaxWidthContainer from "~/components/AppMaxWidthContainer";
   import AppNewsCard from "~/components/news/NewsCard";
   import TranslatedText from "~/components/TranslatedText";
@@ -106,6 +109,10 @@ name: PageBlogHome
     },
 
     computed: {
+      ...mapGetters("translations", [
+        "capitalizedTranslation",
+      ]),
+
       headNews() {
         const headNews = this.news.slice(0, 1).pop();
 

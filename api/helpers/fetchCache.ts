@@ -18,6 +18,7 @@ interface ICache<T> {
   fetchedFor: number;
   cacheFor: number;
   accessedSinceFetch: number,
+  lastFetchSuccess: boolean,
   data: T | null;
   fetching: AtomicBool;
   timer: ReturnType<typeof setInterval> | null;
@@ -30,6 +31,7 @@ const newCacheEntry = (cacheFor = 0n): ICache<unknown> => ({
   fetchedFor: 0,
   accessedSinceFetch: 0,
   cacheFor: toMs(cacheFor),
+  lastFetchSuccess: true,
   data: null,
   fetching: new AtomicBool(),
   timer: null,
@@ -91,6 +93,7 @@ export const cachedFetcher = <T>(
   function cacheSet(cacheKey: CacheKey, key: "data", value: Cache["data"]): void;
   function cacheSet(cacheKey: CacheKey, key: "fetchedFor", value: Cache["fetchedFor"]): void;
   function cacheSet(cacheKey: CacheKey, key: "accessedSinceFetch", value: Cache["accessedSinceFetch"]): void;
+  function cacheSet(cacheKey: CacheKey, key: "lastFetchSuccess", value: Cache["lastFetchSuccess"]): void;
   function cacheSet(cacheKey: CacheKey, key: "timer", value: Cache["timer"]): void;
   function cacheSet(cacheKey: CacheKey, key: keyof Cache, value): void {
     if (!(cacheKey in cache)) {
@@ -104,6 +107,7 @@ export const cachedFetcher = <T>(
   function cacheGet(cacheKey: CacheKey, key: "data"): Cache["data"];
   function cacheGet(cacheKey: CacheKey, key: "fetching"): Cache["fetching"];
   function cacheGet(cacheKey: CacheKey, key: "accessedSinceFetch"): Cache["accessedSinceFetch"];
+  function cacheGet(cacheKey: CacheKey, key: "lastFetchSuccess"): Cache["lastFetchSuccess"];
   function cacheGet(cacheKey: CacheKey, key: "timer"): Cache["timer"];
   function cacheGet(cacheKey: CacheKey, key: keyof Cache) {
     if (!(cacheKey in cache)) {
@@ -220,8 +224,13 @@ export const cachedFetcher = <T>(
 
         setData(key, data, toMs(endTime - startTime));
         resetAccessed(key);
+        cacheSet(key, "lastFetchSuccess", true);
 
         return data;
+      } catch {
+        cacheSet(key, "lastFetchSuccess", false);
+
+        return getData(key);
       } finally {
         setFetching(key, false);
         setTimer(key, fetchData);
